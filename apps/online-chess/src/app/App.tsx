@@ -1,18 +1,10 @@
 import { Route, Routes } from 'react-router-dom';
+import { LandingPage } from './landing_page/LandingPage';
 
 export function App() {
   return (
-    <div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.
-            </div>
-          }
-        />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+    </Routes>
   );
 }
