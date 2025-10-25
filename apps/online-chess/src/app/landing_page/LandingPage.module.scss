@@ -12,14 +12,16 @@
 .title {
     font-weight: bold;
     font-size: 4rem;
-    margin: 2rem 0;
 }
 
 .subtitle {
     font-size: 2rem;
+    margin: 2rem 0;
     color: #4B5563
 }
 
 .buttons {
-
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
 }

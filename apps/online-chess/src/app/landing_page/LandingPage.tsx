@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import styles from './LandingPage.module.scss';
+import { Button } from '../../components/Button/Button';
 
 export const LandingPage: FC = (props) => {
   return (
@@ -9,7 +10,10 @@ export const LandingPage: FC = (props) => {
         <div className={styles.subtitle}>
           Challenge friends or test your skills against players worldwide.
         </div>
-        <div className={styles.buttons}></div>
+        <div className={styles.buttons}>
+          <Button variant="black">Sign In</Button>
+          <Button variant="white">Sign Up</Button>
+        </div>
       </div>
     </div>
   );
