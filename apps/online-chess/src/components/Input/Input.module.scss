@@ -1,0 +1,16 @@
+.input {
+    padding: 1rem;
+    font-size: inherit;
+    border-radius: 8px;
+    border: 1px solid #D1D5DB;
+
+    &:focus {
+        border-color: #3B82F6;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+
+    &::placeholder {
+        color: #9CA3AF;
+    }
+}
