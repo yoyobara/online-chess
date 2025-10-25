@@ -3,6 +3,11 @@
     font-size: 1.5rem;
     border-radius: 10px;
     transition: box-shadow 0.2s ease;
+    outline: none;
+
+    &:active {
+        border-style: outset;
+    }
 
     &:hover {
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
