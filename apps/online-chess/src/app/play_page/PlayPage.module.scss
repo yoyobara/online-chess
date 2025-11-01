@@ -1,0 +1,51 @@
+.play_page {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 4% 2%;
+
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: repeat(10, 1fr);
+    gap: 2%;
+}
+
+.board_container {
+    grid-column: 2;
+    grid-row: 1 / -2;
+    background-color: aqua;
+}
+
+.chat {
+    grid-column: 3;
+    grid-row: 4/-1;
+    background-color: bisque;
+}
+
+.history {
+    grid-column: 1;
+    grid-row: 4/-1;
+    background-color: darkkhaki;
+}
+
+.player {
+    grid-column: 1;
+    grid-row: 1/4;
+    background-color: steelblue;
+}
+
+.opponent {
+    grid-column: 3;
+    grid-row: 1/4;
+    background-color: cadetblue;
+}
+
+.buttons {
+    grid-column: 2;
+    display: flex;
+    gap: 2%;
+    justify-content: center;
+
+    button {
+        width: 20%;
+    }
+}
