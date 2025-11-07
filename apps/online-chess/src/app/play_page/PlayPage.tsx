@@ -23,7 +23,7 @@ export const PlayPage: FC = () => {
         className={styles.opponent}
       />
       <div className={styles.buttons}>
-        <Button variant="black">Resign</Button>
+        <Button variant="red">Resign</Button>
         <Button variant="white">Offer Draw</Button>
       </div>
     </div>
