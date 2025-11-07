@@ -1,0 +1,19 @@
+.chessboard {
+    aspect-ratio: 1/1;
+    height: 100%;
+
+    position: relative;
+}
+
+.board_img {
+    height: 100%;
+    width: 100%;
+
+    position: absolute;
+    z-index: 0;
+}
+
+.piece {
+    position: absolute;
+    z-index: 1;
+}
