@@ -7,6 +7,8 @@
     grid-template-columns: 1fr 2fr 1fr;
     grid-template-rows: repeat(10, 1fr);
     gap: 2%;
+
+    background-color: #F9FAFB;
 }
 
 .board_container {
@@ -30,13 +32,11 @@
 .player {
     grid-column: 1;
     grid-row: 1/4;
-    background-color: steelblue;
 }
 
 .opponent {
     grid-column: 3;
     grid-row: 1/4;
-    background-color: cadetblue;
 }
 
 .buttons {
