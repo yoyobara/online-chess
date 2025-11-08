@@ -1,0 +1,26 @@
+.player_paper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10%;
+    gap: 5%;
+
+    .player_name {
+        font-size: 4rem;
+        text-transform: capitalize;
+    }
+
+    .player_rating {
+        font-size: 1.5rem;
+    }
+}
+
+.white {
+    background-color: white;
+    color: black;
+}
+
+.purple {
+    background-color: #6d28d9;
+    color: white;
+}
