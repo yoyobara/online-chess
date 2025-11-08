@@ -4,7 +4,7 @@ import styles from './Chessboard.module.scss';
 import { Piece } from '../../../types/piece';
 import { getPieceSvg } from '../../../utils/piece';
 
-interface chessBoardProps {
+interface ChessBoardProps {
   pieces: Piece[];
 }
 
@@ -26,7 +26,7 @@ export const pieceElement = (piece: Piece, index: number) => {
   );
 };
 
-export const Chessboard: FC<chessBoardProps> = ({ pieces }) => {
+export const Chessboard: FC<ChessBoardProps> = ({ pieces }) => {
   return (
     <div className={styles.chessboard}>
       <img className={styles.board_img} src={boardSvg} alt="chessboard" />

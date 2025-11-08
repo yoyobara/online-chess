@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
@@ -9,7 +9,12 @@ export const PlayPage: FC = () => {
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
-        <Chessboard pieces={[{ color: 'white', type: 'bishop' }]} />
+        <Chessboard
+          pieces={[
+            { color: 'white', type: 'bishop' },
+            { color: 'black', type: 'queen' },
+          ]}
+        />
       </div>
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>
