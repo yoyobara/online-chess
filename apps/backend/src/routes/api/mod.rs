@@ -1,7 +1,7 @@
-use axum::{routing::get, Router};
+mod user;
 
-mod example;
+use axum::Router;
 
 pub fn router() -> Router {
-    Router::new().route("/echo", get(example::echo))
+    Router::new().nest("/auth", user::router())
 }
