@@ -1,15 +1,8 @@
-use std::time::{SystemTime, UNIX_EPOCH};
-
 use axum::{http::StatusCode, response::IntoResponse, Json};
-use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::Deserialize;
-use tower_cookies::{Cookie, Cookies};
+use tower_cookies::Cookies;
 
-use crate::{
-    config::CONFIG,
-    constants::auth::AUTH_COOKIE_NAME,
-    extractors::{AuthUser, Claims},
-};
+use crate::{extractors::AuthUser, utils::create_auth_cookie};
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
@@ -17,7 +10,6 @@ pub struct LoginRequest {
     password: String,
 }
 
-#[axum::debug_handler]
 pub async fn login_handler(
     cookies: Cookies,
     Json(login_request): Json<LoginRequest>,
@@ -26,27 +18,9 @@ pub async fn login_handler(
         return StatusCode::UNAUTHORIZED;
     }
 
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as usize;
-
-    let claims = Claims {
-        iat: timestamp,
-        exp: timestamp + 60 * 60 * 24 * 7,
-        user: AuthUser {
-            player_id: "hel".to_owned(),
-        },
-    };
-
-    let encoded = encode(
-        &Header::default(),
-        &claims,
-        &EncodingKey::from_secret(CONFIG.jwt_secret.as_ref()),
-    )
-    .unwrap();
-
-    cookies.add(Cookie::new(AUTH_COOKIE_NAME, encoded));
+    cookies.add(create_auth_cookie(AuthUser {
+        player_id: "BRUH".to_owned(),
+    }));
 
     StatusCode::OK
 }

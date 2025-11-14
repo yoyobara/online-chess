@@ -12,8 +12,8 @@ pub struct AuthUser {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub iat: usize,
-    pub exp: usize,
+    pub iat: i64,
+    pub exp: i64,
     pub user: AuthUser,
 }
 

@@ -2,6 +2,7 @@ mod config;
 mod constants;
 mod extractors;
 mod routes;
+mod utils;
 
 const ADDR: (&str, u16) = ("0.0.0.0", 3000);
 
