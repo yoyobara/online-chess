@@ -3,7 +3,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use tower_cookies::Cookies;
 
-use crate::constants::auth::AUTH_COOKIE_NAME;
+use crate::{config::CONFIG, constants::auth::AUTH_COOKIE_NAME};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthUser {
@@ -36,10 +36,9 @@ where
             .map(|c| c.value().to_string())
             .ok_or((StatusCode::UNAUTHORIZED, "missing jwt cookie"))?;
 
-        let secret = "mysecret";
         let decoded = decode::<Claims>(
             &jwt_token,
-            &DecodingKey::from_secret(secret.as_ref()),
+            &DecodingKey::from_secret(CONFIG.jwt_secret.as_ref()),
             &Validation::new(Algorithm::HS256),
         )
         .map_err(|_| (StatusCode::UNAUTHORIZED, "invalid jwt"))?;
