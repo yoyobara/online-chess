@@ -6,4 +6,4 @@ pub struct Config {
     pub jwt_secret: String,
 }
 
-pub static CONFIG: Lazy<Config> = Lazy::new(|| envy::from_env().unwrap());
+pub static ENV_CONFIG: Lazy<Config> = Lazy::new(|| envy::from_env().unwrap());

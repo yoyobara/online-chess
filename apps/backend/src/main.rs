@@ -1,4 +1,4 @@
-mod config;
+mod configs;
 mod constants;
 mod extractors;
 mod routes;
