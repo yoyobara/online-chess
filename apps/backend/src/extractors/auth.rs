@@ -3,7 +3,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use tower_cookies::Cookies;
 
-use crate::{configs::ENV_CONFIG, constants::auth::AUTH_COOKIE_NAME};
+use crate::{constants::auth::AUTH_COOKIE_NAME, state::AppState};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthUser {
@@ -17,15 +17,12 @@ pub struct Claims {
     pub user: AuthUser,
 }
 
-impl<S> FromRequestParts<S> for AuthUser
-where
-    S: Send + Sync,
-{
+impl FromRequestParts<AppState> for AuthUser {
     type Rejection = (StatusCode, &'static str);
 
     async fn from_request_parts(
         parts: &mut axum::http::request::Parts,
-        state: &S,
+        state: &AppState,
     ) -> Result<Self, Self::Rejection> {
         let cookies = Cookies::from_request_parts(parts, state)
             .await
@@ -38,7 +35,7 @@ where
 
         let decoded = decode::<Claims>(
             &jwt_token,
-            &DecodingKey::from_secret(ENV_CONFIG.jwt_secret.as_ref()),
+            &DecodingKey::from_secret(state.config.jwt_secret.as_ref()),
             &Validation::new(Algorithm::HS256),
         )
         .map_err(|_| (StatusCode::UNAUTHORIZED, "invalid jwt"))?;

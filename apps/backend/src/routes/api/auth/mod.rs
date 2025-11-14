@@ -7,7 +7,9 @@ use axum::{
     Router,
 };
 
-pub fn router() -> Router {
+use crate::state::AppState;
+
+pub fn router() -> Router<AppState> {
     Router::new()
         .route("/me", get(me::me_handler))
         .route("/login", post(login::login_handler))

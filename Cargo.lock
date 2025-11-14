@@ -85,7 +85,6 @@ dependencies = [
  "axum",
  "envy",
  "jsonwebtoken",
- "once_cell",
  "serde",
  "serde_json",
  "tokio",

@@ -2,11 +2,10 @@ use jsonwebtoken::{encode, EncodingKey, Header};
 use tower_cookies::cookie::time::{Duration, OffsetDateTime};
 use tower_cookies::Cookie;
 
-use crate::configs::ENV_CONFIG;
 use crate::constants::auth::AUTH_COOKIE_NAME;
 use crate::extractors::{AuthUser, Claims};
 
-pub fn create_auth_cookie(user: AuthUser) -> Cookie<'static> {
+pub fn create_auth_cookie(user: AuthUser, secret: &[u8]) -> Cookie<'static> {
     let now = OffsetDateTime::now_utc();
     let expiry = now.saturating_add(Duration::WEEK);
 
@@ -19,7 +18,7 @@ pub fn create_auth_cookie(user: AuthUser) -> Cookie<'static> {
     let encoded = encode(
         &Header::default(),
         &claims,
-        &EncodingKey::from_secret(ENV_CONFIG.jwt_secret.as_ref()),
+        &EncodingKey::from_secret(secret),
     )
     .unwrap();
 
