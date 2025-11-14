@@ -5,6 +5,6 @@ use crate::extractors::AuthUser;
 
 pub async fn me_handler(AuthUser { player_id }: AuthUser) -> impl IntoResponse {
     Json(json!({
-        "value": player_id
+        "player_id": player_id
     }))
 }
