@@ -7,7 +7,7 @@ use crate::{constants::auth::AUTH_COOKIE_NAME, state::AppState};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthUser {
-    pub player_id: String,
+    pub player_id: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

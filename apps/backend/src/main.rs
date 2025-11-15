@@ -11,7 +11,8 @@ const ADDR: (&str, u16) = ("0.0.0.0", 3000);
 
 #[tokio::main]
 async fn main() {
-    let app = routes::router().with_state(AppState::default());
+    let state = AppState::new().await;
+    let app = routes::router().with_state(state);
     let listener = tokio::net::TcpListener::bind(ADDR).await.unwrap();
 
     axum::serve(listener, app).await.unwrap();

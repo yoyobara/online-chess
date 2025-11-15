@@ -1,4 +1,7 @@
+use argon2::password_hash::{rand_core::OsRng, PasswordHasher, SaltString};
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use jsonwebtoken::{encode, EncodingKey, Header};
+use secrecy::{ExposeSecret, SecretString};
 use tower_cookies::cookie::time::{Duration, OffsetDateTime};
 use tower_cookies::Cookie;
 
@@ -30,4 +33,25 @@ pub fn create_auth_cookie(user: AuthUser, secret: &[u8]) -> Cookie<'static> {
         .build();
 
     cookie
+}
+
+pub fn hash_password(password: &SecretString) -> String {
+    let argon2 = Argon2::default();
+    let salt = SaltString::generate(&mut OsRng);
+
+    let hash = argon2
+        .hash_password(password.expose_secret().as_ref(), &salt)
+        .unwrap();
+
+    hash.to_string()
+}
+
+pub fn verify_password(password_attempt: &SecretString, phc: &str) -> bool {
+    let argon2 = Argon2::default();
+    let parsed_hash = PasswordHash::new(phc).unwrap();
+
+    let verification =
+        argon2.verify_password(password_attempt.expose_secret().as_ref(), &parsed_hash);
+
+    verification.is_ok()
 }
