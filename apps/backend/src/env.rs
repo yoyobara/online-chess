@@ -6,6 +6,6 @@ pub struct Config {
     pub database_url: String,
 }
 
-pub fn load_env() -> Config {
+pub fn load_config() -> Config {
     envy::from_env().unwrap()
 }
