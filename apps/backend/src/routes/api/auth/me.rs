@@ -8,7 +8,7 @@ pub async fn me_handler(
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     let user = sqlx::query!(
-        "SELECT id, username, email, rank FROM users WHERE id = ?",
+        "SELECT id, username, email, rank FROM users WHERE id = $1",
         player_id
     )
     .fetch_one(&state.pool)

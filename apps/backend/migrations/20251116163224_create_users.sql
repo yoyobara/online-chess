@@ -1,39 +1,24 @@
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
-    email TEXT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     rank INTEGER NOT NULL DEFAULT 1200,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME,
-    deleted_at DATETIME
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
-CREATE UNIQUE INDEX idx_users_username_unique
-    ON users (username)
-    WHERE deleted_at IS NULL;
-
-
-CREATE UNIQUE INDEX idx_users_email_unique
-    ON users (email)
-    WHERE deleted_at IS NULL;
+CREATE OR REPLACE FUNCTION users_set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.updated_at IS NULL THEN
+        NEW.updated_at := CURRENT_TIMESTAMP;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER users_set_updated_at
-AFTER UPDATE ON users
+BEFORE UPDATE ON users
 FOR EACH ROW
-WHEN NEW.updated_at IS NULL
-BEGIN
-    UPDATE users
-    SET updated_at = CURRENT_TIMESTAMP
-    WHERE id = NEW.id;
-END;
-
-CREATE TRIGGER users_soft_delete_timestamp
-AFTER UPDATE ON users
-FOR EACH ROW
-WHEN OLD.deleted_at IS NULL AND NEW.deleted_at IS NOT NULL
-BEGIN
-    UPDATE users
-    SET deleted_at = COALESCE(NEW.deleted_at, CURRENT_TIMESTAMP)
-    WHERE id = NEW.id;
-END;
+EXECUTE FUNCTION users_set_updated_at();

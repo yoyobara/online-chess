@@ -23,7 +23,7 @@ pub async fn register_handler(
     let password_hash = hash_password(&register_request.password.into());
 
     let insert_query = sqlx::query!(
-        "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?) RETURNING id;",
+        "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id;",
         register_request.username,
         register_request.email,
         password_hash

@@ -1,11 +1,11 @@
-use sqlx::{Pool, Sqlite};
+use sqlx::{Pool, Postgres};
 
 use crate::configs::{load_env, load_pool, Config};
 
 #[derive(Clone)]
 pub struct AppState {
     pub config: Config,
-    pub pool: Pool<Sqlite>,
+    pub pool: Pool<Postgres>,
 }
 
 impl AppState {
