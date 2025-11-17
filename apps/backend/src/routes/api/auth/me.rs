@@ -18,7 +18,5 @@ pub async fn me_handler(
     Json(json!({
         "id": user.id,
         "username": user.username,
-        "email": user.email,
-        "rank": user.rank
     }))
 }
