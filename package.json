@@ -2,7 +2,9 @@
   "name": "@online-chess/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "concurrently \"nx dev backend\" \"nx serve online-chess\""
+  },
   "private": true,
   "dependencies": {
     "@nxrs/cargo": "^0.6.2",
@@ -31,6 +33,7 @@
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-import": "2.31.0",
