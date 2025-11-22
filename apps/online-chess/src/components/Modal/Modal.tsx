@@ -14,11 +14,12 @@ export const Modal: FC<ModalProps> = ({
   overlayClassName = '',
 }) => {
   return (
-    <div
-      onClick={onOverlayClick}
-      className={`${styles.overlay} ${overlayClassName}`}
-    >
+    <>
+      <div
+        onClick={onOverlayClick}
+        className={`${styles.overlay} ${overlayClassName}`}
+      ></div>
       <div className={`${styles.modal} ${modalClassName}`}>{children}</div>
-    </div>
+    </>
   );
 };
