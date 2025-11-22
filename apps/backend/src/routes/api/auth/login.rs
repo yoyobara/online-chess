@@ -10,7 +10,7 @@ use crate::{
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
-    username: String,
+    email: String,
     password: String,
 }
 
@@ -20,8 +20,8 @@ pub async fn login_handler(
     Json(login_request): Json<LoginRequest>,
 ) -> impl IntoResponse {
     let user_query = sqlx::query!(
-        "SELECT id, password_hash FROM users WHERE username = $1",
-        login_request.username
+        "SELECT id, password_hash FROM users WHERE email = $1",
+        login_request.email
     )
     .fetch_one(&state.pool)
     .await;

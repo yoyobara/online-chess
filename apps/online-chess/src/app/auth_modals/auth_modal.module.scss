@@ -6,3 +6,13 @@
     color: #9CA3AF;
     align-self: center;
 }
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.error_text {
+    color: #EF4444;
+}

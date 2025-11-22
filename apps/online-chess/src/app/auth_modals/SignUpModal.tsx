@@ -9,7 +9,7 @@ export const SignUpModal: FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Modal onOverlayClick={() => navigate('/')}>
+    <Modal modalClassName={styles.form} onOverlayClick={() => navigate('/')}>
       <div className={styles.title}>Sign Up</div>
       <Input placeholder="Username" />
       <Input placeholder="Email" />
