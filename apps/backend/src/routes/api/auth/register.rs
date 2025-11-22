@@ -22,6 +22,19 @@ pub async fn register_handler(
 ) -> impl IntoResponse {
     let password_hash = hash_password(&register_request.password.into());
 
+    let existing_user = sqlx::query!(
+        "SELECT id FROM users WHERE email = $2 OR username = $1;",
+        register_request.username,
+        register_request.email
+    )
+    .fetch_optional(&state.pool)
+    .await
+    .unwrap();
+
+    if existing_user.is_some() {
+        return StatusCode::CONFLICT;
+    }
+
     let insert_query = sqlx::query!(
         "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id;",
         register_request.username,

@@ -5,7 +5,7 @@ import { Button } from '../../components/Button/Button';
 import { Input } from '../../components/Input/Input';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { isAxiosError } from 'axios';
 
 interface SignInInputs {
@@ -15,6 +15,7 @@ interface SignInInputs {
 
 export const SignInModal: FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -29,6 +30,7 @@ export const SignInModal: FC = () => {
         .post('/api/auth/login', loginRequest, { withCredentials: true })
         .then((res) => res.data),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['auth_data'] });
       navigate('/play');
     },
     onError: (e) => {
@@ -53,9 +55,8 @@ export const SignInModal: FC = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<SignInInputs> = (data) => {
+  const onSubmit: SubmitHandler<SignInInputs> = (data) =>
     loginMutation.mutate(data);
-  };
 
   return (
     <Modal modalClassName={styles.form} onOverlayClick={() => navigate('/')}>
