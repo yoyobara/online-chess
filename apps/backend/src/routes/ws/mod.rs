@@ -2,7 +2,10 @@ mod handler;
 mod message;
 
 use axum::{
-    extract::{ws::Message::*, State, WebSocketUpgrade},
+    extract::{
+        ws::Message::{self, *},
+        State, WebSocketUpgrade,
+    },
     response::IntoResponse,
 };
 
@@ -17,7 +20,15 @@ pub async fn ws_handler(
         while let Some(Ok(msg)) = socket.recv().await {
             match msg {
                 Text(text) => {
-                    on_message(serde_json::from_str(&text).unwrap(), player_id, &state).await
+                    let to_send =
+                        on_message(serde_json::from_str(&text).unwrap(), player_id, &state).await;
+
+                    if let Some(res) = to_send {
+                        socket
+                            .send(Message::text(serde_json::to_string(&res).unwrap()))
+                            .await
+                            .unwrap();
+                    }
                 }
                 Close(_) => break,
                 _ => {}

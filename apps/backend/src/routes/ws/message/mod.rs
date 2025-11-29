@@ -1,7 +1,5 @@
-use serde::{Deserialize, Serialize};
+mod client;
+mod server;
 
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "type")]
-pub enum ChessMessage {
-    LookingForMatch,
-}
+pub use client::ClientMessage;
+pub use server::ServerMessage;
