@@ -2,7 +2,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::configs::{load_env, load_pool, Config};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AppState {
     pub config: Config,
     pub pool: Pool<Postgres>,
