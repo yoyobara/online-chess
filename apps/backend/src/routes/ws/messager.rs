@@ -3,7 +3,7 @@ use axum::extract::ws::{Message, WebSocket};
 use crate::routes::ws::message::{ClientMessage, ServerMessage};
 
 pub struct WsMessager {
-    socket: WebSocket,
+    pub socket: WebSocket,
 }
 
 impl WsMessager {
