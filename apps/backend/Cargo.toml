@@ -16,3 +16,4 @@ envy = "0.4.2"
 sqlx = { version = "0.8.6", features = ["postgres", "macros", "runtime-tokio"] }
 argon2 = { version = "0.5.3", features = ["password-hash"] }
 secrecy = "0.10.3"
+either = "1.15.0"

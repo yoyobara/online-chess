@@ -1,12 +1,8 @@
 use sqlx::postgres::PgListener;
 
-use crate::{
-    routes::ws::{client_state::ClientState, messager::WsMessenger},
-    state::AppState,
-};
+use crate::{routes::ws::client_state::ClientState, state::AppState};
 
 pub async fn handle_looking_for_match(
-    _messenger: &mut WsMessenger,
     client_state: &mut ClientState,
     listener: &mut PgListener,
     app_state: &AppState,
