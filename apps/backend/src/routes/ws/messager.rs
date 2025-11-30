@@ -2,19 +2,19 @@ use axum::extract::ws::{Message, WebSocket};
 
 use crate::routes::ws::message::{ClientMessage, ServerMessage};
 
-pub struct WsMessager {
+pub struct WsMessenger {
     pub socket: WebSocket,
 }
 
-impl WsMessager {
+impl WsMessenger {
     pub fn new(socket: WebSocket) -> Self {
         Self { socket }
     }
 
-    pub async fn recv(&mut self) -> ClientMessage {
-        let msg = self.socket.recv().await.unwrap().unwrap();
+    pub async fn recv(&mut self) -> Option<ClientMessage> {
+        let msg = self.socket.recv().await?.unwrap();
 
-        serde_json::from_str(&msg.into_text().unwrap()).unwrap()
+        serde_json::from_str(&msg.into_text().ok()?).unwrap()
     }
 
     pub async fn send(&mut self, msg: ServerMessage) {
