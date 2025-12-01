@@ -1,6 +1,5 @@
+/*
 use sqlx::postgres::PgListener;
-
-use crate::{routes::ws::client_state::ClientState, state::AppState};
 
 pub async fn handle_looking_for_match(
     client_state: &mut ClientState,
@@ -62,3 +61,5 @@ pub async fn handle_looking_for_match(
 
     *client_state = ClientState::WaitingForMatch { match_id };
 }
+
+*/

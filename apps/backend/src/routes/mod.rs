@@ -1,5 +1,5 @@
 mod api;
-mod ws;
+pub mod ws;
 
 use axum::{routing::any, Router};
 use tower_cookies::CookieManagerLayer;
