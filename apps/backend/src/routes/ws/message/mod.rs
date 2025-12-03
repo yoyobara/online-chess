@@ -1,10 +1,10 @@
 mod client;
-mod internal;
 mod server;
 
 pub use client::ClientMessage;
-pub use internal::{InternalMessage, InternalMessageWithReciever};
 pub use server::ServerMessage;
+
+use crate::internal_broadcast::InternalMessage;
 
 #[derive(Debug)]
 pub enum Event {

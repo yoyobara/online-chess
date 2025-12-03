@@ -2,8 +2,9 @@ use axum::extract::ws::{self, WebSocket};
 use sqlx::{Pool, Postgres};
 use tokio::{select, sync::broadcast::Receiver};
 
-use crate::routes::ws::message::{
-    ClientMessage, Event, InternalMessage, InternalMessageWithReciever,
+use crate::{
+    internal_broadcast::InternalMessageWithReciever,
+    routes::ws::message::{ClientMessage, Event},
 };
 
 enum SessionState {

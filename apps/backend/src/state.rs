@@ -3,7 +3,7 @@ use std::sync::Arc;
 use sqlx::{Pool, Postgres};
 use tokio::sync::broadcast::Sender;
 
-use crate::{configs::Config, routes::ws::message::InternalMessageWithReciever};
+use crate::{configs::Config, internal_broadcast::InternalMessageWithReciever};
 
 #[derive(Clone, Debug)]
 pub struct AppState {
