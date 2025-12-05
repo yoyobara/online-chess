@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Serialize, Debug)]
 #[serde(tag = "type")]
 pub enum ServerMessage {
     MatchFound,

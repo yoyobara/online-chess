@@ -53,4 +53,8 @@ impl Session {
 
     async fn handle_client_message(&mut self, msg: ClientMessage) {}
     async fn handle_internal_message(&mut self, msg: InternalMessage) {}
+
+    async fn handle_looking_for_match(&mut self) {
+        assert_eq!(self.state, SessionState::Connected);
+    }
 }
