@@ -48,25 +48,27 @@ impl Session {
 
     async fn recv(&mut self) -> Event {
         let internal_recv = async {
-            let msg = self.internal_reciever.recv().await.ok()?;
+            loop {
+                let msg = self.internal_reciever.recv().await.unwrap();
 
-            if msg.to_user == self.player_id {
-                Some(msg.message)
-            } else {
-                None
+                if msg.to_user == self.player_id {
+                    return msg.message;
+                }
             }
         };
 
         let ws_recv = async {
-            let msg = self.socket.recv().await?.unwrap();
-            let msg_text = msg.into_text().unwrap();
+            let msg = self.socket.recv().await.unwrap().unwrap();
 
-            Some(serde_json::from_str::<ClientMessage>(&msg_text).unwrap())
+            let deserialized =
+                serde_json::from_str::<ClientMessage>(&msg.into_text().unwrap()).unwrap();
+
+            deserialized
         };
 
         select! {
-            Some(res) = internal_recv => Event::InternalMessage(res),
-            Some(res) = ws_recv => Event::ClientMessage(res),
+            internal_msg = internal_recv => Event::InternalMessage(internal_msg),
+            ws_msg = ws_recv => Event::ClientMessage(ws_msg),
         }
     }
 }
