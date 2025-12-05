@@ -1,5 +1,6 @@
 mod handlers;
-pub mod message;
+mod message;
+mod receiver;
 mod session;
 
 use axum::{
@@ -9,17 +10,17 @@ use axum::{
 
 use crate::{extractors::AuthUser, routes::ws::session::Session, state::AppState};
 
+async fn handle_socket(socket: WebSocket, player_id: i32, app_state: AppState) {
+    let reciever = app_state.internal_sender.subscribe();
+    let mut session = Session::new(socket, reciever, player_id, app_state.pool).await;
+
+    session.mainloop().await;
+}
+
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
     AuthUser { player_id }: AuthUser,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     ws.on_upgrade(async move |socket| handle_socket(socket, player_id, state).await)
-}
-
-pub async fn handle_socket(socket: WebSocket, player_id: i32, app_state: AppState) {
-    let reciever = app_state.internal_sender.subscribe();
-    let mut session = Session::new(socket, reciever, player_id, app_state.pool).await;
-
-    session.mainloop().await;
 }
