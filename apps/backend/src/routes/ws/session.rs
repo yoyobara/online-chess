@@ -3,16 +3,16 @@ use sqlx::{Pool, Postgres};
 use tokio::sync::broadcast::Receiver;
 
 use crate::{
-    internal_broadcast::InternalMessageWithReciever,
-    routes::ws::{message::ServerMessage, receiver::SessionCommunicator},
+    internal_broadcast::{InternalMessage, InternalMessageWithReciever},
+    routes::ws::{
+        communicator::{Event, SessionCommunicator},
+        message::ClientMessage,
+        state::SessionState,
+    },
 };
 
-enum SessionState {
-    Connected,
-}
-
 pub struct Session {
-    communicator: SessionCommunicator,
+    pub(super) communicator: SessionCommunicator,
     player_id: i32,
     pool: Pool<Postgres>,
     state: SessionState,
@@ -40,9 +40,17 @@ impl Session {
 
     pub async fn mainloop(&mut self) {
         loop {
-            self.communicator.recv().await;
+            let event = self.communicator.recv().await;
 
-            self.communicator.ws_send(ServerMessage::MatchFound).await;
+            match event {
+                Event::ClientMessage(client_msg) => self.handle_client_message(client_msg).await,
+                Event::InternalMessage(internal_msg) => {
+                    self.handle_internal_message(internal_msg).await
+                }
+            };
         }
     }
+
+    async fn handle_client_message(&mut self, msg: ClientMessage) {}
+    async fn handle_internal_message(&mut self, msg: InternalMessage) {}
 }

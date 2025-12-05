@@ -1,7 +1,7 @@
-mod handlers;
+mod communicator;
 mod message;
-mod receiver;
 mod session;
+mod state;
 
 use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
