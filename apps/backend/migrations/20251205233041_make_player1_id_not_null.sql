@@ -1,0 +1,2 @@
+ALTER TABLE matches
+ALTER COLUMN player1_id SET NOT NULL;

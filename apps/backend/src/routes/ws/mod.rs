@@ -1,4 +1,5 @@
 mod communicator;
+mod handlers;
 mod message;
 mod session;
 mod state;
