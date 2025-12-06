@@ -4,6 +4,7 @@ import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
+import { MatchmakingModal } from '../matchmaking_modal/MatchmakingModal';
 
 export const PlayPage: FC = () => {
   return (
@@ -34,6 +35,7 @@ export const PlayPage: FC = () => {
         <Button variant="red">Resign</Button>
         <Button variant="white">Offer Draw</Button>
       </div>
+      <MatchmakingModal />
     </div>
   );
 };
