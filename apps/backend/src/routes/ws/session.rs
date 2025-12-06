@@ -112,7 +112,7 @@ impl Session {
                 .await;
         } else {
             let created_match_id = sqlx::query_scalar!(
-                "INSERT INTO matches (player1_id) VALUES($1) RETURNING id;",
+                "INSERT INTO matches (player1_id, match_status) VALUES($1, 'Matchmaking') RETURNING id;",
                 self.player_id
             )
             .fetch_one(&self.pool)
