@@ -145,6 +145,8 @@ impl Session {
     }
 
     async fn client_log(&mut self, message: &'static str) {
-        self.communicator.ws_send(ServerMessage::Log(message)).await;
+        self.communicator
+            .ws_send(ServerMessage::Log { message })
+            .await;
     }
 }
