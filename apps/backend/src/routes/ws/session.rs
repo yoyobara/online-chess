@@ -6,7 +6,7 @@ use crate::{
     internal_broadcast::{InternalMessage, InternalMessageWithReciever},
     routes::ws::{
         communicator::{Event, SessionCommunicator},
-        message::ClientMessage,
+        message::{ClientMessage, ServerMessage},
         state::SessionState,
     },
 };
@@ -107,6 +107,9 @@ impl Session {
                 match_id: matchmaking.id,
                 opponent_id: matchmaking.player1_id,
             };
+
+            self.client_log("found match instantly! opponent should play")
+                .await;
         } else {
             let created_match_id = sqlx::query_scalar!(
                 "INSERT INTO matches (player1_id) VALUES($1) RETURNING id;",
@@ -118,7 +121,9 @@ impl Session {
 
             self.state = SessionState::WaitingForMatch {
                 expected_match_id: created_match_id,
-            }
+            };
+
+            self.client_log("created a match, now waiting...").await;
         }
     }
 
@@ -133,6 +138,13 @@ impl Session {
         self.state = SessionState::YourTurn {
             match_id,
             opponent_id,
-        }
+        };
+
+        self.client_log("finally found match! you should play.")
+            .await;
+    }
+
+    async fn client_log(&mut self, message: &'static str) {
+        self.communicator.ws_send(ServerMessage::Log(message)).await;
     }
 }
