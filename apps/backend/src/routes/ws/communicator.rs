@@ -48,7 +48,9 @@ impl SessionCommunicator {
         };
 
         let ws_recv = async {
-            let msg = self.socket.recv().await.unwrap().unwrap();
+            let msg = self.socket.recv().await.unwrap();
+            dbg!(&msg);
+            let msg = msg.unwrap();
 
             let deserialized =
                 serde_json::from_str::<ClientMessage>(&msg.into_text().unwrap()).unwrap();

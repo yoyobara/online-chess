@@ -4,9 +4,18 @@ import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
-import { MatchmakingModal } from '../matchmaking_modal/MatchmakingModal';
+import { useRealtime } from '../../contexts/realtime';
 
 export const PlayPage: FC = () => {
+  const { lastMessage, sendMessage, readyState } = useRealtime();
+
+  useEffect(() => {
+    setTimeout(() => {
+      sendMessage(JSON.stringify({ type: 'LookingForMatch' }));
+      console.log('sent');
+    }, 5000);
+  }, []);
+
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
@@ -20,13 +29,13 @@ export const PlayPage: FC = () => {
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>
       <PlayerPaper
-        playerName="me"
+        playerName={lastMessage}
         playerRating={1000}
         variant="white"
         className={styles.player}
       />
       <PlayerPaper
-        playerName="foe"
+        playerName={readyState}
         playerRating={200}
         variant="purple"
         className={styles.opponent}
@@ -35,7 +44,6 @@ export const PlayPage: FC = () => {
         <Button variant="red">Resign</Button>
         <Button variant="white">Offer Draw</Button>
       </div>
-      <MatchmakingModal />
     </div>
   );
 };

@@ -9,6 +9,6 @@ use crate::{routes::ws::ws_handler, state::AppState};
 pub fn router() -> Router<AppState> {
     Router::new()
         .nest("/api", api::router())
-        .route("/ws", any(ws_handler))
+        .route("/realtime", any(ws_handler))
         .layer(CookieManagerLayer::new())
 }

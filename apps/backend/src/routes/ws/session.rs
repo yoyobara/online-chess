@@ -42,6 +42,7 @@ impl Session {
     pub async fn mainloop(&mut self) {
         loop {
             let event = self.communicator.recv().await;
+            dbg!(&event);
 
             match event {
                 Event::ClientMessage(client_msg) => self.handle_client_message(client_msg).await,
