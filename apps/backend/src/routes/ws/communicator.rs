@@ -81,4 +81,11 @@ impl SessionCommunicator {
 
         self.socket.send(Message::text(serialized)).await.unwrap();
     }
+
+    pub async fn ws_log(&mut self, log_message: impl Into<String>) {
+        self.ws_send(ServerMessage::Log {
+            message: log_message.into(),
+        })
+        .await;
+    }
 }

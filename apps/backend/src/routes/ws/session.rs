@@ -66,10 +66,4 @@ impl Session {
             } => handle_match_found(self, match_id, opponent_id).await,
         }
     }
-
-    pub(super) async fn client_log(&mut self, message: &'static str) {
-        self.communicator
-            .ws_send(ServerMessage::Log { message })
-            .await;
-    }
 }

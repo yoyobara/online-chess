@@ -1,6 +1,6 @@
 use crate::{
     internal_broadcast::InternalMessage,
-    routes::ws::{session::Session, state::SessionState},
+    routes::ws::{message::ServerMessage, session::Session, state::SessionState},
 };
 
 pub async fn handle_looking_for_match(session: &mut Session) {
@@ -47,7 +47,11 @@ pub async fn handle_looking_for_match(session: &mut Session) {
         };
 
         session
-            .client_log("found match instantly! opponent should play")
+            .communicator
+            .ws_send(ServerMessage::MatchFound {
+                opponent_name: matchmaking.player1_id.to_string(),
+                you_are_white: false,
+            })
             .await;
     } else {
         let created_match_id = sqlx::query_scalar!(
@@ -62,7 +66,10 @@ pub async fn handle_looking_for_match(session: &mut Session) {
             expected_match_id: created_match_id,
         };
 
-        session.client_log("created a match, now waiting...").await;
+        session
+            .communicator
+            .ws_send(ServerMessage::WaitingForMatch)
+            .await;
     }
 }
 
@@ -80,6 +87,10 @@ pub async fn handle_match_found(session: &mut Session, match_id: i32, opponent_i
     };
 
     session
-        .client_log("finally found match! you should play.")
+        .communicator
+        .ws_send(ServerMessage::MatchFound {
+            opponent_name: opponent_id.to_string(),
+            you_are_white: true,
+        })
         .await;
 }
