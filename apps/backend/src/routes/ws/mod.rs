@@ -23,6 +23,5 @@ pub async fn ws_handler(
     AuthUser { player_id }: AuthUser,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    println!("got ws request");
     ws.on_upgrade(async move |socket| handle_socket(socket, player_id, state).await)
 }

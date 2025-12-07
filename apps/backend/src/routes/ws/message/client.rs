@@ -4,4 +4,5 @@ use serde::Deserialize;
 #[serde(tag = "type")]
 pub enum ClientMessage {
     LookingForMatch,
+    ConnectionClosed,
 }

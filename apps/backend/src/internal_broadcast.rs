@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 #[serde(tag = "type")]
 pub enum InternalMessage {
     MatchFound { match_id: i32, opponent_id: i32 },
+    OpponentDisconnected,
 }
 
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]

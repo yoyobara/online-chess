@@ -6,7 +6,10 @@ use crate::{
     internal_broadcast::{InternalMessage, InternalMessageWithReciever},
     routes::ws::{
         communicator::{Event, SessionCommunicator},
-        handlers::{handle_looking_for_match, handle_match_found},
+        handlers::{
+            handle_client_disconnection, handle_looking_for_match, handle_match_found,
+            handle_opponent_disconnection,
+        },
         message::{ClientMessage, ServerMessage},
         state::SessionState,
     },
@@ -40,10 +43,7 @@ impl Session {
     }
 
     pub async fn mainloop(&mut self) {
-        loop {
-            let event = self.communicator.recv().await;
-            dbg!(&event);
-
+        while let Some(event) = self.communicator.recv().await {
             match event {
                 Event::ClientMessage(client_msg) => self.handle_client_message(client_msg).await,
                 Event::InternalMessage(internal_msg) => {
@@ -56,6 +56,7 @@ impl Session {
     async fn handle_client_message(&mut self, msg: ClientMessage) {
         match msg {
             ClientMessage::LookingForMatch => handle_looking_for_match(self).await,
+            ClientMessage::ConnectionClosed => handle_client_disconnection(self).await,
         }
     }
 
@@ -65,6 +66,8 @@ impl Session {
                 match_id,
                 opponent_id,
             } => handle_match_found(self, match_id, opponent_id).await,
+
+            InternalMessage::OpponentDisconnected => handle_opponent_disconnection(self).await,
         }
     }
 }

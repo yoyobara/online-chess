@@ -36,31 +36,34 @@ impl SessionCommunicator {
         }
     }
 
-    pub async fn recv(&mut self) -> Event {
+    pub async fn recv(&mut self) -> Option<Event> {
         let internal_recv = async {
             loop {
                 let msg = self.internal_reciever.recv().await.unwrap();
 
                 if msg.to_user == self.player_id {
+                    println!("user {:?} internal recv - {:?}", self.player_id, msg);
+
                     return msg.message;
                 }
             }
         };
 
         let ws_recv = async {
-            let msg = self.socket.recv().await.unwrap();
-            dbg!(&msg);
-            let msg = msg.unwrap();
+            let msg = self.socket.recv().await?.unwrap();
 
-            let deserialized =
-                serde_json::from_str::<ClientMessage>(&msg.into_text().unwrap()).unwrap();
+            println!("user {:?} ws recv - {:?}", self.player_id, msg);
 
-            deserialized
+            Some(match msg {
+                Message::Close(_) => ClientMessage::ConnectionClosed,
+                Message::Text(text) => serde_json::from_str::<ClientMessage>(&text).unwrap(),
+                _ => unimplemented!(),
+            })
         };
 
         select! {
-            internal_msg = internal_recv => Event::InternalMessage(internal_msg),
-            ws_msg = ws_recv => Event::ClientMessage(ws_msg),
+            internal_msg = internal_recv => Some(Event::InternalMessage(internal_msg)),
+            ws_msg = ws_recv => ws_msg.map(Event::ClientMessage),
         }
     }
 
