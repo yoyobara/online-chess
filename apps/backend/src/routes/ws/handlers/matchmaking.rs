@@ -41,9 +41,11 @@ pub async fn handle_looking_for_match(session: &mut Session) {
             )
             .await;
 
-        session.state = SessionState::OpponentTurn {
+        session.state = SessionState::InGame {
             match_id: matchmaking.id,
             opponent_id: matchmaking.player1_id,
+            your_turn: false,
+            white: false,
         };
 
         session
@@ -81,9 +83,11 @@ pub async fn handle_match_found(session: &mut Session, match_id: i32, opponent_i
         }
     );
 
-    session.state = SessionState::YourTurn {
+    session.state = SessionState::InGame {
         match_id,
         opponent_id,
+        your_turn: true,
+        white: true,
     };
 
     session

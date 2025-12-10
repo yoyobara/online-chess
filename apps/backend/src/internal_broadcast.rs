@@ -7,10 +7,12 @@ use serde::{Deserialize, Serialize};
 #[serde(tag = "type")]
 pub enum InternalMessage {
     MatchFound { match_id: i32, opponent_id: i32 },
+    OpponentDisconnected,
 }
 
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
-pub struct InternalMessageWithReciever {
+pub struct InternalMessageWithMetadata {
+    pub from_user: i32,
     pub to_user: i32,
     pub message: InternalMessage,
 }
@@ -18,10 +20,10 @@ pub struct InternalMessageWithReciever {
 pub async fn start_internal_broadcast(
     pool: Pool<Postgres>,
 ) -> (
-    tokio::sync::broadcast::Sender<InternalMessageWithReciever>,
+    tokio::sync::broadcast::Sender<InternalMessageWithMetadata>,
     tokio::task::JoinHandle<()>,
 ) {
-    let (tx, _rx) = broadcast::channel::<InternalMessageWithReciever>(1024);
+    let (tx, _rx) = broadcast::channel::<InternalMessageWithMetadata>(1024);
 
     let tx1 = tx.clone();
     let handler = tokio::spawn(async move {
@@ -29,7 +31,7 @@ pub async fn start_internal_broadcast(
         listener.listen("game_events").await.unwrap();
 
         while let Ok(msg) = listener.recv().await {
-            let deserialized: InternalMessageWithReciever =
+            let deserialized: InternalMessageWithMetadata =
                 serde_json::from_str(msg.payload()).unwrap();
 
             tx1.send(deserialized).unwrap();
