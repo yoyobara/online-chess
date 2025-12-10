@@ -42,7 +42,10 @@ impl SessionCommunicator {
                 let msg = self.internal_reciever.recv().await.unwrap();
 
                 if msg.to_user == self.player_id {
-                    println!("user {:?} internal recv - {:?}", self.player_id, msg);
+                    println!(
+                        "INTERNAL_RECV {} FROM {}: {:?}",
+                        self.player_id, msg.to_user, msg.message
+                    );
 
                     return msg.message;
                 }
@@ -52,13 +55,15 @@ impl SessionCommunicator {
         let ws_recv = async {
             let msg = self.socket.recv().await?.unwrap();
 
-            println!("user {:?} ws recv - {:?}", self.player_id, msg);
-
-            Some(match msg {
+            let parsed_message = match msg {
                 Message::Close(_) => ClientMessage::ConnectionClosed,
                 Message::Text(text) => serde_json::from_str::<ClientMessage>(&text).unwrap(),
                 _ => unimplemented!(),
-            })
+            };
+
+            println!("WS client -> {}: {:?}", self.player_id, parsed_message);
+
+            Some(parsed_message)
         };
 
         select! {
@@ -79,12 +84,19 @@ impl SessionCommunicator {
             .execute(&self.pool)
             .await
             .unwrap();
+
+        println!(
+            "INTERNAL_SEND {} TO {}: {:?}",
+            self.player_id, msg.to_user, msg.message
+        );
     }
 
     pub async fn ws_send(&mut self, message: ServerMessage) {
         let serialized = serde_json::to_string::<ServerMessage>(&message).unwrap();
 
         self.socket.send(Message::text(serialized)).await.unwrap();
+
+        println!("WS {} -> client: {:?}", self.player_id, message);
     }
 
     pub async fn ws_log(&mut self, log_message: impl Into<String>) {

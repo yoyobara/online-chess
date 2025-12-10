@@ -11,4 +11,5 @@ pub enum ServerMessage {
         opponent_name: String,
         you_are_white: bool,
     },
+    OpponentDisconnected,
 }

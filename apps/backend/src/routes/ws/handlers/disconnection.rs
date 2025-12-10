@@ -1,6 +1,6 @@
 use crate::{
     internal_broadcast::InternalMessage,
-    routes::ws::{session::Session, state::SessionState},
+    routes::ws::{message::ServerMessage, session::Session, state::SessionState},
 };
 
 pub async fn handle_client_disconnection(session: &mut Session) {
@@ -36,6 +36,11 @@ pub async fn handle_opponent_disconnection(session: &mut Session) {
         .execute(&session.pool)
         .await
         .unwrap();
+
+        session
+            .communicator
+            .ws_send(ServerMessage::OpponentDisconnected)
+            .await;
     } else {
         panic!("bad state");
     }
