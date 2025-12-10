@@ -7,11 +7,11 @@ import { Chessboard } from './chessboard/Chessboard';
 import { useRealtime } from '../../contexts/realtime';
 
 export const PlayPage: FC = () => {
-  const { lastMessage, sendMessage, readyState } = useRealtime();
+  const { lastServerMessage, sendMessage, readyState } = useRealtime();
 
   useEffect(() => {
     setTimeout(() => {
-      sendMessage(JSON.stringify({ type: 'LookingForMatch' }));
+      sendMessage({ type: 'LookingForMatch' });
       console.log('sent');
     }, 5000);
   }, []);
@@ -29,13 +29,13 @@ export const PlayPage: FC = () => {
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>
       <PlayerPaper
-        playerName={lastMessage}
+        playerName={JSON.stringify(lastServerMessage)}
         playerRating={1000}
         variant="white"
         className={styles.player}
       />
       <PlayerPaper
-        playerName={readyState}
+        playerName={JSON.stringify(readyState)}
         playerRating={200}
         variant="purple"
         className={styles.opponent}
