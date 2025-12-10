@@ -4,7 +4,7 @@ use tokio::select;
 use tokio::sync::broadcast::Receiver;
 
 use crate::{
-    internal_broadcast::{InternalMessage, InternalMessageWithReciever},
+    internal_broadcast::{InternalMessage, InternalMessageWithMetadata},
     routes::ws::message::{ClientMessage, ServerMessage},
 };
 
@@ -16,7 +16,7 @@ pub enum Event {
 
 pub struct SessionCommunicator {
     socket: WebSocket,
-    internal_reciever: Receiver<InternalMessageWithReciever>,
+    internal_reciever: Receiver<InternalMessageWithMetadata>,
     pool: Pool<Postgres>,
     player_id: i32,
 }
@@ -24,7 +24,7 @@ pub struct SessionCommunicator {
 impl SessionCommunicator {
     pub fn new(
         socket: WebSocket,
-        internal_reciever: Receiver<InternalMessageWithReciever>,
+        internal_reciever: Receiver<InternalMessageWithMetadata>,
         pool: Pool<Postgres>,
         player_id: i32,
     ) -> Self {
@@ -44,7 +44,7 @@ impl SessionCommunicator {
                 if msg.to_user == self.player_id {
                     println!(
                         "INTERNAL_RECV {} FROM {}: {:?}",
-                        self.player_id, msg.to_user, msg.message
+                        self.player_id, msg.from_user, msg.message
                     );
 
                     return msg.message;
@@ -73,12 +73,13 @@ impl SessionCommunicator {
     }
 
     pub async fn internal_notify(&mut self, user_target: i32, message: InternalMessage) {
-        let msg = InternalMessageWithReciever {
+        let msg = InternalMessageWithMetadata {
+            from_user: self.player_id,
             to_user: user_target,
             message,
         };
 
-        let serialized = serde_json::to_string::<InternalMessageWithReciever>(&msg).unwrap();
+        let serialized = serde_json::to_string::<InternalMessageWithMetadata>(&msg).unwrap();
 
         sqlx::query!("SELECT pg_notify('game_events', $1);", serialized)
             .execute(&self.pool)

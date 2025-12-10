@@ -3,7 +3,7 @@ use sqlx::{Pool, Postgres};
 use tokio::sync::broadcast::Receiver;
 
 use crate::{
-    internal_broadcast::{InternalMessage, InternalMessageWithReciever},
+    internal_broadcast::{InternalMessage, InternalMessageWithMetadata},
     routes::ws::{
         communicator::{Event, SessionCommunicator},
         handlers::{
@@ -25,7 +25,7 @@ pub struct Session {
 impl Session {
     pub async fn new(
         socket: WebSocket,
-        internal_reciever: Receiver<InternalMessageWithReciever>,
+        internal_reciever: Receiver<InternalMessageWithMetadata>,
         player_id: i32,
         pool: Pool<Postgres>,
     ) -> Self {
