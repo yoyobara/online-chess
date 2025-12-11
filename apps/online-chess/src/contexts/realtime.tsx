@@ -1,20 +1,42 @@
-import { createContext, FC, PropsWithChildren, useContext } from 'react';
-import useWebSocket, { SendMessage } from 'react-use-websocket';
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+} from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { ClientMessage, ServerMessage } from '../types/messages';
 
 interface RealtimeCommunication {
-  lastMessage: any;
-  sendMessage: SendMessage;
-  readyState: any;
+  lastServerMessage: ServerMessage | null;
+  sendMessage: (message: ClientMessage) => void;
+  readyState: ReadyState;
 }
 
 const realtimeContext = createContext<RealtimeCommunication | null>(null);
 
 export const RealtimeProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { lastMessage, sendMessage, readyState } = useWebSocket('/realtime');
+  const { lastJsonMessage, sendJsonMessage, readyState } =
+    useWebSocket('/realtime');
+
+  // TODO switch with real validation
+  const lastServerMessage = lastJsonMessage as ServerMessage | null;
+
+  const sendMessage = useCallback(
+    (message: ClientMessage) => {
+      sendJsonMessage(message);
+    },
+    [sendJsonMessage]
+  );
 
   return (
     <realtimeContext.Provider
-      value={{ lastMessage: lastMessage?.data, sendMessage, readyState }}
+      value={{
+        lastServerMessage,
+        sendMessage,
+        readyState,
+      }}
     >
       {children}
     </realtimeContext.Provider>
