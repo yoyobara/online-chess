@@ -1,4 +1,10 @@
-import { createContext, FC, PropsWithChildren, useContext } from 'react';
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+} from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { ClientMessage, ServerMessage } from '../types/messages';
 
@@ -17,13 +23,18 @@ export const RealtimeProvider: FC<PropsWithChildren> = ({ children }) => {
   // TODO switch with real validation
   const lastServerMessage = lastJsonMessage as ServerMessage | null;
 
+  const sendMessage = useCallback(
+    (message: ClientMessage) => {
+      sendJsonMessage(message);
+    },
+    [sendJsonMessage]
+  );
+
   return (
     <realtimeContext.Provider
       value={{
         lastServerMessage,
-        sendMessage: (message: ClientMessage) => {
-          sendJsonMessage(message);
-        },
+        sendMessage,
         readyState,
       }}
     >
