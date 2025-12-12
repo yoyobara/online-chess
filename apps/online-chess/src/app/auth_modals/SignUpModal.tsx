@@ -34,7 +34,7 @@ export const SignUpModal: FC = () => {
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth_data'] });
-      navigate('/play');
+      navigate('/home');
     },
     onError: (e) => {
       if (isAxiosError(e)) {
