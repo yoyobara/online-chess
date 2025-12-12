@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export const HomePage: FC = () => {
   const auth = useRequiredAuth();
+  const navigate = useNavigate();
 
   const { data: rank } = useQuery<number>({
     queryKey: ['user_rank'],
@@ -31,7 +32,11 @@ export const HomePage: FC = () => {
           <img className={styles.trophy_icon} src={trophy_icon} alt="trophy" />
           <div className={styles.rank_text}>{rank ?? '...'}</div>
         </Paper>
-        <Button variant="purple" className={styles.play_button}>
+        <Button
+          variant="purple"
+          className={styles.play_button}
+          onClick={() => navigate('/play')}
+        >
           <img height="100%" src={play_circle} alt=""></img>
           Play Online!
         </Button>

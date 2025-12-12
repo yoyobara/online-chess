@@ -9,11 +9,11 @@ interface AuthData {
 const authContext = createContext<AuthData | null>(null);
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { data, isLoading } = useQuery<AuthData>({
+  const { data, isLoading } = useQuery<AuthData | null>({
     queryKey: ['auth_data'],
     queryFn: () =>
       fetch('/api/auth/me', { credentials: 'include' }).then((resp) =>
-        resp.json()
+        resp.ok ? resp.json() : null
       ),
   });
 
