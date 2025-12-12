@@ -9,9 +9,18 @@ import trophy_icon from '../../assets/trophy.svg';
 import play_circle from '../../assets/play_circle.svg';
 
 import { useRequiredAuth } from '../../contexts/auth';
+import { useQuery } from '@tanstack/react-query';
 
 export const HomePage: FC = () => {
   const auth = useRequiredAuth();
+
+  const { data: rank } = useQuery<number>({
+    queryKey: ['user_rank'],
+    queryFn: () =>
+      fetch('/api/user/rank', { credentials: 'include' }).then((resp) =>
+        resp.json()
+      ),
+  });
 
   return (
     <div className={styles.home_page}>
@@ -20,7 +29,7 @@ export const HomePage: FC = () => {
         <div className={styles.username}>{auth.username}</div>
         <Paper className={styles.rank_paper}>
           <img className={styles.trophy_icon} src={trophy_icon} alt="trophy" />
-          <div className={styles.rank_text}>4234</div>
+          <div className={styles.rank_text}>{rank ?? '...'}</div>
         </Paper>
         <Button variant="purple" className={styles.play_button}>
           <img height="100%" src={play_circle} alt=""></img>

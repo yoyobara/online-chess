@@ -3,17 +3,14 @@ use serde_json::json;
 
 use crate::{extractors::AuthUser, state::AppState};
 
-pub async fn me_handler(
+pub async fn rank_handler(
     AuthUser { player_id }: AuthUser,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    let user = sqlx::query!("SELECT id, username FROM users WHERE id = $1", player_id)
+    let rank = sqlx::query_scalar!("SELECT rank FROM users WHERE id = $1", player_id)
         .fetch_one(&state.pool)
         .await
         .unwrap();
 
-    Json(json!({
-        "id": user.id,
-        "username": user.username,
-    }))
+    Json(json!(rank))
 }
