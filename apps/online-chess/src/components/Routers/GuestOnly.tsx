@@ -5,5 +5,5 @@ import { Navigate } from 'react-router-dom';
 export const GuestOnly: FC<PropsWithChildren> = ({ children }) => {
   const auth = useAuth();
 
-  return auth ? <Navigate to="/play" /> : children;
+  return auth ? <Navigate to="/home" /> : children;
 };

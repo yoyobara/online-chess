@@ -6,6 +6,7 @@ import { SignInModal } from './auth_modals/SignInModal';
 import { SignUpModal } from './auth_modals/SignUpModal';
 import { PlayPage } from './play_page/PlayPage';
 import { RealtimeProvider } from '../contexts/realtime';
+import { HomePage } from './home_page/HomePage';
 
 export function App() {
   return (
@@ -32,6 +33,14 @@ export function App() {
           <GuestOnly>
             <SignUpModal />
           </GuestOnly>
+        }
+      />
+      <Route
+        path="/home"
+        element={
+          <LoggedInOnly>
+            <HomePage />
+          </LoggedInOnly>
         }
       />
       <Route

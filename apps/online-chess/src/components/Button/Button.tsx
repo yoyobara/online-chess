@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, FC, MouseEventHandler } from 'react';
 import styles from './Button.module.scss';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant: 'black' | 'gray' | 'white' | 'red';
+  variant: 'black' | 'gray' | 'white' | 'red' | 'purple';
   onClick?: MouseEventHandler<HTMLButtonElement>;
   className?: string;
 }
