@@ -17,7 +17,7 @@ pub async fn handle_client_disconnection(session: &mut Session) {
                 .await
                 .unwrap();
         }
-        _ => panic!("bad state"),
+        _ => panic!("state should be either in game or waiting for match"),
     }
 }
 
@@ -42,6 +42,6 @@ pub async fn handle_opponent_disconnection(session: &mut Session) {
             .ws_send(ServerMessage::OpponentDisconnected)
             .await;
     } else {
-        panic!("bad state");
+        panic!("state should be InGame");
     }
 }

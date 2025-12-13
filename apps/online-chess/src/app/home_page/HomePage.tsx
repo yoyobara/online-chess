@@ -7,13 +7,15 @@ import { Paper } from '../../components/Paper/Paper';
 import profile_default from '../../assets/profile_default.svg';
 import trophy_icon from '../../assets/trophy.svg';
 import play_circle from '../../assets/play_circle.svg';
+import logout_icon from '../../assets/logout.svg';
 
 import { useRequiredAuth } from '../../contexts/auth';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const HomePage: FC = () => {
   const auth = useRequiredAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: rank } = useQuery<number>({
     queryKey: ['user_rank'],
@@ -21,6 +23,15 @@ export const HomePage: FC = () => {
       fetch('/api/user/rank', { credentials: 'include' }).then((resp) =>
         resp.json()
       ),
+  });
+
+  const { mutate } = useMutation({
+    mutationFn: () =>
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['auth_data'] });
+      navigate('/');
+    },
   });
 
   return (
@@ -39,6 +50,13 @@ export const HomePage: FC = () => {
         >
           <img height="100%" src={play_circle} alt=""></img>
           Play Online!
+        </Button>
+        <Button
+          onClick={() => mutate()}
+          variant="white"
+          className={styles.logout_button}
+        >
+          <img src={logout_icon} alt="logout" />
         </Button>
       </Paper>
     </div>

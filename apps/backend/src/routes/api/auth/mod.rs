@@ -1,4 +1,5 @@
 mod login;
+mod logout;
 mod me;
 mod register;
 
@@ -14,4 +15,5 @@ pub fn router() -> Router<AppState> {
         .route("/me", get(me::me_handler))
         .route("/login", post(login::login_handler))
         .route("/register", post(register::register_handler))
+        .route("/logout", post(logout::logout_handler))
 }

@@ -12,6 +12,7 @@
     width: 50%;
     height: 90%;
     box-sizing: border-box;
+    position: relative;
     
     background-color: white;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -74,4 +75,22 @@
     align-items: center;
     justify-content: center;
     gap: 5%;
+}
+
+.logout_button {
+    position: absolute;
+    height: 7%;
+    aspect-ratio: 1/1;
+
+    top: 2%;
+    left: 2%;
+
+    background-color: transparent;
+    border: none;
+    padding: 0;
+
+    img {
+        width: 100%;
+        aspect-ratio: 1/1;
+    }
 }
