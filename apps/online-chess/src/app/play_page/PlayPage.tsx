@@ -36,6 +36,11 @@ export const PlayPage: FC = () => {
     handleNewMessage(lastServerMessage);
   }, [lastServerMessage, handleNewMessage]);
 
+  // run on mount
+  useEffect(() => {
+    sendMessage({ type: 'LookingForMatch' });
+  }, [sendMessage]);
+
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
@@ -64,14 +69,7 @@ export const PlayPage: FC = () => {
       />
       <div className={styles.buttons}>
         <Button variant="red">Resign</Button>
-        <Button
-          variant="white"
-          onClick={() => {
-            sendMessage({ type: 'LookingForMatch' });
-          }}
-        >
-          Offer Draw
-        </Button>
+        <Button variant="white">Offer Draw</Button>
       </div>
       {gameState.type === 'waitingForMatch' && <MatchmakingModal />}
     </div>

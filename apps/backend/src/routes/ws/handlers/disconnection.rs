@@ -17,7 +17,7 @@ pub async fn handle_client_disconnection(session: &mut Session) {
                 .await
                 .unwrap();
         }
-        _ => panic!("state should be either in game or waiting for match"),
+        SessionState::Connected => {}
     }
 }
 
