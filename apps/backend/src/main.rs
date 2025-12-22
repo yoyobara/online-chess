@@ -2,6 +2,8 @@ mod configs;
 mod constants;
 mod extractors;
 mod internal_broadcast;
+mod models;
+mod repositories;
 mod routes;
 mod state;
 mod utils;
