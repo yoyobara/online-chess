@@ -3,25 +3,32 @@ use std::sync::Arc;
 use sqlx::{Pool, Postgres};
 use tokio::sync::broadcast::Sender;
 
-use crate::{configs::Config, internal_broadcast::InternalMessageWithMetadata};
+use crate::{
+    configs::Config, internal_broadcast::InternalMessageWithMetadata,
+    repositories::user::UserRepository,
+};
 
 #[derive(Clone, Debug)]
 pub struct AppState {
     pub config: Arc<Config>,
-    pub pool: Pool<Postgres>,
     pub internal_sender: Sender<InternalMessageWithMetadata>,
+
+    pub pool: Pool<Postgres>,
+    pub user_repo: Arc<dyn UserRepository>,
 }
 
 impl AppState {
     pub async fn new(
         config: Arc<Config>,
-        pool: Pool<Postgres>,
         internal_sender: Sender<InternalMessageWithMetadata>,
+        user_repo: Arc<dyn UserRepository>,
+        pool: Pool<Postgres>,
     ) -> Self {
         Self {
             config,
-            pool,
+            user_repo,
             internal_sender,
+            pool,
         }
     }
 }

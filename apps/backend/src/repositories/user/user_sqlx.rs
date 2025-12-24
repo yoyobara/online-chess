@@ -6,6 +6,7 @@ use crate::{
     repositories::user::{user::UserRepository, UserRepositoryError},
 };
 
+#[derive(Debug, Clone)]
 pub struct SqlxUserRepository {
     pool: Pool<Postgres>,
 }

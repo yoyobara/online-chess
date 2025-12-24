@@ -3,7 +3,7 @@ pub enum UserRepositoryError {
     #[error("user not found")]
     UserNotFound,
 
-    #[error("{0} is already taken")]
+    #[error("violation of constraint")]
     ConstraintViolation(String),
 
     #[error("something went wrong!")]
