@@ -12,10 +12,10 @@ use axum::{
 use crate::{extractors::AuthUser, routes::ws::session::Session, state::AppState};
 
 async fn handle_socket(socket: WebSocket, player_id: i32, app_state: AppState) {
-    let reciever = app_state.internal_sender.subscribe();
-    let mut session = Session::new(socket, reciever, player_id, app_state.pool).await;
+    // let reciever = app_state.internal_sender.subscribe();
+    // let mut session = Session::new(socket, reciever, player_id, app_state.pool).await;
 
-    session.mainloop().await;
+    // session.mainloop().await;
 }
 
 pub async fn ws_handler(
