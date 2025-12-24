@@ -13,7 +13,6 @@ pub struct AppState {
     pub config: Arc<Config>,
     pub internal_sender: Sender<InternalMessageWithMetadata>,
 
-    pub pool: Pool<Postgres>,
     pub user_repo: Arc<dyn UserRepository>,
 }
 
@@ -22,13 +21,11 @@ impl AppState {
         config: Arc<Config>,
         internal_sender: Sender<InternalMessageWithMetadata>,
         user_repo: Arc<dyn UserRepository>,
-        pool: Pool<Postgres>,
     ) -> Self {
         Self {
             config,
             user_repo,
             internal_sender,
-            pool,
         }
     }
 }

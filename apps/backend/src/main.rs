@@ -27,7 +27,7 @@ async fn main() {
     let (tx, internal_broadcast_task) = start_internal_broadcast(pool.clone()).await;
 
     let user_repo = Arc::new(SqlxUserRepository::new(pool.clone()));
-    let state = AppState::new(config, tx, user_repo, pool).await;
+    let state = AppState::new(config, tx, user_repo).await;
 
     let app = routes::router().with_state(state);
     let listener = tokio::net::TcpListener::bind(ADDR).await.unwrap();

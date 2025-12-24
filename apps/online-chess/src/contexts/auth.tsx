@@ -12,7 +12,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const { data, isLoading } = useQuery<AuthData | null>({
     queryKey: ['auth_data'],
     queryFn: () =>
-      fetch('/api/auth/me', { credentials: 'include' }).then((resp) =>
+      fetch('/api/user/me', { credentials: 'include' }).then((resp) =>
         resp.ok ? resp.json() : null
       ),
   });

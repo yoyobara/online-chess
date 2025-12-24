@@ -3,7 +3,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use tower_cookies::Cookies;
 
-use crate::{constants::auth::AUTH_COOKIE_NAME, state::AppState};
+use crate::{constants::auth::AUTH_COOKIE_NAME, error::ApiError, state::AppState};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthUser {
@@ -24,9 +24,7 @@ impl FromRequestParts<AppState> for AuthUser {
         parts: &mut axum::http::request::Parts,
         state: &AppState,
     ) -> Result<Self, Self::Rejection> {
-        let cookies = Cookies::from_request_parts(parts, state)
-            .await
-            .map_err(|_| (StatusCode::UNAUTHORIZED, "cookies extractors failed"))?;
+        let cookies = Cookies::from_request_parts(parts, state).await?;
 
         let jwt_token = cookies
             .get(AUTH_COOKIE_NAME)
