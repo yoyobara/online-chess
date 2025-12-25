@@ -18,6 +18,12 @@ const ADDR: (&str, u16) = ("0.0.0.0", 3000);
 async fn main() {
     let config = load_env();
     let pool = load_pool(&config.database_url).await;
+
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("whatnow");
+
     let (tx, internal_broadcast_task) = start_internal_broadcast(pool.clone()).await;
     let state = AppState::new(config, pool, tx).await;
 
