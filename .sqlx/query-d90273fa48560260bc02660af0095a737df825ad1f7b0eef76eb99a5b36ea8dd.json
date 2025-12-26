@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE matches\n            SET match_status = CASE\n                WHEN $1 THEN 'White_won'::match_status_enum\n                ELSE 'Black_won'::match_status_enum\n            END\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d90273fa48560260bc02660af0095a737df825ad1f7b0eef76eb99a5b36ea8dd"
+}
