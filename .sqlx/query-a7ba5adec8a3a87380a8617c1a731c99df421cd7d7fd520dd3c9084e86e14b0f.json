@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH claimed AS (\n                SELECT id\n                FROM matches\n                WHERE match_status = 'Matchmaking'\n                AND player2_id IS NULL\n                ORDER BY id\n                LIMIT 1\n                FOR UPDATE\n            )\n            UPDATE matches\n            SET player2_id = $1,\n                match_status = 'Ongoing'\n            WHERE id IN (SELECT id FROM claimed)\n            RETURNING id, player1_id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "player1_id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "a7ba5adec8a3a87380a8617c1a731c99df421cd7d7fd520dd3c9084e86e14b0f"
+}

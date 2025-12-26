@@ -1,0 +1,37 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/online-chess/Dockerfile
+    ports:
+      - '8080:80'
+    environment:
+      NGINX_BACKEND_ADDRESS: http://backend:3000
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+
+    ports:
+      - '3000:3000'
+
+    environment:
+      DATABASE_URL: postgres://myuser:mypassword@db:5432/mydatabase
+      JWT_SECRET: example-secret
+      RUST_LOG: DEBUG
+
+    depends_on:
+      - db
+
+    restart: unless-stopped
+
+  db:
+    image: postgres:14
+
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+
+    restart: unless-stopped
