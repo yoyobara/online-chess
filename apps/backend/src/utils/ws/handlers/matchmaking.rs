@@ -1,6 +1,6 @@
 use crate::{
     internal_broadcast::InternalMessage,
-    routes::ws::{message::ServerMessage, session::Session, state::SessionState},
+    utils::ws::{message::ServerMessage, session::Session, state::SessionState},
 };
 
 pub async fn handle_looking_for_match(session: &mut Session) {

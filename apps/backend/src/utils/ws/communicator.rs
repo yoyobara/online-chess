@@ -5,7 +5,7 @@ use tokio::sync::broadcast::Receiver;
 
 use crate::{
     internal_broadcast::{InternalMessage, InternalMessageWithMetadata},
-    routes::ws::message::{ClientMessage, ServerMessage},
+    utils::ws::message::{ClientMessage, ServerMessage},
 };
 
 #[derive(Debug)]

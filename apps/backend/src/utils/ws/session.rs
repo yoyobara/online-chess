@@ -3,7 +3,8 @@ use tokio::sync::broadcast::Receiver;
 
 use crate::{
     internal_broadcast::{InternalMessage, InternalMessageWithMetadata},
-    routes::ws::{
+    state::AppState,
+    utils::ws::{
         communicator::{Event, SessionCommunicator},
         handlers::{
             handle_client_disconnection, handle_looking_for_match, handle_match_found,
@@ -12,7 +13,6 @@ use crate::{
         message::ClientMessage,
         state::SessionState,
     },
-    state::AppState,
 };
 
 pub struct Session {
