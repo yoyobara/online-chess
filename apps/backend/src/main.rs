@@ -11,7 +11,7 @@ mod utils;
 
 use std::sync::Arc;
 
-use tokio::{net::TcpListener, select, signal};
+use tokio::{net::TcpListener, select};
 
 use crate::{
     configs::{load_env, load_pool},
@@ -29,7 +29,7 @@ async fn main() -> anyhow::Result<()> {
     let user_repo = Arc::new(SqlxUserRepository::new(pool.clone()));
     let (tx, internal_broadcast_task) = start_internal_broadcast(pool.clone()).await;
 
-    let state = AppState::new(config, tx, user_repo).await;
+    let state = AppState::new(config, tx, pool.clone(), user_repo).await;
 
     sqlx::migrate!("./migrations").run(&pool).await?;
 

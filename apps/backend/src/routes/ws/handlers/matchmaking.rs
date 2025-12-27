@@ -25,7 +25,7 @@ pub async fn handle_looking_for_match(session: &mut Session) {
             "#,
         session.player_id,
     )
-    .fetch_optional(&session.pool)
+    .fetch_optional(&session.app_state.pool)
     .await
     .unwrap();
 
@@ -60,7 +60,7 @@ pub async fn handle_looking_for_match(session: &mut Session) {
                 "INSERT INTO matches (player1_id, match_status) VALUES($1, 'Matchmaking') RETURNING id;",
                 session.player_id
             )
-            .fetch_one(&session.pool)
+            .fetch_one(&session.app_state.pool)
             .await
             .unwrap();
 

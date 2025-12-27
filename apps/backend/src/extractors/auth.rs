@@ -3,7 +3,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use tower_cookies::Cookies;
 
-use crate::{constants::auth::AUTH_COOKIE_NAME, error::ApiError, state::AppState};
+use crate::{constants::auth::AUTH_COOKIE_NAME, state::AppState};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthUser {
