@@ -8,6 +8,6 @@ pub struct Config {
     pub database_url: String,
 }
 
-pub fn load_env() -> Arc<Config> {
-    Arc::new(envy::from_env().unwrap())
+pub fn load_env() -> anyhow::Result<Arc<Config>> {
+    envy::from_env().map(Arc::new).map_err(Into::into)
 }

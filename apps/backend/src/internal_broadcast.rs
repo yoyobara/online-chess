@@ -1,5 +1,8 @@
 use sqlx::{postgres::PgListener, Pool, Postgres};
-use tokio::sync::broadcast;
+use tokio::{
+    sync::broadcast::{self, Sender},
+    task::JoinHandle,
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -20,23 +23,27 @@ pub struct InternalMessageWithMetadata {
 pub async fn start_internal_broadcast(
     pool: Pool<Postgres>,
 ) -> (
-    tokio::sync::broadcast::Sender<InternalMessageWithMetadata>,
-    tokio::task::JoinHandle<()>,
+    Sender<InternalMessageWithMetadata>,
+    JoinHandle<anyhow::Result<()>>,
 ) {
     let (tx, _rx) = broadcast::channel::<InternalMessageWithMetadata>(1024);
-
-    let tx1 = tx.clone();
-    let handler = tokio::spawn(async move {
-        let mut listener = PgListener::connect_with(&pool).await.unwrap();
-        listener.listen("game_events").await.unwrap();
-
-        while let Ok(msg) = listener.recv().await {
-            let deserialized: InternalMessageWithMetadata =
-                serde_json::from_str(msg.payload()).unwrap();
-
-            tx1.send(deserialized).unwrap();
-        }
-    });
+    let handler = tokio::spawn(internal_broadcast(pool, tx.clone()));
 
     (tx, handler)
+}
+
+async fn internal_broadcast(
+    pool: Pool<Postgres>,
+    tx: Sender<InternalMessageWithMetadata>,
+) -> anyhow::Result<()> {
+    let mut listener = PgListener::connect_with(&pool).await?;
+    listener.listen("game_events").await?;
+
+    while let Ok(msg) = listener.recv().await {
+        let deserialized: InternalMessageWithMetadata = serde_json::from_str(msg.payload())?;
+
+        tx.send(deserialized)?;
+    }
+
+    Ok(())
 }
