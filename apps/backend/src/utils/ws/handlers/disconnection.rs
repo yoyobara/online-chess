@@ -1,6 +1,6 @@
 use crate::{
     internal_broadcast::InternalMessage,
-    routes::ws::{message::ServerMessage, session::Session, state::SessionState},
+    utils::ws::{message::ServerMessage, session::Session, state::SessionState},
 };
 
 pub async fn handle_client_disconnection(session: &mut Session) {
@@ -13,7 +13,7 @@ pub async fn handle_client_disconnection(session: &mut Session) {
         }
         SessionState::WaitingForMatch { expected_match_id } => {
             sqlx::query!("DELETE FROM matches WHERE id = $1", expected_match_id)
-                .execute(&session.pool)
+                .execute(&session.app_state.pool)
                 .await
                 .unwrap();
         }
@@ -33,7 +33,7 @@ pub async fn handle_opponent_disconnection(session: &mut Session) {
             "#,
             white
         )
-        .execute(&session.pool)
+        .execute(&session.app_state.pool)
         .await
         .unwrap();
 

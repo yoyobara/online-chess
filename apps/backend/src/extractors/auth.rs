@@ -24,9 +24,7 @@ impl FromRequestParts<AppState> for AuthUser {
         parts: &mut axum::http::request::Parts,
         state: &AppState,
     ) -> Result<Self, Self::Rejection> {
-        let cookies = Cookies::from_request_parts(parts, state)
-            .await
-            .map_err(|_| (StatusCode::UNAUTHORIZED, "cookies extractors failed"))?;
+        let cookies = Cookies::from_request_parts(parts, state).await?;
 
         let jwt_token = cookies
             .get(AUTH_COOKIE_NAME)

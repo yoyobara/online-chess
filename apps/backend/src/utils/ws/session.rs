@@ -1,16 +1,16 @@
 use axum::extract::ws::WebSocket;
-use sqlx::{Pool, Postgres};
 use tokio::sync::broadcast::Receiver;
 
 use crate::{
     internal_broadcast::{InternalMessage, InternalMessageWithMetadata},
-    routes::ws::{
+    state::AppState,
+    utils::ws::{
         communicator::{Event, SessionCommunicator},
         handlers::{
             handle_client_disconnection, handle_looking_for_match, handle_match_found,
             handle_opponent_disconnection,
         },
-        message::{ClientMessage, ServerMessage},
+        message::ClientMessage,
         state::SessionState,
     },
 };
@@ -18,7 +18,7 @@ use crate::{
 pub struct Session {
     pub(super) communicator: SessionCommunicator,
     pub(super) player_id: i32,
-    pub(super) pool: Pool<Postgres>,
+    pub(super) app_state: AppState,
     pub(super) state: SessionState,
 }
 
@@ -27,17 +27,17 @@ impl Session {
         socket: WebSocket,
         internal_reciever: Receiver<InternalMessageWithMetadata>,
         player_id: i32,
-        pool: Pool<Postgres>,
+        app_state: AppState,
     ) -> Self {
         Self {
             communicator: SessionCommunicator::new(
                 socket,
                 internal_reciever,
-                pool.clone(),
+                app_state.pool.clone(),
                 player_id,
             ),
             player_id,
-            pool,
+            app_state,
             state: SessionState::Connected,
         }
     }

@@ -1,3 +1,4 @@
+mod me;
 mod rank;
 
 use axum::{routing::get, Router};
@@ -5,5 +6,7 @@ use axum::{routing::get, Router};
 use crate::state::AppState;
 
 pub fn router() -> Router<AppState> {
-    Router::new().route("/rank", get(rank::rank_handler))
+    Router::new()
+        .route("/me", get(me::me_handler))
+        .route("/rank", get(rank::rank_handler))
 }
