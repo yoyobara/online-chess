@@ -25,7 +25,7 @@ pub async fn register_handler(
         password,
     }): Json<RegisterRequest>,
 ) -> ApiResult<StatusCode> {
-    let password_hash = hash_password(&password.into());
+    let password_hash = hash_password(&password.into())?;
 
     let created_user_id = state
         .user_repo
@@ -37,7 +37,7 @@ pub async fn register_handler(
             player_id: created_user_id,
         },
         state.config.jwt_secret.as_ref(),
-    ));
+    )?);
 
     Ok(StatusCode::CREATED)
 }

@@ -22,11 +22,11 @@ pub async fn login_handler(
 ) -> ApiResult<StatusCode> {
     let user = state.user_repo.get_by_email(login_request.email).await?;
 
-    if verify_password(&login_request.password.into(), &user.password_hash) {
+    if verify_password(&login_request.password.into(), &user.password_hash)? {
         cookies.add(create_auth_cookie(
             AuthUser { player_id: user.id },
             state.config.jwt_secret.as_ref(),
-        ));
+        )?);
 
         Ok(StatusCode::OK)
     } else {

@@ -8,7 +8,7 @@ use tower_cookies::Cookie;
 use crate::constants::auth::AUTH_COOKIE_NAME;
 use crate::extractors::{AuthUser, Claims};
 
-pub fn create_auth_cookie(user: AuthUser, secret: &[u8]) -> Cookie<'static> {
+pub fn create_auth_cookie(user: AuthUser, secret: &[u8]) -> anyhow::Result<Cookie<'static>> {
     let now = OffsetDateTime::now_utc();
     let expiry = now.saturating_add(Duration::WEEK);
 
@@ -22,8 +22,7 @@ pub fn create_auth_cookie(user: AuthUser, secret: &[u8]) -> Cookie<'static> {
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(secret),
-    )
-    .unwrap();
+    )?;
 
     let cookie = Cookie::build((AUTH_COOKIE_NAME, encoded))
         .expires(expiry)
@@ -32,26 +31,24 @@ pub fn create_auth_cookie(user: AuthUser, secret: &[u8]) -> Cookie<'static> {
         .path("/")
         .build();
 
-    cookie
+    Ok(cookie)
 }
 
-pub fn hash_password(password: &SecretString) -> String {
+pub fn hash_password(password: &SecretString) -> anyhow::Result<String> {
     let argon2 = Argon2::default();
     let salt = SaltString::generate(&mut OsRng);
 
-    let hash = argon2
-        .hash_password(password.expose_secret().as_ref(), &salt)
-        .unwrap();
+    let hash = argon2.hash_password(password.expose_secret().as_ref(), &salt)?;
 
-    hash.to_string()
+    Ok(hash.to_string())
 }
 
-pub fn verify_password(password_attempt: &SecretString, phc: &str) -> bool {
+pub fn verify_password(password_attempt: &SecretString, phc: &str) -> anyhow::Result<bool> {
     let argon2 = Argon2::default();
-    let parsed_hash = PasswordHash::new(phc).unwrap();
+    let parsed_hash = PasswordHash::new(phc)?;
 
     let verification =
         argon2.verify_password(password_attempt.expose_secret().as_ref(), &parsed_hash);
 
-    verification.is_ok()
+    Ok(verification.is_ok())
 }
