@@ -3,13 +3,11 @@ use axum::{
     response::IntoResponse,
 };
 
-use crate::{extractors::AuthUser, state::AppState, utils::Session};
+use crate::{extractors::AuthUser, state::AppState};
 
+#[allow(unused_variables)]
 async fn handle_socket(socket: WebSocket, player_id: i32, app_state: AppState) {
-    let reciever = app_state.internal_sender.subscribe();
-    let mut session = Session::new(socket, reciever, player_id, app_state).await;
-
-    session.mainloop().await;
+    unimplemented!()
 }
 
 pub async fn realtime_handler(
