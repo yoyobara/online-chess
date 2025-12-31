@@ -6,6 +6,7 @@ use serde::Deserialize;
 pub struct Config {
     pub jwt_secret: String,
     pub database_url: String,
+    pub redis_url: String,
 }
 
 pub fn load_env() -> anyhow::Result<Arc<Config>> {
