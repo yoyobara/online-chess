@@ -1,9 +1,6 @@
 use crate::{extractors::AuthUser, state::AppState, utils::new_uuid_v4};
 use axum::{
-    extract::{
-        ws::{Message, WebSocket},
-        State, WebSocketUpgrade,
-    },
+    extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,
 };
 use redis::AsyncTypedCommands;
@@ -15,28 +12,27 @@ async fn handle_socket(
     player_id: i32,
     mut app_state: AppState,
 ) -> anyhow::Result<()> {
+    let match_id;
     let player_pop_result: Option<i32> = app_state
         .redis_connection
         .lpop("matchmaking:waiting_players", None)
         .await?;
 
     if let Some(popped_player) = player_pop_result {
-        let new_match_id = new_uuid_v4();
+        match_id = new_uuid_v4();
 
         app_state
             .redis_connection
-            .set(format!("matches:{}", new_match_id), 1)
+            .set(format!("matches:{}", match_id), 1)
             .await?;
 
         app_state
             .redis_connection
             .publish(
                 format!("matchmaking_waiting_users:{}", popped_player),
-                &new_match_id,
+                &match_id,
             )
             .await?;
-
-        socket.send(Message::Text(new_match_id.into())).await?;
     } else {
         let (tx, rx) = oneshot::channel::<String>();
         app_state.matchmaking_registry_map.insert(player_id, tx);
@@ -45,9 +41,12 @@ async fn handle_socket(
             .lpush("matchmaking:waiting_players", player_id)
             .await?;
 
-        let found_match_id = rx.await?;
-        socket.send(Message::Text(found_match_id.into())).await?;
+        match_id = rx.await?;
     }
+
+    socket
+        .send(serde_json::to_string(&match_id)?.into())
+        .await?;
 
     Ok(())
 }

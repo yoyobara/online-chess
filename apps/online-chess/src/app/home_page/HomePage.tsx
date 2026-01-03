@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import styles from './HomePage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { useNavigate } from 'react-router-dom';
@@ -11,11 +11,30 @@ import logout_icon from '../../assets/logout.svg';
 
 import { useRequiredAuth } from '../../contexts/auth';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import useWebSocket from 'react-use-websocket';
+import { MatchmakingModal } from '../matchmaking_modal/MatchmakingModal';
 
 export const HomePage: FC = () => {
   const auth = useRequiredAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const [matchmaking, setMatchmaking] = useState<boolean>(false);
+  const { lastJsonMessage, lastMessage } = useWebSocket(
+    '/matchmaking',
+    undefined,
+    matchmaking
+  );
+
+  useEffect(() => {
+    if (lastJsonMessage) {
+      navigate(`/play/${lastJsonMessage}`);
+    }
+  }, [lastJsonMessage, navigate]);
+
+  useEffect(() => {
+    console.log(lastMessage);
+  }, [lastMessage]);
 
   const { data: rank } = useQuery<number>({
     queryKey: ['user_rank'],
@@ -46,7 +65,7 @@ export const HomePage: FC = () => {
         <Button
           variant="purple"
           className={styles.play_button}
-          onClick={() => navigate('/play')}
+          onClick={() => setMatchmaking(true)}
         >
           <img height="100%" src={play_circle} alt=""></img>
           Play Online!
@@ -59,6 +78,7 @@ export const HomePage: FC = () => {
           <img src={logout_icon} alt="logout" />
         </Button>
       </Paper>
+      {matchmaking && <MatchmakingModal />}
     </div>
   );
 };
