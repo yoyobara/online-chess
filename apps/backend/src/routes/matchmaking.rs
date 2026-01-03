@@ -52,7 +52,7 @@ async fn handle_socket(
     Ok(())
 }
 
-pub async fn realtime_handler(
+pub async fn matchmaking_handler(
     ws: WebSocketUpgrade,
     AuthUser { player_id }: AuthUser,
     State(state): State<AppState>,

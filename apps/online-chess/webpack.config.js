@@ -20,7 +20,7 @@ module.exports = {
         target: 'http://localhost:3000',
       },
       {
-        context: ['/realtime'],
+        context: ['/matchmaking'],
         target: 'ws://localhost:3000',
         ws: true,
       },
