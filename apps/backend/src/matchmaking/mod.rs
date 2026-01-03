@@ -4,7 +4,7 @@ use redis::Client;
 use std::sync::Arc;
 use tokio::{sync::oneshot, task::JoinHandle};
 
-type RegistryMap = Arc<DashMap<i32, oneshot::Sender<i32>>>;
+pub type RegistryMap = Arc<DashMap<i32, oneshot::Sender<String>>>;
 
 fn extract_user_id_from_channel(channel_name: &str) -> i32 {
     let (_, user_id) = channel_name.split_once(":").unwrap();
