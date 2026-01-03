@@ -5,7 +5,6 @@ import { LandingPage } from './landing_page/LandingPage';
 import { SignInModal } from './auth_modals/SignInModal';
 import { SignUpModal } from './auth_modals/SignUpModal';
 import { PlayPage } from './play_page/PlayPage';
-import { RealtimeProvider } from '../contexts/realtime';
 import { HomePage } from './home_page/HomePage';
 
 export function App() {
@@ -47,9 +46,7 @@ export function App() {
         path="/play"
         element={
           <LoggedInOnly>
-            <RealtimeProvider>
-              <PlayPage />
-            </RealtimeProvider>
+            <PlayPage />
           </LoggedInOnly>
         }
       />
