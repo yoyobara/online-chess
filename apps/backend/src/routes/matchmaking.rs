@@ -21,9 +21,15 @@ async fn handle_socket(
     if let Some(popped_player) = player_pop_result {
         match_id = new_uuid_v4();
 
-        app_state
-            .redis_connection
-            .set(format!("matches:{}", match_id), 1)
+        let _: () = redis::pipe()
+            .atomic()
+            .hset_multiple(
+                format!("matches:{}", &match_id),
+                &[("player1_id", player_id), ("player2_id", popped_player)],
+            )
+            .sadd(format!("player:{}:matches", player_id), &match_id)
+            .sadd(format!("player:{}:matches", popped_player), &match_id)
+            .query_async(&mut app_state.redis_connection)
             .await?;
 
         app_state

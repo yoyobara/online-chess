@@ -18,7 +18,7 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .nest("/api", api::router())
         .route("/matchmaking", any(matchmaking_handler))
-        .route("/realtime", any(realtime_handler))
+        .route("/join/{match_id}", any(realtime_handler))
         .layer(CookieManagerLayer::new())
         .layer(TraceLayer::new_for_http())
 }

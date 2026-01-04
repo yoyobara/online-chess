@@ -15,6 +15,9 @@ pub enum ApiError {
     #[error("password and email do not match")]
     WrongPassword,
 
+    #[error("the user is not in the match")]
+    UserNotInMatch,
+
     // TODO remove for security
     #[error("something went wrong: {0}")]
     InternalServerError(#[from] anyhow::Error),
@@ -22,11 +25,13 @@ pub enum ApiError {
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
+        use ApiError::*;
+
         let status_code = match self {
-            ApiError::UserNotFound => StatusCode::NOT_FOUND,
-            ApiError::EmailOrNameExists(_) => StatusCode::CONFLICT,
-            ApiError::WrongPassword => StatusCode::UNAUTHORIZED,
-            ApiError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            UserNotFound => StatusCode::NOT_FOUND,
+            EmailOrNameExists(_) => StatusCode::CONFLICT,
+            WrongPassword | UserNotInMatch => StatusCode::UNAUTHORIZED,
+            InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
         let body = json!({"error": self.to_string() });
@@ -40,10 +45,12 @@ pub type ApiResult<T> = Result<T, ApiError>;
 // repos conversion
 impl From<UserRepositoryError> for ApiError {
     fn from(value: UserRepositoryError) -> Self {
+        use UserRepositoryError::*;
+
         match value {
-            UserRepositoryError::UserNotFound => Self::UserNotFound,
-            UserRepositoryError::ConstraintViolation(field) => Self::EmailOrNameExists(field),
-            UserRepositoryError::Db(err) => Self::InternalServerError(err),
+            UserNotFound => Self::UserNotFound,
+            ConstraintViolation(field) => Self::EmailOrNameExists(field),
+            Db(err) => Self::InternalServerError(err),
         }
     }
 }
