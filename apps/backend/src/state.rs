@@ -1,15 +1,30 @@
 use std::sync::Arc;
 
-use crate::{configs::Config, repositories::user::UserRepository};
+use redis::aio::MultiplexedConnection;
+
+use crate::{configs::Config, matchmaking::RegistryMap, repositories::user::UserRepository};
 
 #[derive(Clone, Debug)]
 pub struct AppState {
     pub config: Arc<Config>,
     pub user_repo: Arc<dyn UserRepository>,
+    pub redis_connection: MultiplexedConnection,
+
+    pub matchmaking_registry_map: RegistryMap,
 }
 
 impl AppState {
-    pub async fn new(config: Arc<Config>, user_repo: Arc<dyn UserRepository>) -> Self {
-        Self { config, user_repo }
+    pub async fn new(
+        config: Arc<Config>,
+        user_repo: Arc<dyn UserRepository>,
+        matchmaking_registry_map: RegistryMap,
+        redis_connection: MultiplexedConnection,
+    ) -> Self {
+        Self {
+            config,
+            user_repo,
+            matchmaking_registry_map,
+            redis_connection,
+        }
     }
 }
