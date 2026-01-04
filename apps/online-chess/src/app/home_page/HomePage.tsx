@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import styles from './HomePage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { useNavigate } from 'react-router-dom';
@@ -11,30 +11,17 @@ import logout_icon from '../../assets/logout.svg';
 
 import { useRequiredAuth } from '../../contexts/auth';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import useWebSocket from 'react-use-websocket';
 import { MatchmakingModal } from '../matchmaking_modal/MatchmakingModal';
+import { useMatchmaking } from '../../hooks/matchmaking';
 
 export const HomePage: FC = () => {
   const auth = useRequiredAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [matchmaking, setMatchmaking] = useState<boolean>(false);
-  const { lastJsonMessage, lastMessage } = useWebSocket(
-    '/matchmaking',
-    undefined,
-    matchmaking
+  const { matchmaking, setMatchmaking } = useMatchmaking((matchId) =>
+    navigate(`/play/${matchId}`)
   );
-
-  useEffect(() => {
-    if (lastJsonMessage) {
-      navigate(`/play/${lastJsonMessage}`);
-    }
-  }, [lastJsonMessage, navigate]);
-
-  useEffect(() => {
-    console.log(lastMessage);
-  }, [lastMessage]);
 
   const { data: rank } = useQuery<number>({
     queryKey: ['user_rank'],
