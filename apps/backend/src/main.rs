@@ -2,7 +2,6 @@ mod configs;
 mod constants;
 mod error;
 mod extractors;
-mod matchmaking;
 mod models;
 mod repositories;
 mod routes;
@@ -15,9 +14,9 @@ use tokio::{join, net::TcpListener};
 
 use crate::{
     configs::{load_env, load_pool, load_redis},
-    matchmaking::init_matchmaking_listener,
     repositories::user::SqlxUserRepository,
     state::AppState,
+    utils::matchmaking::init_matchmaking_listener,
 };
 
 #[tokio::main]

@@ -6,7 +6,7 @@ use crate::{
     error::ApiResult,
     extractors::AuthUser,
     state::AppState,
-    utils::{create_auth_cookie, hash_password},
+    utils::auth::{create_auth_cookie, hash_password},
 };
 
 #[derive(Deserialize)]

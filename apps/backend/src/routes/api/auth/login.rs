@@ -6,7 +6,7 @@ use crate::{
     error::{ApiError, ApiResult},
     extractors::AuthUser,
     state::AppState,
-    utils::{create_auth_cookie, verify_password},
+    utils::auth::{create_auth_cookie, verify_password},
 };
 
 #[derive(Deserialize)]

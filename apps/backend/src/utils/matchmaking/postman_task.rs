@@ -1,7 +1,7 @@
 use futures_util::StreamExt as _;
 use redis::Client;
 
-use crate::matchmaking::RegistryMap;
+use crate::utils::matchmaking::RegistryMap;
 
 fn extract_user_id_from_channel(channel_name: &str) -> i32 {
     let (_, user_id) = channel_name.split_once(":").unwrap();

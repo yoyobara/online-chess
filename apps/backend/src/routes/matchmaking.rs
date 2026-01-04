@@ -1,4 +1,4 @@
-use crate::{extractors::AuthUser, state::AppState, utils::new_uuid_v4};
+use crate::{extractors::AuthUser, state::AppState, utils::uuid::new_uuid_v4};
 use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,

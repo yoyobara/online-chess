@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use redis::aio::MultiplexedConnection;
 
-use crate::{configs::Config, matchmaking::RegistryMap, repositories::user::UserRepository};
+use crate::{configs::Config, repositories::user::UserRepository, utils::matchmaking::RegistryMap};
 
 #[derive(Clone, Debug)]
 pub struct AppState {
