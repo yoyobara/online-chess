@@ -1,4 +1,4 @@
-use crate::{extractors::AuthUser, state::AppState, utils::uuid::new_uuid_v4};
+use crate::{extractors::AuthUser, state::AppState};
 use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,
@@ -16,11 +16,9 @@ async fn handle_socket(
     let player_pop_result = app_state.match_repo.pop_matchmaking_player().await?;
 
     if let Some(popped_player) = player_pop_result {
-        match_id = new_uuid_v4();
-
-        app_state
+        match_id = app_state
             .match_repo
-            .register_match(player_id, popped_player)
+            .register_match(popped_player, player_id)
             .await?;
 
         app_state
