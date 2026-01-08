@@ -1,4 +1,4 @@
-use crate::{extractors::AuthUser, state::AppState, utils::uuid::new_uuid_v4};
+use crate::{extractors::AuthUser, state::AppState};
 use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,
@@ -13,17 +13,12 @@ async fn handle_socket(
     mut app_state: AppState,
 ) -> anyhow::Result<()> {
     let match_id;
-    let player_pop_result: Option<i32> = app_state
-        .redis_connection
-        .lpop("matchmaking:waiting_players", None)
-        .await?;
+    let player_pop_result = app_state.match_repo.pop_matchmaking_player().await?;
 
     if let Some(popped_player) = player_pop_result {
-        match_id = new_uuid_v4();
-
-        app_state
-            .redis_connection
-            .set(format!("matches:{}", match_id), 1)
+        match_id = app_state
+            .match_repo
+            .register_match(popped_player, player_id)
             .await?;
 
         app_state
@@ -36,9 +31,10 @@ async fn handle_socket(
     } else {
         let (tx, rx) = oneshot::channel::<String>();
         app_state.matchmaking_registry_map.insert(player_id, tx);
+
         app_state
-            .redis_connection
-            .lpush("matchmaking:waiting_players", player_id)
+            .match_repo
+            .push_matchmaking_player(player_id)
             .await?;
 
         match_id = rx.await?;

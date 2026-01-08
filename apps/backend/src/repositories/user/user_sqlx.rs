@@ -3,7 +3,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::{
     models::user::UserData,
-    repositories::user::{user::UserRepository, UserRepositoryError},
+    repositories::user::{error::UserRepositoryResult, user::UserRepository, UserRepositoryError},
 };
 
 #[derive(Debug, Clone)]
@@ -31,14 +31,14 @@ fn sqlx_to_repo_error(err: sqlx::Error) -> UserRepositoryError {
 
 #[async_trait]
 impl UserRepository for SqlxUserRepository {
-    async fn get_user(&self, id: i32) -> Result<UserData, UserRepositoryError> {
+    async fn get_user(&self, id: i32) -> UserRepositoryResult<UserData> {
         sqlx::query_as!(UserData, "select * from users where id = $1", id)
             .fetch_one(&self.pool)
             .await
             .map_err(sqlx_to_repo_error)
     }
 
-    async fn get_by_email(&self, email: String) -> Result<UserData, UserRepositoryError> {
+    async fn get_by_email(&self, email: String) -> UserRepositoryResult<UserData> {
         sqlx::query_as!(UserData, "select * from users where email = $1", email)
             .fetch_one(&self.pool)
             .await
@@ -49,7 +49,7 @@ impl UserRepository for SqlxUserRepository {
         username: String,
         email: String,
         password_hash: String,
-    ) -> Result<i32, UserRepositoryError> {
+    ) -> UserRepositoryResult<i32> {
         sqlx::query_scalar!(
             "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id;",
             username,

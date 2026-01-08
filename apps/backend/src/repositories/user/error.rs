@@ -9,3 +9,5 @@ pub enum UserRepositoryError {
     #[error("something went wrong!")]
     Db(#[from] anyhow::Error),
 }
+
+pub type UserRepositoryResult<T> = Result<T, UserRepositoryError>;
