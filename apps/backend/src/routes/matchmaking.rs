@@ -13,23 +13,14 @@ async fn handle_socket(
     mut app_state: AppState,
 ) -> anyhow::Result<()> {
     let match_id;
-    let player_pop_result: Option<i32> = app_state
-        .redis_connection
-        .lpop("matchmaking:waiting_players", None)
-        .await?;
+    let player_pop_result = app_state.match_repo.pop_matchmaking_player().await?;
 
     if let Some(popped_player) = player_pop_result {
         match_id = new_uuid_v4();
 
-        let _: () = redis::pipe()
-            .atomic()
-            .hset_multiple(
-                format!("matches:{}", &match_id),
-                &[("player1_id", player_id), ("player2_id", popped_player)],
-            )
-            .sadd(format!("player:{}:matches", player_id), &match_id)
-            .sadd(format!("player:{}:matches", popped_player), &match_id)
-            .query_async(&mut app_state.redis_connection)
+        app_state
+            .match_repo
+            .register_match(player_id, popped_player)
             .await?;
 
         app_state
@@ -42,9 +33,10 @@ async fn handle_socket(
     } else {
         let (tx, rx) = oneshot::channel::<String>();
         app_state.matchmaking_registry_map.insert(player_id, tx);
+
         app_state
-            .redis_connection
-            .lpush("matchmaking:waiting_players", player_id)
+            .match_repo
+            .push_matchmaking_player(player_id)
             .await?;
 
         match_id = rx.await?;

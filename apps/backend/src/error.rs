@@ -2,7 +2,7 @@ use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde_json::json;
 use thiserror::Error;
 
-use crate::repositories::user::UserRepositoryError;
+use crate::repositories::{r#match::MatchRepositoryError, user::UserRepositoryError};
 
 #[derive(Error, Debug)]
 pub enum ApiError {
@@ -51,6 +51,14 @@ impl From<UserRepositoryError> for ApiError {
             UserNotFound => Self::UserNotFound,
             ConstraintViolation(field) => Self::EmailOrNameExists(field),
             Db(err) => Self::InternalServerError(err),
+        }
+    }
+}
+
+impl From<MatchRepositoryError> for ApiError {
+    fn from(value: MatchRepositoryError) -> Self {
+        match value {
+            MatchRepositoryError::Unknown(err) => Self::InternalServerError(err),
         }
     }
 }

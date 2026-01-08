@@ -14,7 +14,7 @@ use tokio::{join, net::TcpListener};
 
 use crate::{
     configs::{load_env, load_pool, load_redis},
-    repositories::user::SqlxUserRepository,
+    repositories::{r#match::RedisMatchRepository, user::SqlxUserRepository},
     state::AppState,
     utils::matchmaking::init_matchmaking_listener,
 };
@@ -29,14 +29,16 @@ async fn main() -> anyhow::Result<()> {
     let redis_connection = client.get_multiplexed_async_connection().await?;
 
     let user_repo = Arc::new(SqlxUserRepository::new(pool.clone()));
+    let match_repo = Arc::new(RedisMatchRepository::new(redis_connection.clone()));
 
     let (matchmaking_task, matchmaking_registry_map) = init_matchmaking_listener(client).await?;
 
     let state = AppState::new(
         config,
         user_repo,
-        matchmaking_registry_map,
+        match_repo,
         redis_connection,
+        matchmaking_registry_map,
     )
     .await;
 

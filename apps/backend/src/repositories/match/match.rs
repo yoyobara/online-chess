@@ -14,6 +14,6 @@ pub trait MatchRepository: Send + Sync + Debug {
     async fn is_player_in_match(
         &self,
         player_id: i32,
-        match_id: String,
+        match_id: &str,
     ) -> MatchRepositoryResult<bool>;
 }
