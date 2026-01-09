@@ -10,13 +10,13 @@ mod utils;
 
 use std::sync::Arc;
 
-use tokio::{join, net::TcpListener};
+use tokio::net::TcpListener;
 
 use crate::{
     configs::{load_env, load_pool, load_redis},
     repositories::{r#match::RedisMatchRepository, user::SqlxUserRepository},
     state::AppState,
-    utils::matchmaking::init_matchmaking_listener,
+    utils::pubsub::{redis::RedisPubSub, PubSubFactory},
 };
 
 #[tokio::main]
@@ -26,28 +26,21 @@ async fn main() -> anyhow::Result<()> {
 
     let pool = load_pool(&config.database_url).await?;
     let client = load_redis(&config.redis_url).await?;
-    let redis_connection = client.get_multiplexed_async_connection().await?;
 
     let user_repo = Arc::new(SqlxUserRepository::new(pool.clone()));
-    let match_repo = Arc::new(RedisMatchRepository::new(redis_connection.clone()));
+    let match_repo = Arc::new(RedisMatchRepository::new(
+        client.get_multiplexed_async_connection().await?,
+    ));
 
-    let (matchmaking_task, matchmaking_registry_map) = init_matchmaking_listener(client).await?;
+    let pubsub_factory: Arc<PubSubFactory> =
+        Arc::new(move || Box::new(RedisPubSub::new(client.clone())));
 
-    let state = AppState::new(
-        config,
-        user_repo,
-        match_repo,
-        redis_connection,
-        matchmaking_registry_map,
-    )
-    .await;
+    let state = AppState::new(config, pubsub_factory, user_repo, match_repo).await;
 
     let app = routes::router().with_state(state);
     let listener = TcpListener::bind(("0.0.0.0", port)).await?;
     println!("listening on {}", listener.local_addr()?);
     axum::serve(listener, app).await?;
-
-    join!(matchmaking_task).0??;
 
     Ok(())
 }
