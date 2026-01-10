@@ -8,23 +8,24 @@ services:
     environment:
       NGINX_BACKEND_ADDRESS: http://backend:3000
 
+    depends_on:
+      - backend
+
   backend:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
 
-    ports:
-      - '3000:3000'
-
     environment:
+      PORT: 3000
       DATABASE_URL: postgres://myuser:mypassword@db:5432/mydatabase
+      REDIS_URL: redis://redis
       JWT_SECRET: example-secret
       RUST_LOG: DEBUG
 
     depends_on:
       - db
-
-    restart: unless-stopped
+      - redis
 
   db:
     image: postgres:14
@@ -34,4 +35,5 @@ services:
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydatabase
 
-    restart: unless-stopped
+  redis:
+    image: redis:8
