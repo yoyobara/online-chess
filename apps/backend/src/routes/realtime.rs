@@ -2,6 +2,7 @@ use crate::{
     error::{ApiError, ApiResult},
     extractors::AuthUser,
     state::AppState,
+    utils::realtime::RealtimeSession,
 };
 use axum::{
     body::Body,
@@ -16,7 +17,9 @@ async fn handle_socket(
     match_id: String,
     app_state: AppState,
 ) -> anyhow::Result<()> {
-    unimplemented!()
+    let session = RealtimeSession::new(app_state, socket, player_id, match_id);
+
+    session.mainloop().await
 }
 
 pub async fn realtime_handler(
