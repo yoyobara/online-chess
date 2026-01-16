@@ -3,15 +3,14 @@ use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,
 };
-use redis::AsyncTypedCommands;
-use tokio::sync::oneshot;
 
 #[allow(unused_variables)]
 async fn handle_socket(
     mut socket: WebSocket,
     player_id: i32,
-    mut app_state: AppState,
+    app_state: AppState,
 ) -> anyhow::Result<()> {
+    let pubsub = (app_state.pubsub_factory)();
     let match_id;
     let player_pop_result = app_state.match_repo.pop_matchmaking_player().await?;
 
@@ -21,23 +20,23 @@ async fn handle_socket(
             .register_match(popped_player, player_id)
             .await?;
 
-        app_state
-            .redis_connection
+        pubsub
             .publish(
-                format!("matchmaking_waiting_users:{}", popped_player),
-                &match_id,
+                &format!("matchmaking_waiting_users:{}", popped_player),
+                match_id.as_bytes(),
             )
             .await?;
     } else {
-        let (tx, rx) = oneshot::channel::<String>();
-        app_state.matchmaking_registry_map.insert(player_id, tx);
+        let mut rx = pubsub
+            .subscribe(&format!("matchmaking_waiting_users:{}", player_id))
+            .await?;
 
         app_state
             .match_repo
             .push_matchmaking_player(player_id)
             .await?;
 
-        match_id = rx.await?;
+        match_id = String::from_utf8(rx.recv().await.unwrap())?;
     }
 
     socket

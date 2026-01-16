@@ -1,4 +1,4 @@
 pub mod auth;
-pub mod matchmaking;
+pub mod pubsub;
 pub mod realtime;
 pub mod uuid;
