@@ -1,32 +1,23 @@
 use async_trait::async_trait;
 use futures_util::StreamExt;
 use redis::{AsyncTypedCommands, Client};
-use serde::{Deserialize, Serialize};
-use std::marker::PhantomData;
 use tokio::sync::mpsc::{self, Receiver};
 
-use crate::utils::pubsub::PubSub;
+use crate::utils::pubsub::{message::PubSubMessage, PubSub};
 
-pub struct RedisPubSub<T> {
+pub struct RedisPubSub {
     client: Client,
-    _phantom: PhantomData<T>,
 }
 
-impl<T> RedisPubSub<T> {
+impl RedisPubSub {
     pub fn new(client: Client) -> Self {
-        Self {
-            client,
-            _phantom: PhantomData,
-        }
+        Self { client }
     }
 }
 
 #[async_trait]
-impl<T> PubSub<T> for RedisPubSub<T>
-where
-    T: Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static,
-{
-    async fn publish(&self, topic: &str, payload: &T) -> anyhow::Result<()> {
+impl PubSub for RedisPubSub {
+    async fn publish(&self, topic: &str, payload: &PubSubMessage) -> anyhow::Result<()> {
         let data = serde_json::to_vec(payload)?;
         let mut conn = self.client.get_multiplexed_async_connection().await?;
 
@@ -34,7 +25,7 @@ where
         Ok(())
     }
 
-    async fn subscribe(&self, topic: &str) -> anyhow::Result<Receiver<T>> {
+    async fn subscribe(&self, topic: &str) -> anyhow::Result<Receiver<PubSubMessage>> {
         let (tx, rx) = mpsc::channel(1024);
 
         let client_clone = self.client.clone();

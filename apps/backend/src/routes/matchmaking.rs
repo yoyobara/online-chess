@@ -1,4 +1,4 @@
-use crate::{extractors::AuthUser, state::AppState};
+use crate::{extractors::AuthUser, state::AppState, utils::pubsub::message::PubSubMessage};
 use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,
@@ -23,7 +23,7 @@ async fn handle_socket(
         pubsub
             .publish(
                 &format!("matchmaking_waiting_users:{}", popped_player),
-                &match_id,
+                &PubSubMessage::MatchmakingMatchId(match_id.clone()),
             )
             .await?;
     } else {
@@ -36,7 +36,9 @@ async fn handle_socket(
             .push_matchmaking_player(player_id)
             .await?;
 
-        match_id = rx.recv().await.unwrap();
+        match_id = match rx.recv().await.unwrap() {
+            PubSubMessage::MatchmakingMatchId(id) => id,
+        };
     }
 
     socket

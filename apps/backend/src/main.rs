@@ -15,8 +15,8 @@ use tokio::net::TcpListener;
 use crate::{
     configs::{load_env, load_pool, load_redis},
     repositories::{r#match::RedisMatchRepository, user::SqlxUserRepository},
-    state::AppState,
-    utils::pubsub::{redis::RedisPubSub, PubSubFactory},
+    state::{AppState, PubSubFactory},
+    utils::pubsub::redis::RedisPubSub,
 };
 
 #[tokio::main]
@@ -32,8 +32,8 @@ async fn main() -> anyhow::Result<()> {
         client.get_multiplexed_async_connection().await?,
     ));
 
-    let pubsub_factory: Arc<PubSubFactory<String>> =
-        Arc::new(move || Box::new(RedisPubSub::<String>::new(client.clone())));
+    let pubsub_factory: Arc<PubSubFactory> =
+        Arc::new(move || Box::new(RedisPubSub::new(client.clone())));
 
     let state = AppState::new(config, pubsub_factory, user_repo, match_repo).await;
 
