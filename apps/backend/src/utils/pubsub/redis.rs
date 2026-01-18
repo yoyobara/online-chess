@@ -1,30 +1,40 @@
 use async_trait::async_trait;
 use futures_util::StreamExt;
 use redis::{AsyncTypedCommands, Client};
+use serde::{Deserialize, Serialize};
+use std::marker::PhantomData;
 use tokio::sync::mpsc::{self, Receiver};
 
 use crate::utils::pubsub::PubSub;
 
-pub struct RedisPubSub {
+pub struct RedisPubSub<T> {
     client: Client,
+    _phantom: PhantomData<T>,
 }
 
-impl RedisPubSub {
+impl<T> RedisPubSub<T> {
     pub fn new(client: Client) -> Self {
-        Self { client }
+        Self {
+            client,
+            _phantom: PhantomData,
+        }
     }
 }
 
 #[async_trait]
-impl PubSub for RedisPubSub {
-    async fn publish(&self, topic: &str, payload: &[u8]) -> anyhow::Result<()> {
+impl<T> PubSub<T> for RedisPubSub<T>
+where
+    T: Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static,
+{
+    async fn publish(&self, topic: &str, payload: &T) -> anyhow::Result<()> {
+        let data = serde_json::to_vec(payload)?;
         let mut conn = self.client.get_multiplexed_async_connection().await?;
 
-        conn.publish(topic, payload).await?;
+        conn.publish(topic, data).await?;
         Ok(())
     }
 
-    async fn subscribe(&self, topic: &str) -> anyhow::Result<Receiver<Vec<u8>>> {
+    async fn subscribe(&self, topic: &str) -> anyhow::Result<Receiver<T>> {
         let (tx, rx) = mpsc::channel(1024);
 
         let client_clone = self.client.clone();
@@ -41,14 +51,16 @@ impl PubSub for RedisPubSub {
                     break;
                 };
 
-                let payload: Vec<u8> = msg.get_payload()?;
+                let payload_bytes: Vec<u8> = msg.get_payload()?;
 
-                if tx.send(payload).await.is_err() {
-                    break;
+                if let Ok(payload) = serde_json::from_slice(&payload_bytes) {
+                    if tx.send(payload).await.is_err() {
+                        break;
+                    }
                 }
             }
 
-            anyhow::Ok(())
+            Ok::<(), anyhow::Error>(())
         });
 
         Ok(rx)

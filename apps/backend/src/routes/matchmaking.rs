@@ -23,7 +23,7 @@ async fn handle_socket(
         pubsub
             .publish(
                 &format!("matchmaking_waiting_users:{}", popped_player),
-                match_id.as_bytes(),
+                &match_id,
             )
             .await?;
     } else {
@@ -36,7 +36,7 @@ async fn handle_socket(
             .push_matchmaking_player(player_id)
             .await?;
 
-        match_id = String::from_utf8(rx.recv().await.unwrap())?;
+        match_id = rx.recv().await.unwrap();
     }
 
     socket
