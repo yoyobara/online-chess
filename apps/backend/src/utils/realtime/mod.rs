@@ -56,7 +56,7 @@ impl RealtimeSession {
 
         loop {
             select! {
-                Some(pubsub_msg) = pubsub_reciever.recv() => self.handle_pubsub_msg(pubsub_msg).await?,
+                Some(pubsub_msg) = pubsub_reciever.recv() => self.handle_pubsub_msg(pubsub_msg?).await?,
                 Some(client_msg) = self.communicator.recv() => self.handle_client_msg(client_msg?).await?,
                 else => {
                     break;

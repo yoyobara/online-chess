@@ -25,7 +25,10 @@ impl PubSub for RedisPubSub {
         Ok(())
     }
 
-    async fn subscribe(&self, topic: &str) -> anyhow::Result<Receiver<PubSubMessage>> {
+    async fn subscribe(
+        &self,
+        topic: &str,
+    ) -> anyhow::Result<Receiver<anyhow::Result<PubSubMessage>>> {
         let (tx, rx) = mpsc::channel(1024);
 
         let client_clone = self.client.clone();
@@ -43,12 +46,10 @@ impl PubSub for RedisPubSub {
                 };
 
                 let payload_bytes: Vec<u8> = msg.get_payload()?;
+                let payload =
+                    serde_json::from_slice::<PubSubMessage>(&payload_bytes).map_err(Into::into);
 
-                if let Ok(payload) = serde_json::from_slice(&payload_bytes) {
-                    if tx.send(payload).await.is_err() {
-                        break;
-                    }
-                }
+                tx.send(payload).await?;
             }
 
             Ok::<(), anyhow::Error>(())

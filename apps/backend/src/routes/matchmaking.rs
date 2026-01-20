@@ -1,4 +1,5 @@
 use crate::{extractors::AuthUser, state::AppState, utils::pubsub::message::PubSubMessage};
+use anyhow::anyhow;
 use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,
@@ -36,7 +37,7 @@ async fn handle_socket(
             .push_matchmaking_player(player_id)
             .await?;
 
-        match_id = match rx.recv().await.unwrap() {
+        match_id = match rx.recv().await.ok_or(anyhow!("reciever closed"))?? {
             PubSubMessage::MatchmakingMatchId(id) => id,
         };
     }
