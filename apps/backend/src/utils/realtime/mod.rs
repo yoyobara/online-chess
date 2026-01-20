@@ -1,6 +1,12 @@
-use axum::extract::ws::WebSocket;
+mod message;
 
-use crate::{state::AppState, utils::pubsub::PubSub};
+use axum::extract::ws::{Message, WebSocket};
+use tokio::select;
+
+use crate::{
+    state::AppState,
+    utils::pubsub::{message::PubSubMessage, PubSub},
+};
 
 pub struct RealtimeSession {
     app_state: AppState,
@@ -23,11 +29,25 @@ impl RealtimeSession {
         }
     }
 
+    async fn handle_pubsub_msg(&mut self, msg: PubSubMessage) {}
+
+    async fn handle_client_msg(&mut self, msg: Message) {}
+
     pub async fn mainloop(mut self) -> anyhow::Result<()> {
         let mut pubsub_reciever = self
             .pubsub
             .subscribe(&format!("match:{}", self.match_id))
             .await?;
+
+        loop {
+            select! {
+                Some(pubsub_msg) = pubsub_reciever.recv() => self.handle_pubsub_msg(pubsub_msg).await,
+                Some(client_msg) = self.socket.recv() => self.handle_client_msg(client_msg?).await,
+                else => {
+                    break;
+                }
+            }
+        }
 
         Ok(())
     }
