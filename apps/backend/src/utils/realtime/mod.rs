@@ -1,37 +1,52 @@
-mod message;
+pub mod client_communication;
 
-use axum::extract::ws::{Message, WebSocket};
 use tokio::select;
 
 use crate::{
     state::AppState,
-    utils::pubsub::{message::PubSubMessage, PubSub},
+    utils::{
+        pubsub::{message::PubSubMessage, PubSub},
+        realtime::client_communication::{message::ClientMessage, ClientCommunicator},
+    },
 };
 
 pub struct RealtimeSession {
     app_state: AppState,
-    socket: WebSocket,
     player_id: i32,
     match_id: String,
+    communicator: Box<dyn ClientCommunicator>,
     pubsub: Box<dyn PubSub>,
 }
 
 impl RealtimeSession {
-    pub fn new(app_state: AppState, socket: WebSocket, player_id: i32, match_id: String) -> Self {
+    pub fn new(
+        app_state: AppState,
+        communicator: Box<dyn ClientCommunicator>,
+        player_id: i32,
+        match_id: String,
+    ) -> Self {
         let pubsub = (app_state.pubsub_factory)();
 
         Self {
             app_state,
-            socket,
             player_id,
             match_id,
+            communicator,
             pubsub,
         }
     }
 
-    async fn handle_pubsub_msg(&mut self, msg: PubSubMessage) {}
+    async fn handle_pubsub_msg(&mut self, msg: PubSubMessage) -> anyhow::Result<()> {
+        println!("{:?}", msg);
 
-    async fn handle_client_msg(&mut self, msg: Message) {}
+        Ok(())
+    }
+
+    async fn handle_client_msg(&mut self, msg: ClientMessage) -> anyhow::Result<()> {
+        println!("{:?}", msg);
+
+        Ok(())
+    }
 
     pub async fn mainloop(mut self) -> anyhow::Result<()> {
         let mut pubsub_reciever = self
@@ -41,8 +56,8 @@ impl RealtimeSession {
 
         loop {
             select! {
-                Some(pubsub_msg) = pubsub_reciever.recv() => self.handle_pubsub_msg(pubsub_msg).await,
-                Some(client_msg) = self.socket.recv() => self.handle_client_msg(client_msg?).await,
+                Some(pubsub_msg) = pubsub_reciever.recv() => self.handle_pubsub_msg(pubsub_msg).await?,
+                Some(client_msg) = self.communicator.recv() => self.handle_client_msg(client_msg?).await?,
                 else => {
                     break;
                 }
