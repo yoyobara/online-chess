@@ -1,5 +1,6 @@
 pub mod client_communication;
 
+use rust_chess::board::Board;
 use tokio::select;
 
 use crate::{

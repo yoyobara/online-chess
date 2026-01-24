@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use async_trait::async_trait;
 use redis::{aio::MultiplexedConnection, AsyncTypedCommands, RedisError};
+use rust_chess::board::Board;
 
 use crate::{
     repositories::r#match::{MatchRepository, MatchRepositoryError, MatchRepositoryResult},
@@ -51,12 +52,21 @@ impl MatchRepository for RedisMatchRepository {
         player_2_id: i32,
     ) -> MatchRepositoryResult<String> {
         let match_id = new_uuid_v4();
+        let new_board = Board::new();
 
         let _: () = redis::pipe()
             .atomic()
             .hset_multiple(
                 format!("matches:{}", &match_id),
-                &[("player1_id", player_1_id), ("player2_id", player_2_id)],
+                &[
+                    ("player1_id", player_1_id.to_string()),
+                    ("player2_id", player_2_id.to_string()),
+                    (
+                        "game_board",
+                        serde_json::to_string(&new_board).map_err(anyhow::Error::from)?,
+                    ),
+                    ("move_count", 0.to_string()),
+                ],
             )
             .sadd(format!("player:{}:matches", player_1_id), &match_id)
             .sadd(format!("player:{}:matches", player_2_id), &match_id)
