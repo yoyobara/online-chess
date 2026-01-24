@@ -155,6 +155,7 @@ dependencies = [
  "futures-util",
  "jsonwebtoken",
  "redis",
+ "rust-chess",
  "secrecy",
  "serde",
  "serde_json",
@@ -1577,6 +1578,11 @@ dependencies = [
  "subtle",
  "zeroize",
 ]
+
+[[package]]
+name = "rust-chess"
+version = "0.1.0"
+source = "git+https://github.com/yoyobara/rust-chess.git?branch=main#d67401ccbd77f46e195c7fd02f4f76f4f9bd678d"
 
 [[package]]
 name = "rustc_version"
