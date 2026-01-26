@@ -4,6 +4,7 @@ use redis::{aio::MultiplexedConnection, AsyncTypedCommands, RedisError};
 use rust_chess::board::Board;
 
 use crate::{
+    models::match_state::MatchState,
     repositories::r#match::{MatchRepository, MatchRepositoryError, MatchRepositoryResult},
     utils::uuid::new_uuid_v4,
 };
@@ -87,5 +88,47 @@ impl MatchRepository for RedisMatchRepository {
             .sismember(format!("player:{}:matches", player_id), &match_id)
             .await
             .map_err(redis_to_repo_error)
+    }
+
+    async fn set_player_connected(
+        &self,
+        match_id: &str,
+        player_id: i32,
+        connected: bool,
+    ) -> MatchRepositoryResult<()> {
+        let key = format!("player:{}:connected_matches", player_id);
+
+        if connected {
+            self.connection
+                .clone()
+                .set(key, match_id)
+                .await
+                .map_err(redis_to_repo_error)?;
+        } else {
+            self.connection
+                .clone()
+                .del(key)
+                .await
+                .map_err(redis_to_repo_error)?;
+        }
+
+        Ok(())
+    }
+
+    async fn get_match_state(&self, match_id: &str) -> MatchRepositoryResult<MatchState> {
+        let match_fields = self
+            .connection
+            .clone()
+            .hmget(
+                &format!("matches:{}", match_id),
+                &["game_board", "move_count"],
+            )
+            .await
+            .map_err(redis_to_repo_error)?;
+
+        Ok(MatchState {
+            board: serde_json::from_str(&match_fields[0]).map_err(anyhow::Error::from)?,
+            move_count: match_fields[1].parse().map_err(anyhow::Error::from)?,
+        })
     }
 }

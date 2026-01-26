@@ -1,4 +1,3 @@
-use anyhow::anyhow;
 use async_trait::async_trait;
 use axum::extract::ws::{Message, WebSocket};
 

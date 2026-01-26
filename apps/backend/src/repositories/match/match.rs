@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use async_trait::async_trait;
 
-use crate::repositories::r#match::error::MatchRepositoryResult;
+use crate::{models::match_state::MatchState, repositories::r#match::error::MatchRepositoryResult};
 
 #[async_trait]
 pub trait MatchRepository: Send + Sync + Debug {
@@ -14,9 +14,19 @@ pub trait MatchRepository: Send + Sync + Debug {
         player_1_id: i32,
         player_2_id: i32,
     ) -> MatchRepositoryResult<String>;
+
     async fn is_player_in_match(
         &self,
         player_id: i32,
         match_id: &str,
     ) -> MatchRepositoryResult<bool>;
+
+    async fn set_player_connected(
+        &self,
+        match_id: &str,
+        player_id: i32,
+        connected: bool,
+    ) -> MatchRepositoryResult<()>;
+
+    async fn get_match_state(&self, match_id: &str) -> MatchRepositoryResult<MatchState>;
 }

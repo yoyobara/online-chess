@@ -2,10 +2,7 @@ use crate::{
     error::{ApiError, ApiResult},
     extractors::AuthUser,
     state::AppState,
-    utils::realtime::{
-        client_communication::{ClientCommunicator, WsCommunicator},
-        RealtimeSession,
-    },
+    utils::realtime::{client_communication::WsCommunicator, RealtimeSession},
 };
 use axum::{
     body::Body,

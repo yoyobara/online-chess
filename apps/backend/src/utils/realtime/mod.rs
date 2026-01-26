@@ -1,13 +1,18 @@
 pub mod client_communication;
 
-use rust_chess::board::Board;
+mod client_handlers;
+mod pubsub_handlers;
+
 use tokio::select;
 
 use crate::{
     state::AppState,
     utils::{
         pubsub::{message::PubSubMessage, PubSub},
-        realtime::client_communication::{message::ClientMessage, ClientCommunicator},
+        realtime::{
+            client_communication::{message::ClientMessage, ClientCommunicator},
+            client_handlers::handle_client_join,
+        },
     },
 };
 
@@ -44,9 +49,9 @@ impl RealtimeSession {
     }
 
     async fn handle_client_msg(&mut self, msg: ClientMessage) -> anyhow::Result<()> {
-        println!("{:?}", msg);
-
-        Ok(())
+        match msg {
+            ClientMessage::JoinGame => handle_client_join(self).await,
+        }
     }
 
     pub async fn mainloop(mut self) -> anyhow::Result<()> {
