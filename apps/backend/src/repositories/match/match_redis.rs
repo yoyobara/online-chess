@@ -4,7 +4,7 @@ use redis::{aio::MultiplexedConnection, AsyncTypedCommands, RedisError};
 use rust_chess::board::Board;
 
 use crate::{
-    models::match_state::MatchState,
+    models::r#match::{MatchPlayers, MatchState},
     repositories::r#match::{MatchRepository, MatchRepositoryError, MatchRepositoryResult},
     utils::uuid::new_uuid_v4,
 };
@@ -49,8 +49,8 @@ impl MatchRepository for RedisMatchRepository {
 
     async fn register_match(
         &self,
-        player_1_id: i32,
-        player_2_id: i32,
+        white_player_id: i32,
+        black_player_id: i32,
     ) -> MatchRepositoryResult<String> {
         let match_id = new_uuid_v4();
         let new_board = Board::new();
@@ -60,8 +60,8 @@ impl MatchRepository for RedisMatchRepository {
             .hset_multiple(
                 format!("matches:{}", &match_id),
                 &[
-                    ("player1_id", player_1_id.to_string()),
-                    ("player2_id", player_2_id.to_string()),
+                    ("white_player_id", white_player_id.to_string()),
+                    ("black_player_id", black_player_id.to_string()),
                     (
                         "game_board",
                         serde_json::to_string(&new_board).map_err(anyhow::Error::from)?,
@@ -69,8 +69,8 @@ impl MatchRepository for RedisMatchRepository {
                     ("move_count", 0.to_string()),
                 ],
             )
-            .sadd(format!("player:{}:matches", player_1_id), &match_id)
-            .sadd(format!("player:{}:matches", player_2_id), &match_id)
+            .sadd(format!("player:{}:matches", white_player_id), &match_id)
+            .sadd(format!("player:{}:matches", black_player_id), &match_id)
             .query_async(&mut self.connection.clone())
             .await
             .map_err(redis_to_repo_error)?;
@@ -129,6 +129,23 @@ impl MatchRepository for RedisMatchRepository {
         Ok(MatchState {
             board: serde_json::from_str(&match_fields[0]).map_err(anyhow::Error::from)?,
             move_count: match_fields[1].parse().map_err(anyhow::Error::from)?,
+        })
+    }
+
+    async fn get_players(&self, match_id: &str) -> MatchRepositoryResult<MatchPlayers> {
+        let players = self
+            .connection
+            .clone()
+            .hmget(
+                &format!("matches:{}", match_id),
+                &["white_player_id", "black_player_id"],
+            )
+            .await
+            .map_err(redis_to_repo_error)?;
+
+        Ok(MatchPlayers {
+            white_player_id: players[0].parse::<i32>().map_err(anyhow::Error::from)?,
+            black_player_id: players[1].parse::<i32>().map_err(anyhow::Error::from)?,
         })
     }
 }
