@@ -43,7 +43,7 @@ export function App() {
         }
       />
       <Route
-        path="/play"
+        path="/play/:match_id"
         element={
           <LoggedInOnly>
             <PlayPage />

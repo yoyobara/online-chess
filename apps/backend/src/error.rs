@@ -36,6 +36,8 @@ impl IntoResponse for ApiError {
 
         let body = json!({"error": self.to_string() });
 
+        println!("{:?}", (status_code, &body));
+
         (status_code, Json(body)).into_response()
     }
 }

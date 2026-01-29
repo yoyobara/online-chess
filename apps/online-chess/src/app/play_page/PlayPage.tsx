@@ -1,13 +1,35 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
 import { useRequiredAuth } from '../../contexts/auth';
+import { useParams } from 'react-router-dom';
+import { useRealtime } from '../../hooks/realtime';
 
 export const PlayPage: FC = () => {
   const auth = useRequiredAuth();
+  const { lastJsonMessage, sendJsonMessage } = useRealtime(
+    useParams().match_id!
+  );
+
+  useEffect(() => {
+    console.log(lastJsonMessage);
+  }, [lastJsonMessage]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      console.log('send shit');
+      sendJsonMessage({
+        type: 'JoinGame',
+      });
+    }, 5000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [sendJsonMessage]);
 
   return (
     <div className={styles.play_page}>
