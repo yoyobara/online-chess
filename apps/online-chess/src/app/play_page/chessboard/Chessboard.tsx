@@ -5,17 +5,21 @@ import { Piece } from '../../../types/piece';
 import { getPieceSvg } from '../../../utils/piece';
 
 interface ChessBoardProps {
-  pieces: Piece[];
+  pieces: (Piece | null)[];
 }
 
-export const pieceElement = (piece: Piece, index: number) => {
+export const pieceElement = (piece: Piece | null, index: number) => {
   const [row, column] = [Math.floor(index / 8), index % 8];
+
+  if (!piece) {
+    return <div></div>;
+  }
 
   return (
     <img
       className={styles.piece}
       src={getPieceSvg(piece)}
-      alt={`${piece.color} ${piece.type}`}
+      alt={`${piece.piece_color} ${piece.piece_type}`}
       style={{
         width: '12.5%',
         height: '12.5%',

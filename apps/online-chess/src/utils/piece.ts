@@ -14,20 +14,20 @@ import pawnB from '../assets/pieces/pawn-b.svg';
 import { Piece } from '../types/piece';
 
 export const getPieceSvg = (piece: Piece): string => {
-  const { type, color } = piece;
+  const { piece_type, piece_color } = piece;
 
-  switch (type) {
-    case 'king':
-      return color === 'white' ? kingW : kingB;
-    case 'queen':
-      return color === 'white' ? queenW : queenB;
-    case 'rook':
-      return color === 'white' ? rookW : rookB;
-    case 'bishop':
-      return color === 'white' ? bishopW : bishopB;
-    case 'knight':
-      return color === 'white' ? knightW : knightB;
-    case 'pawn':
-      return color === 'white' ? pawnW : pawnB;
+  switch (piece_type) {
+    case 'King':
+      return piece_color === 'White' ? kingW : kingB;
+    case 'Queen':
+      return piece_color === 'White' ? queenW : queenB;
+    case 'Rook':
+      return piece_color === 'White' ? rookW : rookB;
+    case 'Bishop':
+      return piece_color === 'White' ? bishopW : bishopB;
+    case 'Knight':
+      return piece_color === 'White' ? knightW : knightB;
+    case 'Pawn':
+      return piece_color === 'White' ? pawnW : pawnB;
   }
 };
