@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "concurrently \"nx dev backend\" \"nx serve online-chess\""
+    "start": "concurrently \"redis-server\" \"nx dev backend\" \"nx serve online-chess\""
   },
   "private": true,
   "dependencies": {
