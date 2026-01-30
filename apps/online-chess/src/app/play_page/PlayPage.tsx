@@ -8,16 +8,28 @@ import { useRequiredAuth } from '../../contexts/auth';
 import { useParams } from 'react-router-dom';
 import { useRealtime } from '../../hooks/realtime';
 import { MatchState } from '../../types/match';
+import { useQuery } from '@tanstack/react-query';
+import { UserData } from '../../types/user';
 
 export const PlayPage: FC = () => {
   const auth = useRequiredAuth();
   const { lastJsonMessage } = useRealtime(useParams().match_id!);
 
+  const { data: rank } = useQuery<number>({
+    queryKey: ['user_rank'],
+    queryFn: () =>
+      fetch('/api/user/rank', { credentials: 'include' }).then((resp) =>
+        resp.json()
+      ),
+  });
+
   const [matchState, setMatchState] = useState<MatchState | null>(null);
+  const [opponentData, setOpponentData] = useState<UserData | null>(null);
 
   useEffect(() => {
     if (lastJsonMessage?.type === 'JoinResponse') {
       setMatchState(lastJsonMessage.data.initial_state);
+      setOpponentData(lastJsonMessage.data.opponent);
     }
   }, [lastJsonMessage]);
 
@@ -30,13 +42,13 @@ export const PlayPage: FC = () => {
       <Paper className={styles.history}></Paper>
       <PlayerPaper
         playerName={auth.username}
-        playerRating={1000}
+        playerRating={rank ?? -999}
         variant="white"
         className={styles.player}
       />
       <PlayerPaper
-        playerName="dummy1"
-        playerRating={200}
+        playerName={opponentData?.username ?? '...'}
+        playerRating={opponentData?.rank ?? -999}
         variant="purple"
         className={styles.opponent}
       />

@@ -25,17 +25,20 @@ pub async fn handle_client_join(session: &mut RealtimeSession) -> anyhow::Result
         .get_players(&session.match_id)
         .await?;
 
-    let player_color = match session.player_id {
-        id if id == players.white_player_id => Color::White,
-        id if id == players.black_player_id => Color::Black,
+    let (player_color, opponent_id) = match session.player_id {
+        id if id == players.white_player_id => (Color::White, players.black_player_id),
+        id if id == players.black_player_id => (Color::Black, players.white_player_id),
         _ => return Err(anyhow!("player not in match!")),
     };
+
+    let opponent_data = session.app_state.user_repo.get_user(opponent_id).await?;
 
     session
         .communicator
         .send(ServerMessage::JoinResponse(JoinResponse {
             initial_state: match_state,
             color: player_color,
+            opponent: opponent_data.into(),
         }))
         .await
 }
