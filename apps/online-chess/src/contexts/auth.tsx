@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { FC, PropsWithChildren, createContext, useContext } from 'react';
 
 interface AuthData {
-  id: number;
   username: string;
+  email: string;
+  rank: number;
 }
 
 const authContext = createContext<AuthData | null>(null);

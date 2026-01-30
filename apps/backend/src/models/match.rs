@@ -1,8 +1,6 @@
 use rust_chess::{board::Board, core::color::Color};
 use serde::Serialize;
 
-use crate::models::user::UserData;
-
 #[derive(Serialize, Debug)]
 pub struct MatchState {
     pub board: Board,
@@ -13,7 +11,7 @@ pub struct MatchState {
 pub struct JoinResponse {
     pub initial_state: MatchState,
     pub color: Color,
-    pub opponent: UserData,
+    pub opponent_id: i32,
 }
 
 #[derive(Serialize, Debug)]

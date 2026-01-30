@@ -31,14 +31,12 @@ pub async fn handle_client_join(session: &mut RealtimeSession) -> anyhow::Result
         _ => return Err(anyhow!("player not in match!")),
     };
 
-    let opponent_data = session.app_state.user_repo.get_user(opponent_id).await?;
-
     session
         .communicator
         .send(ServerMessage::JoinResponse(JoinResponse {
             initial_state: match_state,
             color: player_color,
-            opponent: opponent_data.into(),
+            opponent_id,
         }))
         .await
 }

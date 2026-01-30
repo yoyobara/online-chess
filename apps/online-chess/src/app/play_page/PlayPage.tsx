@@ -12,24 +12,26 @@ import { useQuery } from '@tanstack/react-query';
 import { UserData } from '../../types/user';
 
 export const PlayPage: FC = () => {
-  const auth = useRequiredAuth();
+  const me = useRequiredAuth();
   const { lastJsonMessage } = useRealtime(useParams().match_id!);
 
-  const { data: rank } = useQuery<number>({
-    queryKey: ['user_rank'],
-    queryFn: () =>
-      fetch('/api/user/rank', { credentials: 'include' }).then((resp) =>
-        resp.json()
-      ),
-  });
-
   const [matchState, setMatchState] = useState<MatchState | null>(null);
-  const [opponentData, setOpponentData] = useState<UserData | null>(null);
+  const [opponentId, setOpponentId] = useState<number | null>(null);
+
+  const { data: opponentData } = useQuery<UserData>({
+    queryKey: ['user', opponentId],
+    queryFn: () =>
+      fetch(`/api/user/${opponentId}`, { credentials: 'include' }).then(
+        (resp) => (resp.ok ? resp.json() : null)
+      ),
+
+    enabled: !!opponentId,
+  });
 
   useEffect(() => {
     if (lastJsonMessage?.type === 'JoinResponse') {
       setMatchState(lastJsonMessage.data.initial_state);
-      setOpponentData(lastJsonMessage.data.opponent);
+      setOpponentId(lastJsonMessage.data.opponent_id);
     }
   }, [lastJsonMessage]);
 
@@ -41,8 +43,8 @@ export const PlayPage: FC = () => {
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>
       <PlayerPaper
-        playerName={auth.username}
-        playerRating={rank ?? -999}
+        playerName={me.username}
+        playerRating={me.rank ?? -999}
         variant="white"
         className={styles.player}
       />

@@ -16,6 +16,7 @@ pub struct User {
 #[derive(Serialize, Debug)]
 pub struct UserData {
     username: String,
+    email: String,
     rank: i32,
 }
 
@@ -24,6 +25,7 @@ impl From<User> for UserData {
         Self {
             username: value.username,
             rank: value.rank,
+            email: value.email,
         }
     }
 }
