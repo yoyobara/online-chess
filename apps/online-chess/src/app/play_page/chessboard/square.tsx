@@ -7,21 +7,22 @@ export interface SquareProps {
 }
 
 export const Square: FC<SquareProps> = ({ index }: SquareProps) => {
-  //   const { isOver, setNodeRef } = useDroppable({
-  //     id: `square ${index}`,
-  //   });
+  const { setNodeRef } = useDroppable({
+    id: `square ${index}`,
+  });
 
   const [row, column] = [Math.floor(index / 8), index % 8];
 
   return (
     <div
+      ref={setNodeRef}
       className={`${styles.square} ${
-        (row + column) % 2 ? styles.black : styles.white
+        (row + column) % 2 ? styles.white : styles.black
       }`}
       style={{
         width: '12.5%',
         height: '12.5%',
-        top: `calc(12.5% * ${row})`,
+        top: `calc(12.5% * ${7 - row})`,
         left: `calc(12.5% * ${column})`,
       }}
     />

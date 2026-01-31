@@ -3,6 +3,7 @@ import { Piece } from '../../../types/piece';
 
 import styles from './Chessboard.module.scss';
 import { getPieceSvg } from '../../../utils/piece';
+import { useDraggable } from '@dnd-kit/core';
 
 export interface PieceComponentProps {
   piece: Piece;
@@ -13,19 +14,33 @@ export const PieceComponent: FC<PieceComponentProps> = ({
   piece,
   index,
 }: PieceComponentProps) => {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: `piece ${index}`,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
   const [row, column] = [Math.floor(index / 8), index % 8];
 
   return (
     <img
+      ref={setNodeRef}
       className={styles.piece}
       src={getPieceSvg(piece)}
       alt={`${piece.piece_color} ${piece.piece_type}`}
       style={{
         width: '12.5%',
         height: '12.5%',
-        top: `calc(12.5% * ${row})`,
+        top: `calc(12.5% * ${7 - row})`,
         left: `calc(12.5% * ${column})`,
+        ...style,
       }}
+      {...listeners}
+      {...attributes}
     />
   );
 };
