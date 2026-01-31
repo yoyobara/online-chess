@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { FC, useEffect, useState } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
@@ -35,10 +36,14 @@ export const PlayPage: FC = () => {
     }
   }, [lastJsonMessage]);
 
+  if (!matchState) {
+    return null;
+  }
+
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
-        <Chessboard pieces={matchState?.board.state ?? []} />
+        <Chessboard board={matchState.board} />
       </div>
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>

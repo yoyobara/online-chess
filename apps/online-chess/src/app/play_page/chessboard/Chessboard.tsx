@@ -1,40 +1,37 @@
-import { FC } from 'react';
-import boardSvg from '../../../assets/board.svg';
+import { FC, useMemo } from 'react';
 import styles from './Chessboard.module.scss';
+import { Square } from './square';
+import { PieceComponent } from './piece';
+import { Board } from '../../../types/board';
 import { Piece } from '../../../types/piece';
-import { getPieceSvg } from '../../../utils/piece';
 
 interface ChessBoardProps {
-  pieces: (Piece | null)[];
+  board: Board;
 }
 
-export const pieceElement = (piece: Piece | null, index: number) => {
-  const [row, column] = [Math.floor(index / 8), index % 8];
+const makePiecesArray = (board: Board): (Piece | null)[] => {
+  const pieces = [];
 
-  if (!piece) {
-    return <div></div>;
+  for (let i = 7; i >= 0; i--) {
+    for (let j = 0; j < 8; j++) {
+      pieces.push(board.state[i * 8 + j]);
+    }
   }
 
-  return (
-    <img
-      className={styles.piece}
-      src={getPieceSvg(piece)}
-      alt={`${piece.piece_color} ${piece.piece_type}`}
-      style={{
-        width: '12.5%',
-        height: '12.5%',
-        top: `calc(12.5% * ${row})`,
-        left: `calc(12.5% * ${column})`,
-      }}
-    />
-  );
+  return pieces;
 };
 
-export const Chessboard: FC<ChessBoardProps> = ({ pieces }) => {
+export const Chessboard: FC<ChessBoardProps> = ({ board }) => {
+  const pieces = useMemo(() => makePiecesArray(board), [board]);
+
   return (
     <div className={styles.chessboard}>
-      <img className={styles.board_img} src={boardSvg} alt="chessboard" />
-      {pieces.map(pieceElement)}
+      {Array.from({ length: 64 }).map((_, i) => (
+        <Square index={i} />
+      ))}
+      {pieces.map((piece, i) =>
+        piece ? <PieceComponent index={i} piece={piece} /> : null
+      )}
     </div>
   );
 };
