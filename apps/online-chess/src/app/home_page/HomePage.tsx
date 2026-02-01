@@ -10,27 +10,19 @@ import play_circle from '../../assets/play_circle.svg';
 import logout_icon from '../../assets/logout.svg';
 
 import { useRequiredAuth } from '../../contexts/auth';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MatchmakingModal } from '../matchmaking_modal/MatchmakingModal';
 import { useMatchmaking } from '../../hooks/matchmaking';
+import { useLogout } from '../../queries/auth/logout';
 
 export const HomePage: FC = () => {
   const me = useRequiredAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const { matchmaking, setMatchmaking } = useMatchmaking((matchId) =>
     navigate(`/play/${matchId}`)
   );
 
-  const { mutate } = useMutation({
-    mutationFn: () =>
-      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auth_data'] });
-      navigate('/');
-    },
-  });
+  const { logoutMutation } = useLogout();
 
   return (
     <div className={styles.home_page}>
@@ -50,7 +42,7 @@ export const HomePage: FC = () => {
           Play Online!
         </Button>
         <Button
-          onClick={() => mutate()}
+          onClick={() => logoutMutation.mutate()}
           variant="white"
           className={styles.logout_button}
         >

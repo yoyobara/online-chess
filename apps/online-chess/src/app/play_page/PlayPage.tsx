@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { FC, useEffect, useState } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
@@ -9,25 +8,16 @@ import { useRequiredAuth } from '../../contexts/auth';
 import { useParams } from 'react-router-dom';
 import { useRealtime } from '../../hooks/realtime';
 import { MatchState } from '../../types/match';
-import { useQuery } from '@tanstack/react-query';
-import { UserData } from '../../types/user';
+import { useUserData } from '../../queries/user';
 
 export const PlayPage: FC = () => {
   const me = useRequiredAuth();
-  const { lastJsonMessage } = useRealtime(useParams().match_id!);
 
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [opponentId, setOpponentId] = useState<number | null>(null);
 
-  const { data: opponentData } = useQuery<UserData>({
-    queryKey: ['user', opponentId],
-    queryFn: () =>
-      fetch(`/api/user/${opponentId}`, { credentials: 'include' }).then(
-        (resp) => (resp.ok ? resp.json() : null)
-      ),
-
-    enabled: !!opponentId,
-  });
+  const { lastJsonMessage } = useRealtime(useParams().match_id!);
+  const { user: opponentData } = useUserData(opponentId);
 
   useEffect(() => {
     if (lastJsonMessage?.type === 'JoinResponse') {

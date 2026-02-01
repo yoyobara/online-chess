@@ -1,30 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
 import { FC, PropsWithChildren, createContext, useContext } from 'react';
-
-interface AuthData {
-  username: string;
-  email: string;
-  rank: number;
-}
+import { useMe } from '../queries/auth/me';
+import { AuthData } from '../types/auth/auth_data';
 
 const authContext = createContext<AuthData | null>(null);
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { data, isLoading } = useQuery<AuthData | null>({
-    queryKey: ['auth_data'],
-    queryFn: () =>
-      fetch('/api/user/me', { credentials: 'include' }).then((resp) =>
-        resp.ok ? resp.json() : null
-      ),
-  });
+  const { data } = useMe();
 
-  if (isLoading) {
+  if (data === undefined) {
     return null;
   }
 
-  return (
-    <authContext.Provider value={data ?? null}>{children}</authContext.Provider>
-  );
+  return <authContext.Provider value={data}>{children}</authContext.Provider>;
 };
 
 export const useAuth = (): AuthData | null => {

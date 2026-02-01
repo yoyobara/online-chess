@@ -5,17 +5,11 @@ import { Button } from '../../components/Button/Button';
 import { Input } from '../../components/Input/Input';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios, { isAxiosError } from 'axios';
-
-interface SignInInputs {
-  email: string;
-  password: string;
-}
+import { SignInInputs } from '../../types/auth/sign_in';
+import { useSignIn } from '../../queries/auth/sign_in';
 
 export const SignInModal: FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const {
     register,
@@ -24,36 +18,7 @@ export const SignInModal: FC = () => {
     formState: { errors },
   } = useForm<SignInInputs>();
 
-  const loginMutation = useMutation({
-    mutationFn: (loginRequest: SignInInputs) =>
-      axios
-        .post('/api/auth/login', loginRequest, { withCredentials: true })
-        .then((res) => res.data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auth_data'] });
-      navigate('/home');
-    },
-    onError: (e) => {
-      if (isAxiosError(e)) {
-        switch (e.status) {
-          case 401:
-            setError('password', {
-              message: 'the password does not match the email',
-            });
-            break;
-
-          case 404:
-            setError('email', {
-              message: 'a user with that email could not be found',
-            });
-            break;
-
-          default:
-            break;
-        }
-      }
-    },
-  });
+  const { loginMutation } = useSignIn(setError);
 
   const onSubmit: SubmitHandler<SignInInputs> = (data) =>
     loginMutation.mutate(data);
