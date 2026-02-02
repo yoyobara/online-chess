@@ -2,7 +2,7 @@ import { FC, PropsWithChildren, createContext, useContext } from 'react';
 import { useMe } from '../queries/auth/me';
 import { AuthData } from '../types/auth/auth_data';
 
-const authContext = createContext<AuthData | null>(null);
+const authContext = createContext<AuthData | null | undefined>(undefined);
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const { data } = useMe();
@@ -17,16 +17,19 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 export const useAuth = (): AuthData | null => {
   const context = useContext(authContext);
 
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+
   return context;
 };
 
 export const useRequiredAuth = (): AuthData => {
-  const context = useContext(authContext);
-  if (!context) {
-    throw new Error(
-      'useRequiredAuth must be used within AuthProvider with an authenticated user'
-    );
+  const auth = useAuth();
+
+  if (auth === null) {
+    throw new Error('useRequiredAuth must be used with an authenticated user');
   }
 
-  return context;
+  return auth;
 };

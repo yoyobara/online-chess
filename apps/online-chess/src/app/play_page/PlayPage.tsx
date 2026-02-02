@@ -5,10 +5,9 @@ import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
 import { useRequiredAuth } from '../../contexts/auth';
-import { useParams } from 'react-router-dom';
-import { useRealtime } from '../../hooks/realtime';
 import { MatchState } from '../../types/match';
 import { useUserData } from '../../queries/user';
+import { useRealtime } from '../../contexts/realtime';
 
 export const PlayPage: FC = () => {
   const me = useRequiredAuth();
@@ -16,15 +15,15 @@ export const PlayPage: FC = () => {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [opponentId, setOpponentId] = useState<number | null>(null);
 
-  const { lastJsonMessage } = useRealtime(useParams().match_id!);
+  const { lastMessage } = useRealtime();
   const { user: opponentData } = useUserData(opponentId);
 
   useEffect(() => {
-    if (lastJsonMessage?.type === 'JoinResponse') {
-      setMatchState(lastJsonMessage.data.initial_state);
-      setOpponentId(lastJsonMessage.data.opponent_id);
+    if (lastMessage?.type === 'JoinResponse') {
+      setMatchState(lastMessage.data.initial_state);
+      setOpponentId(lastMessage.data.opponent_id);
     }
-  }, [lastJsonMessage]);
+  }, [lastMessage]);
 
   if (!matchState) {
     return null;
