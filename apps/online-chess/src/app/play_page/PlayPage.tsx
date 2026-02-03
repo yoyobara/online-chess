@@ -25,26 +25,30 @@ export const PlayPage: FC = () => {
     }
   }, [lastMessage]);
 
-  if (!matchState) {
+  const handleMove = (src: string, dest: string) => {
+    console.log(`${src} to ${dest}`);
+  };
+
+  if (!matchState || !opponentData) {
     return null;
   }
 
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
-        <Chessboard board={matchState.board} />
+        <Chessboard board={matchState.board} handleMove={handleMove} />
       </div>
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>
       <PlayerPaper
         playerName={me.username}
-        playerRating={me.rank ?? -999}
+        playerRating={me.rank}
         variant="white"
         className={styles.player}
       />
       <PlayerPaper
-        playerName={opponentData?.username ?? '...'}
-        playerRating={opponentData?.rank ?? -999}
+        playerName={opponentData.username}
+        playerRating={opponentData.rank}
         variant="purple"
         className={styles.opponent}
       />

@@ -4,6 +4,7 @@ import { Piece } from '../../../types/piece';
 import styles from './Chessboard.module.scss';
 import { getPieceSvg } from '../../../utils/piece';
 import { useDraggable } from '@dnd-kit/core';
+import { getSquareName } from '../../../utils/square';
 
 export interface PieceComponentProps {
   piece: Piece;
@@ -14,8 +15,13 @@ export const PieceComponent: FC<PieceComponentProps> = ({
   piece,
   index,
 }: PieceComponentProps) => {
+  const [row, column] = [Math.floor(index / 8), index % 8];
+
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: `piece ${index}`,
+    data: {
+      squareName: getSquareName(row, column),
+    },
   });
 
   const style = transform
@@ -23,8 +29,6 @@ export const PieceComponent: FC<PieceComponentProps> = ({
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
       }
     : undefined;
-
-  const [row, column] = [Math.floor(index / 8), index % 8];
 
   return (
     <img

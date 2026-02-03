@@ -1,17 +1,21 @@
 import { FC } from 'react';
 import styles from './Chessboard.module.scss';
 import { useDroppable } from '@dnd-kit/core';
+import { getSquareName } from '../../../utils/square';
 
 export interface SquareProps {
   index: number;
 }
 
 export const Square: FC<SquareProps> = ({ index }: SquareProps) => {
+  const [row, column] = [Math.floor(index / 8), index % 8];
+
   const { setNodeRef } = useDroppable({
     id: `square ${index}`,
+    data: {
+      squareName: getSquareName(row, column),
+    },
   });
-
-  const [row, column] = [Math.floor(index / 8), index % 8];
 
   return (
     <div
