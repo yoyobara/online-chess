@@ -15,18 +15,40 @@ export const PlayPage: FC = () => {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [opponentId, setOpponentId] = useState<number | null>(null);
 
-  const { lastMessage } = useRealtime();
+  const { lastMessage, sendMessage } = useRealtime();
   const { user: opponentData } = useUserData(opponentId);
 
   useEffect(() => {
-    if (lastMessage?.type === 'JoinResponse') {
-      setMatchState(lastMessage.data.initial_state);
-      setOpponentId(lastMessage.data.opponent_id);
+    if (!lastMessage) return;
+
+    switch (lastMessage.type) {
+      case 'JoinResponse':
+        setMatchState(lastMessage.data.initial_state);
+        setOpponentId(lastMessage.data.opponent_id);
+        break;
+
+      case 'MoveResult':
+        if (lastMessage.data) {
+          setMatchState(lastMessage.data);
+        }
+        break;
+
+      case 'NewState':
+        setMatchState(lastMessage.data);
+        break;
     }
   }, [lastMessage]);
 
   const handleMove = (src: string, dest: string) => {
     console.log(`${src} to ${dest}`);
+
+    sendMessage({
+      type: 'PlayerMove',
+      data: {
+        src_square: src,
+        dest_square: dest,
+      },
+    });
   };
 
   if (!matchState || !opponentData) {

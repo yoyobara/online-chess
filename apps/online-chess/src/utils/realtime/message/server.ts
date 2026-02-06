@@ -7,7 +7,16 @@ type JoinResponse = {
   opponent_id: number;
 };
 
-export type ServerMessage = {
-  type: 'JoinResponse';
-  data: JoinResponse;
-};
+export type ServerMessage =
+  | {
+      type: 'JoinResponse';
+      data: JoinResponse;
+    }
+  | {
+      type: 'MoveResult';
+      data: MatchState | null;
+    }
+  | {
+      type: 'NewState';
+      data: MatchState;
+    };

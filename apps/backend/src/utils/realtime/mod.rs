@@ -51,6 +51,7 @@ impl RealtimeSession {
     async fn handle_client_msg(&mut self, msg: ClientMessage) -> anyhow::Result<()> {
         match msg {
             ClientMessage::JoinGame => handle_client_join(self).await,
+            ClientMessage::PlayerMove(_move_data) => unimplemented!(),
         }
     }
 
