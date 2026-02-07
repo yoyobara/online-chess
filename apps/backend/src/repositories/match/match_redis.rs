@@ -132,6 +132,29 @@ impl MatchRepository for RedisMatchRepository {
         })
     }
 
+    async fn update_match_state(
+        &self,
+        match_id: &str,
+        new_state: MatchState,
+    ) -> MatchRepositoryResult<()> {
+        self.connection
+            .clone()
+            .hset_multiple(
+                format!("matches:{}", match_id),
+                &[
+                    (
+                        "game_board",
+                        serde_json::to_string(&new_state.board).map_err(anyhow::Error::from)?,
+                    ),
+                    ("move_count", new_state.move_count.to_string()),
+                ],
+            )
+            .await
+            .map_err(redis_to_repo_error)?;
+
+        Ok(())
+    }
+
     async fn get_players(&self, match_id: &str) -> MatchRepositoryResult<MatchPlayers> {
         let players = self
             .connection
