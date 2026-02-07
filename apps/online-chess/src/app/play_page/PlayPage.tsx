@@ -28,8 +28,8 @@ export const PlayPage: FC = () => {
         break;
 
       case 'MoveResult':
-        if (lastMessage.data) {
-          setMatchState(lastMessage.data);
+        if (!lastMessage.data) {
+          alert('bad move!');
         }
         break;
 

@@ -14,7 +14,7 @@ export type ServerMessage =
     }
   | {
       type: 'MoveResult';
-      data: MatchState | null;
+      data: boolean;
     }
   | {
       type: 'NewState';

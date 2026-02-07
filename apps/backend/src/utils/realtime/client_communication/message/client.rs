@@ -1,9 +1,10 @@
+use rust_chess::core::square::Square;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct PlayerMoveData {
-    src_square: String,
-    dest_sqaure: String,
+    pub src_square: Square,
+    pub dest_square: Square,
 }
 
 #[derive(Debug, Deserialize)]

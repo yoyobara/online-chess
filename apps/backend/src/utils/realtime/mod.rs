@@ -3,15 +3,20 @@ pub mod client_communication;
 mod client_handlers;
 mod pubsub_handlers;
 
+use anyhow::anyhow;
 use tokio::select;
 
 use crate::{
+    models::r#match::MatchState,
     state::AppState,
     utils::{
         pubsub::{message::PubSubMessage, PubSub},
         realtime::{
-            client_communication::{message::ClientMessage, ClientCommunicator},
-            client_handlers::handle_client_join,
+            client_communication::{
+                message::{ClientMessage, ServerMessage},
+                ClientCommunicator,
+            },
+            client_handlers::{handle_client_join, handle_client_player_move},
         },
     },
 };
@@ -43,15 +48,22 @@ impl RealtimeSession {
     }
 
     async fn handle_pubsub_msg(&mut self, msg: PubSubMessage) -> anyhow::Result<()> {
-        println!("{:?}", msg);
-
-        Ok(())
+        match msg {
+            PubSubMessage::PlayerMove(new_state) => {
+                self.communicator
+                    .send(ServerMessage::NewState(new_state))
+                    .await
+            }
+            _ => Err(anyhow!("bad pubsub message")),
+        }
     }
 
     async fn handle_client_msg(&mut self, msg: ClientMessage) -> anyhow::Result<()> {
         match msg {
             ClientMessage::JoinGame => handle_client_join(self).await,
-            ClientMessage::PlayerMove(_move_data) => unimplemented!(),
+            ClientMessage::PlayerMove(move_data) => {
+                handle_client_player_move(self, move_data).await
+            }
         }
     }
 

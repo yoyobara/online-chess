@@ -6,6 +6,6 @@ use crate::models::r#match::{JoinResponse, MatchState};
 #[serde(tag = "type", content = "data")]
 pub enum ServerMessage {
     JoinResponse(JoinResponse),
-    MoveResult(Option<MatchState>),
+    MoveResult(bool),
     NewState(MatchState),
 }

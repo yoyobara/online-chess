@@ -35,7 +35,7 @@ pub trait MatchRepository: Send + Sync + Debug {
     async fn update_match_state(
         &self,
         match_id: &str,
-        new_state: MatchState,
+        new_state: &MatchState,
     ) -> MatchRepositoryResult<()>;
 
     async fn get_players(&self, match_id: &str) -> MatchRepositoryResult<MatchPlayers>;

@@ -1,7 +1,7 @@
 use rust_chess::{board::Board, core::color::Color};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MatchState {
     pub board: Board,
     pub move_count: i32,

@@ -135,7 +135,7 @@ impl MatchRepository for RedisMatchRepository {
     async fn update_match_state(
         &self,
         match_id: &str,
-        new_state: MatchState,
+        new_state: &MatchState,
     ) -> MatchRepositoryResult<()> {
         self.connection
             .clone()

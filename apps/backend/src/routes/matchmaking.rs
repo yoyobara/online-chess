@@ -39,6 +39,7 @@ async fn handle_socket(
 
         match_id = match rx.recv().await.ok_or(anyhow!("reciever closed"))?? {
             PubSubMessage::MatchmakingMatchId(id) => id,
+            _ => Err(anyhow!("only matchmaking pubsub message is allowed"))?,
         };
     }
 
