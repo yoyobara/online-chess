@@ -10,17 +10,20 @@ import { getSquareName } from '../../utils/square';
 import { getPieceByIndex } from '../../utils/board';
 import { MatchState } from '../../types/match';
 import { UserData } from '../../types/user';
+import { PieceColor } from '../../types/piece';
 
 export interface PlayPageProps {
   matchState: MatchState;
   setMatchState: Dispatch<SetStateAction<MatchState | null>>;
   opponentData: UserData;
+  myColor: PieceColor;
 }
 
 export const PlayPage: FC<PlayPageProps> = ({
   matchState,
   setMatchState,
   opponentData,
+  myColor,
 }) => {
   const me = useRequiredAuth();
   const { lastMessage, sendMessage } = useRealtime();
@@ -61,7 +64,11 @@ export const PlayPage: FC<PlayPageProps> = ({
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
-        <Chessboard board={matchState.board} handleMove={handleMove} />
+        <Chessboard
+          board={matchState.board}
+          handleMove={handleMove}
+          myColor={myColor}
+        />
       </div>
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>

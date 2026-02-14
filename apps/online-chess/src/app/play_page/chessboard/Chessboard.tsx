@@ -4,13 +4,19 @@ import { Square } from './square';
 import { PieceComponent } from './piece';
 import { Board } from '../../../types/board';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { PieceColor } from '../../../types/piece';
 
 interface ChessBoardProps {
   board: Board;
   handleMove: (srcIndex: number, destIndex: number) => void;
+  myColor: PieceColor;
 }
 
-export const Chessboard: FC<ChessBoardProps> = ({ board, handleMove }) => {
+export const Chessboard: FC<ChessBoardProps> = ({
+  board,
+  handleMove,
+  myColor,
+}) => {
   const onDragEnd = (ev: DragEndEvent) => {
     if (!ev.over) return;
 
@@ -24,10 +30,15 @@ export const Chessboard: FC<ChessBoardProps> = ({ board, handleMove }) => {
     <DndContext onDragEnd={onDragEnd}>
       <div className={styles.chessboard}>
         {Array.from({ length: 64 }).map((_, i) => (
-          <Square index={i} />
+          <Square index={myColor === 'White' ? i : 63 - i} />
         ))}
         {board.state.map((piece, i) =>
-          piece ? <PieceComponent index={i} piece={piece} /> : null
+          piece ? (
+            <PieceComponent
+              index={myColor === 'White' ? i : 63 - i}
+              piece={piece}
+            />
+          ) : null
         )}
       </div>
     </DndContext>
