@@ -1,34 +1,34 @@
-import { FC, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
 import { useRequiredAuth } from '../../contexts/auth';
-import { MatchState } from '../../types/match';
-import { useUserData } from '../../queries/user';
 import { useRealtime } from '../../contexts/realtime';
 import { getSquareName } from '../../utils/square';
 import { getPieceByIndex } from '../../utils/board';
+import { MatchState } from '../../types/match';
+import { UserData } from '../../types/user';
 
-export const PlayPage: FC = () => {
+export interface PlayPageProps {
+  matchState: MatchState;
+  setMatchState: Dispatch<SetStateAction<MatchState | null>>;
+  opponentData: UserData;
+}
+
+export const PlayPage: FC<PlayPageProps> = ({
+  matchState,
+  setMatchState,
+  opponentData,
+}) => {
   const me = useRequiredAuth();
-
-  const [matchState, setMatchState] = useState<MatchState | null>(null);
-  const [opponentId, setOpponentId] = useState<number | null>(null);
-
   const { lastMessage, sendMessage } = useRealtime();
-  const { user: opponentData } = useUserData(opponentId);
 
   useEffect(() => {
     if (!lastMessage) return;
 
     switch (lastMessage.type) {
-      case 'JoinResponse':
-        setMatchState(lastMessage.data.initial_state);
-        setOpponentId(lastMessage.data.opponent_id);
-        break;
-
       case 'NewState':
         setMatchState(lastMessage.data);
         break;
@@ -36,7 +36,7 @@ export const PlayPage: FC = () => {
       case 'MoveResult':
         break;
     }
-  }, [lastMessage]);
+  }, [lastMessage, setMatchState]);
 
   const handleMove = (srcIndex: number, destIndex: number) => {
     if (srcIndex === destIndex) {
@@ -53,14 +53,10 @@ export const PlayPage: FC = () => {
         src_square: src,
         dest_square: dest,
         captured_piece:
-          getPieceByIndex(matchState!.board, destIndex)?.piece_type ?? null,
+          getPieceByIndex(matchState.board, destIndex)?.piece_type ?? null,
       },
     });
   };
-
-  if (!matchState || !opponentData) {
-    return null;
-  }
 
   return (
     <div className={styles.play_page}>

@@ -6,6 +6,7 @@ import { SignInModal } from './auth_modals/SignInModal';
 import { SignUpModal } from './auth_modals/SignUpModal';
 import { HomePage } from './home_page/HomePage';
 import { PlayPageContainer } from './play_page/PlayPageContainer';
+import { PlayPageRealtimeProvider } from './play_page/PlayPageRealtimeProvider';
 
 export function App() {
   return (
@@ -46,7 +47,9 @@ export function App() {
         path="/play/:match_id"
         element={
           <LoggedInOnly>
-            <PlayPageContainer />
+            <PlayPageRealtimeProvider>
+              <PlayPageContainer />
+            </PlayPageRealtimeProvider>
           </LoggedInOnly>
         }
       />
