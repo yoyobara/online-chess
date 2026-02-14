@@ -1,5 +1,4 @@
 use anyhow::Result;
-use rust_chess::core::chess_move::Move;
 use rust_chess::core::chess_move::Move as ChessMove;
 
 use crate::utils::{
@@ -14,7 +13,12 @@ pub async fn handle_client_player_move(
     session: &mut RealtimeSession,
     move_data: PlayerMoveData,
 ) -> Result<()> {
-    let mv = ChessMove::new(move_data.src_square, move_data.dest_square, None, None);
+    let mv = ChessMove::new(
+        move_data.src_square,
+        move_data.dest_square,
+        move_data.captured_piece,
+        None,
+    );
 
     let mut match_state = session
         .app_state
@@ -23,6 +27,9 @@ pub async fn handle_client_player_move(
         .await?;
 
     let moves = match_state.board.get_legal_moves(mv.from).unwrap();
+
+    println!("{:?}", moves);
+    println!("{:?}", mv);
 
     if moves.contains(&mv) {
         match_state.board.apply_move(mv);

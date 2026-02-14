@@ -8,6 +8,8 @@ import { useRequiredAuth } from '../../contexts/auth';
 import { MatchState } from '../../types/match';
 import { useUserData } from '../../queries/user';
 import { useRealtime } from '../../contexts/realtime';
+import { getSquareName } from '../../utils/square';
+import { getPieceByIndex } from '../../utils/board';
 
 export const PlayPage: FC = () => {
   const me = useRequiredAuth();
@@ -27,26 +29,31 @@ export const PlayPage: FC = () => {
         setOpponentId(lastMessage.data.opponent_id);
         break;
 
-      case 'MoveResult':
-        if (!lastMessage.data) {
-          alert('bad move!');
-        }
-        break;
-
       case 'NewState':
         setMatchState(lastMessage.data);
+        break;
+
+      case 'MoveResult':
         break;
     }
   }, [lastMessage]);
 
-  const handleMove = (src: string, dest: string) => {
-    console.log(`${src} to ${dest}`);
+  const handleMove = (srcIndex: number, destIndex: number) => {
+    if (srcIndex === destIndex) {
+      return;
+    }
 
+    const src = getSquareName(srcIndex);
+    const dest = getSquareName(destIndex);
+
+    console.log(`${src} to ${dest}`);
     sendMessage({
       type: 'PlayerMove',
       data: {
         src_square: src,
         dest_square: dest,
+        captured_piece:
+          getPieceByIndex(matchState!.board, destIndex)?.piece_type ?? null,
       },
     });
   };

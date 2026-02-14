@@ -5,7 +5,7 @@ export type CastlingRights = {
   kingside: boolean;
 };
 
-export type Board = {
+export interface Board {
   state: Array<Piece | null>;
   castling_rights: [CastlingRights, CastlingRights];
-};
+}

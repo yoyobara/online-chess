@@ -4,7 +4,6 @@ import { Piece } from '../../../types/piece';
 import styles from './Chessboard.module.scss';
 import { getPieceSvg } from '../../../utils/piece';
 import { useDraggable } from '@dnd-kit/core';
-import { getSquareName } from '../../../utils/square';
 
 export interface PieceComponentProps {
   piece: Piece;
@@ -20,7 +19,7 @@ export const PieceComponent: FC<PieceComponentProps> = ({
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: `piece ${index}`,
     data: {
-      squareName: getSquareName(row, column),
+      index,
     },
   });
 

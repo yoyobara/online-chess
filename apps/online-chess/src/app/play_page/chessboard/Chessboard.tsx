@@ -7,17 +7,17 @@ import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
 interface ChessBoardProps {
   board: Board;
-  handleMove: (src: string, dest: string) => void;
+  handleMove: (srcIndex: number, destIndex: number) => void;
 }
 
 export const Chessboard: FC<ChessBoardProps> = ({ board, handleMove }) => {
   const onDragEnd = (ev: DragEndEvent) => {
     if (!ev.over) return;
 
-    const destSquare: string = ev.over.data.current?.squareName;
-    const srcSquare: string = ev.active.data.current?.squareName;
+    const destSquareIndex: number = ev.over.data.current?.index;
+    const srcSquareIndex: number = ev.active.data.current?.index;
 
-    handleMove(srcSquare, destSquare);
+    handleMove(srcSquareIndex, destSquareIndex);
   };
 
   return (
