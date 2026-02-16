@@ -1,21 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { UserData } from '../types/user';
 
-export const useUserData = (userId: number | null) => {
+export const useUserData = (userId: number) => {
   const { data: user } = useQuery<UserData>({
     queryKey: ['user', userId],
     queryFn: async () => {
-      if (!userId) return null;
-
       const resp = await fetch(`/api/user/${userId}`, {
         credentials: 'include',
       });
 
-      return resp.ok ? resp.json() : null;
-    },
+      if (!resp.ok) {
+        throw Error('bad user query');
+      }
 
-    enabled: !!userId,
+      return resp.json();
+    },
   });
 
-  return { user };
+  return user;
 };

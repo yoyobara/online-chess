@@ -7,8 +7,8 @@ import profile_default from '../../../assets/profile_default.svg';
 interface PlayPaperProps {
   className?: string;
   variant: 'white' | 'purple';
-  playerName: string;
-  playerRating: number;
+  playerName: string | null;
+  playerRating: number | null;
 }
 
 export const PlayerPaper: FC<PlayPaperProps> = ({
@@ -20,8 +20,10 @@ export const PlayerPaper: FC<PlayPaperProps> = ({
   return (
     <Paper className={`${styles.player_paper} ${styles[variant]} ${className}`}>
       <img className={styles.profile_photo} src={profile_default} alt="" />
-      <div className={styles.player_name}>{playerName}</div>
-      <div className={styles.player_rating}>Rating: {playerRating}</div>
+      <div className={styles.player_name}>{playerName ?? '...'}</div>
+      <div className={styles.player_rating}>
+        Rating: {playerRating ?? '...'}
+      </div>
     </Paper>
   );
 };
