@@ -5,9 +5,6 @@ import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
 import { useRequiredAuth } from '../../contexts/auth';
-import { useRealtime } from '../../contexts/realtime';
-import { getSquareName } from '../../utils/square';
-import { getPieceByIndex } from '../../utils/board';
 import { GameData } from '../../types/game_state';
 import { useUserData } from '../../queries/user';
 
@@ -17,38 +14,12 @@ export interface PlayPageProps {
 
 export const PlayPage: FC<PlayPageProps> = ({ game }) => {
   const me = useRequiredAuth();
-  const { sendMessage } = useRealtime();
-
   const opponent = useUserData(game.opponentId);
-
-  const handleMove = (srcIndex: number, destIndex: number) => {
-    if (srcIndex === destIndex) {
-      return;
-    }
-
-    const src = getSquareName(srcIndex);
-    const dest = getSquareName(destIndex);
-
-    console.log(`${src} to ${dest}`);
-    sendMessage({
-      type: 'PlayerMove',
-      data: {
-        src_square: src,
-        dest_square: dest,
-        captured_piece:
-          getPieceByIndex(game.currentBoard, destIndex)?.piece_type ?? null,
-      },
-    });
-  };
 
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
-        <Chessboard
-          board={game.currentBoard}
-          handleMove={handleMove}
-          myColor={game.myColor}
-        />
+        <Chessboard board={game.currentBoard} myColor={game.myColor} />
       </div>
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>

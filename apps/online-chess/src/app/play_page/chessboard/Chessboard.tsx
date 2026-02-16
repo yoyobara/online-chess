@@ -5,18 +5,37 @@ import { PieceComponent } from './piece';
 import { Board } from '../../../types/board';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { PieceColor } from '../../../types/piece';
+import { getSquareName } from '../../../utils/square';
+import { useRealtime } from '../../../contexts/realtime';
+import { getPieceByIndex } from '../../../utils/board';
 
 interface ChessBoardProps {
   board: Board;
-  handleMove: (srcIndex: number, destIndex: number) => void;
   myColor: PieceColor;
 }
 
-export const Chessboard: FC<ChessBoardProps> = ({
-  board,
-  handleMove,
-  myColor,
-}) => {
+export const Chessboard: FC<ChessBoardProps> = ({ board, myColor }) => {
+  const { sendMessage } = useRealtime();
+
+  const handleMove = (srcIndex: number, destIndex: number) => {
+    if (srcIndex === destIndex) {
+      return;
+    }
+
+    const src = getSquareName(srcIndex);
+    const dest = getSquareName(destIndex);
+
+    console.log(`${src} to ${dest}`);
+    sendMessage({
+      type: 'PlayerMove',
+      data: {
+        src_square: src,
+        dest_square: dest,
+        captured_piece: getPieceByIndex(board, destIndex)?.piece_type ?? null,
+      },
+    });
+  };
+
   const onDragEnd = (ev: DragEndEvent) => {
     if (!ev.over) return;
 
