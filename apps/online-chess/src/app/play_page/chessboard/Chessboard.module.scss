@@ -3,6 +3,9 @@
     height: 100%;
 
     position: relative;
+    display: grid;
+    grid-template-rows: repeat(8, 1fr);
+    grid-template-columns: repeat(8, 1fr);
 }
 
 .board_img {
@@ -22,11 +25,11 @@
     position: absolute;
     z-index: 1;
 
-    &.white {
+    &.light {
         background-color: #f0d9b5;
     }
 
-    &.black {
+    &.dark {
         background-color: #b58863;
     }
 }

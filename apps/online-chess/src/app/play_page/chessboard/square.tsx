@@ -1,18 +1,27 @@
 import { FC } from 'react';
 import styles from './Chessboard.module.scss';
 import { useDroppable } from '@dnd-kit/core';
+import { getSquareColor, getSquareName } from '../../../utils/square';
 
 export interface SquareProps {
+  squareNumber: number;
   index: number;
 }
 
-export const Square: FC<SquareProps> = ({ index }: SquareProps) => {
+export const Square: FC<SquareProps> = ({
+  squareNumber,
+  index,
+}: SquareProps) => {
+  const name = getSquareName(squareNumber);
+  const color = getSquareColor(squareNumber);
   const [row, column] = [Math.floor(index / 8), index % 8];
 
   const { setNodeRef } = useDroppable({
-    id: `square ${index}`,
+    id: `square ${name}`,
     data: {
-      index,
+      name,
+      squareNumber,
+      color,
     },
   });
 
@@ -20,7 +29,7 @@ export const Square: FC<SquareProps> = ({ index }: SquareProps) => {
     <div
       ref={setNodeRef}
       className={`${styles.square} ${
-        (row + column) % 2 ? styles.white : styles.black
+        color === 'Light' ? styles.light : styles.dark
       }`}
       style={{
         width: '12.5%',

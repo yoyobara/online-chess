@@ -7,19 +7,21 @@ import { useDraggable } from '@dnd-kit/core';
 
 export interface PieceComponentProps {
   piece: Piece;
+  squareNumber: number;
   index: number;
 }
 
 export const PieceComponent: FC<PieceComponentProps> = ({
   piece,
+  squareNumber,
   index,
 }: PieceComponentProps) => {
   const [row, column] = [Math.floor(index / 8), index % 8];
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: `piece ${index}`,
+    id: `piece ${squareNumber}`,
     data: {
-      index,
+      squareNumber,
     },
   });
 

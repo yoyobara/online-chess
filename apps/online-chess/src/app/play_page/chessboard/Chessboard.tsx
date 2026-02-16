@@ -20,26 +20,27 @@ export const Chessboard: FC<ChessBoardProps> = ({
   const onDragEnd = (ev: DragEndEvent) => {
     if (!ev.over) return;
 
-    const destSquareIndex: number = ev.over.data.current?.index;
-    const srcSquareIndex: number = ev.active.data.current?.index;
+    const destSquareNumber: number = ev.over.data.current?.squareNumber;
+    const srcSquareNumber: number = ev.active.data.current?.squareNumber;
 
-    handleMove(srcSquareIndex, destSquareIndex);
+    handleMove(srcSquareNumber, destSquareNumber);
   };
 
   return (
     <DndContext onDragEnd={onDragEnd}>
       <div className={styles.chessboard}>
-        {Array.from({ length: 64 }).map((_, i) => (
-          <Square index={myColor === 'White' ? i : 63 - i} />
+        {board.state.map((piece, i) => (
+          <>
+            <Square squareNumber={i} index={myColor === 'White' ? i : 63 - i} />
+            {piece ? (
+              <PieceComponent
+                squareNumber={i}
+                index={myColor === 'White' ? i : 63 - i}
+                piece={piece}
+              />
+            ) : null}
+          </>
         ))}
-        {board.state.map((piece, i) =>
-          piece ? (
-            <PieceComponent
-              index={myColor === 'White' ? i : 63 - i}
-              piece={piece}
-            />
-          ) : null
-        )}
       </div>
     </DndContext>
   );
