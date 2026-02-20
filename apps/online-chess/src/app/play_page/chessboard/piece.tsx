@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Piece } from '../../../types/piece';
+import { Piece, PieceColor } from '../../../types/piece';
 
 import styles from './Chessboard.module.scss';
 import { getPieceSvg } from '../../../utils/piece';
@@ -9,12 +9,14 @@ export interface PieceComponentProps {
   piece: Piece;
   squareNumber: number;
   index: number;
+  disabled: true | PieceColor;
 }
 
 export const PieceComponent: FC<PieceComponentProps> = ({
   piece,
   squareNumber,
   index,
+  disabled,
 }: PieceComponentProps) => {
   const [row, column] = [Math.floor(index / 8), index % 8];
 
@@ -23,6 +25,7 @@ export const PieceComponent: FC<PieceComponentProps> = ({
     data: {
       squareNumber,
     },
+    disabled: disabled === true || disabled === piece.piece_color,
   });
 
   const style = transform
@@ -37,6 +40,7 @@ export const PieceComponent: FC<PieceComponentProps> = ({
       className={styles.piece}
       src={getPieceSvg(piece)}
       alt={`${piece.piece_color} ${piece.piece_type}`}
+      draggable={false}
       style={{
         width: '12.5%',
         height: '12.5%',

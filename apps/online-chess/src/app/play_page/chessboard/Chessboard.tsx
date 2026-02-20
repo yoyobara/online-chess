@@ -12,9 +12,14 @@ import { getPieceByIndex } from '../../../utils/board';
 interface ChessBoardProps {
   board: Board;
   myColor: PieceColor;
+  disableDrag: true | PieceColor;
 }
 
-export const Chessboard: FC<ChessBoardProps> = ({ board, myColor }) => {
+export const Chessboard: FC<ChessBoardProps> = ({
+  board,
+  myColor,
+  disableDrag,
+}) => {
   const { sendMessage } = useRealtime();
 
   const handleMove = (srcIndex: number, destIndex: number) => {
@@ -56,6 +61,7 @@ export const Chessboard: FC<ChessBoardProps> = ({ board, myColor }) => {
                 squareNumber={i}
                 index={myColor === 'White' ? i : 63 - i}
                 piece={piece}
+                disabled={disableDrag}
               />
             ) : null}
           </>

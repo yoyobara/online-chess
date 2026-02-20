@@ -1,11 +1,14 @@
-use anyhow::Result;
-use rust_chess::core::chess_move::Move as ChessMove;
+use anyhow::{anyhow, Result};
+use rust_chess::core::{chess_move::Move as ChessMove, color::Color};
 
-use crate::utils::{
-    pubsub::message::PubSubMessage,
-    realtime::{
-        client_communication::message::{PlayerMoveData, ServerMessage},
-        RealtimeSession,
+use crate::{
+    models::r#match::MatchState,
+    utils::{
+        pubsub::message::PubSubMessage,
+        realtime::{
+            client_communication::message::{PlayerMoveData, ServerMessage},
+            RealtimeSession,
+        },
     },
 };
 
@@ -26,12 +29,27 @@ pub async fn handle_client_player_move(
         .get_match_state(&session.match_id)
         .await?;
 
+    let players = session
+        .app_state
+        .match_repo
+        .get_players(&session.match_id)
+        .await?;
+
+    let your_color = match session.player_id {
+        id if id == players.white_player_id => Color::White,
+        id if id == players.black_player_id => Color::Black,
+        _ => return Err(anyhow!("player not in match!")),
+    };
+
+    let your_turn = match_state.move_count % 2 == (if your_color == Color::White { 0 } else { 1 });
+    let your_piece = match_state.board.get(mv.from).map(|p| p.piece_color) == Some(your_color);
+
     let moves = match_state.board.get_legal_moves(mv.from).unwrap();
 
     println!("{:?}", moves);
     println!("{:?}", mv);
 
-    if moves.contains(&mv) {
+    if your_piece && your_turn && moves.contains(&mv) {
         match_state.board.apply_move(mv);
         match_state.move_count += 1;
 

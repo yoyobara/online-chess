@@ -16,10 +16,17 @@ export const PlayPage: FC<PlayPageProps> = ({ game }) => {
   const me = useRequiredAuth();
   const opponent = useUserData(game.opponentId);
 
+  const opponentColor = game.myColor === 'White' ? 'Black' : 'White';
+  const isMyTurn = game.moveCount % 2 === (game.myColor === 'White' ? 0 : 1);
+
   return (
     <div className={styles.play_page}>
       <div className={styles.board_container}>
-        <Chessboard board={game.currentBoard} myColor={game.myColor} />
+        <Chessboard
+          board={game.currentBoard}
+          myColor={game.myColor}
+          disableDrag={isMyTurn ? opponentColor : true}
+        />
       </div>
       <Paper className={styles.chat}></Paper>
       <Paper className={styles.history}></Paper>

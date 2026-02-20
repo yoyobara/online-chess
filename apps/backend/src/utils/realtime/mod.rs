@@ -7,7 +7,6 @@ use anyhow::anyhow;
 use tokio::select;
 
 use crate::{
-    models::r#match::MatchState,
     state::AppState,
     utils::{
         pubsub::{message::PubSubMessage, PubSub},
