@@ -4,6 +4,7 @@ mod client_handlers;
 mod pubsub_handlers;
 
 use anyhow::anyhow;
+use rust_chess::core::color::Color;
 use tokio::select;
 
 use crate::{
@@ -22,28 +23,44 @@ use crate::{
 
 pub struct RealtimeSession {
     app_state: AppState,
-    player_id: i32,
-    match_id: String,
     communicator: Box<dyn ClientCommunicator>,
     pubsub: Box<dyn PubSub>,
+
+    match_id: String,
+
+    player_id: i32,
+    player_color: Color,
+
+    opponent_id: i32,
+    opponent_color: Color,
 }
 
 impl RealtimeSession {
-    pub fn new(
+    pub async fn new(
         app_state: AppState,
         communicator: Box<dyn ClientCommunicator>,
         player_id: i32,
         match_id: String,
-    ) -> Self {
+    ) -> anyhow::Result<Self> {
         let pubsub = (app_state.pubsub_factory)();
 
-        Self {
+        let players = app_state.match_repo.get_players(&match_id).await?;
+        let (player_color, opponent_color, opponent_id) = if player_id == players.white_player_id {
+            (Color::White, Color::Black, players.black_player_id)
+        } else {
+            (Color::Black, Color::White, players.white_player_id)
+        };
+
+        Ok(Self {
             app_state,
-            player_id,
-            match_id,
             communicator,
             pubsub,
-        }
+            match_id,
+            player_id,
+            player_color,
+            opponent_id,
+            opponent_color,
+        })
     }
 
     async fn handle_pubsub_msg(&mut self, msg: PubSubMessage) -> anyhow::Result<()> {

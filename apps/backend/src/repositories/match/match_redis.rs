@@ -90,31 +90,6 @@ impl MatchRepository for RedisMatchRepository {
             .map_err(redis_to_repo_error)
     }
 
-    async fn set_player_connected(
-        &self,
-        match_id: &str,
-        player_id: i32,
-        connected: bool,
-    ) -> MatchRepositoryResult<()> {
-        let key = format!("player:{}:connected_matches", player_id);
-
-        if connected {
-            self.connection
-                .clone()
-                .set(key, match_id)
-                .await
-                .map_err(redis_to_repo_error)?;
-        } else {
-            self.connection
-                .clone()
-                .del(key)
-                .await
-                .map_err(redis_to_repo_error)?;
-        }
-
-        Ok(())
-    }
-
     async fn get_match_state(&self, match_id: &str) -> MatchRepositoryResult<MatchState> {
         let match_fields = self
             .connection

@@ -24,13 +24,6 @@ pub trait MatchRepository: Send + Sync + Debug {
         match_id: &str,
     ) -> MatchRepositoryResult<bool>;
 
-    async fn set_player_connected(
-        &self,
-        match_id: &str,
-        player_id: i32,
-        connected: bool,
-    ) -> MatchRepositoryResult<()>;
-
     async fn get_match_state(&self, match_id: &str) -> MatchRepositoryResult<MatchState>;
     async fn update_match_state(
         &self,

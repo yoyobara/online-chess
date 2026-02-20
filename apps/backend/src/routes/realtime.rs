@@ -18,7 +18,7 @@ async fn handle_socket(
     app_state: AppState,
 ) -> anyhow::Result<()> {
     let client_communicator = Box::new(WsCommunicator::new(socket));
-    let session = RealtimeSession::new(app_state, client_communicator, player_id, match_id);
+    let session = RealtimeSession::new(app_state, client_communicator, player_id, match_id).await?;
 
     session.mainloop().await
 }
