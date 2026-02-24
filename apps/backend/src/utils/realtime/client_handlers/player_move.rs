@@ -1,11 +1,17 @@
 use anyhow::Result;
-use rust_chess::core::{chess_move::Move as ChessMove, color::Color};
+use rust_chess::{
+    board::{Board, EndgameState},
+    core::{chess_move::Move as ChessMove, color::Color},
+};
 
-use crate::utils::{
-    pubsub::message::PubSubMessage,
-    realtime::{
-        client_communication::message::{PlayerMoveData, ServerMessage},
-        RealtimeSession,
+use crate::{
+    models::r#match::{MatchResult, MatchState},
+    utils::{
+        pubsub::message::PubSubMessage,
+        realtime::{
+            client_communication::message::{PlayerMoveData, ServerMessage},
+            RealtimeSession,
+        },
     },
 };
 
@@ -51,6 +57,15 @@ pub async fn handle_client_player_move(
             .communicator
             .send(ServerMessage::MoveResult(true))
             .await?;
+
+        let endgame_state = match_state
+            .board
+            .is_player_under_endgame_state(session.opponent_color);
+
+        match_state.game_result = endgame_state.map(|state| match state {
+            EndgameState::Checkmate => MatchResult::Win(session.player_color),
+            EndgameState::Stalemate => MatchResult::Draw,
+        });
 
         session
             .app_state

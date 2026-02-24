@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum MatchResult {
-    Checkmate(Color),
-    Stalemate,
+    Win(Color),
+    Draw,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
