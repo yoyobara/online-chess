@@ -21,6 +21,7 @@ use crate::{
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    println!("SHIT");
     let config = load_env()?;
     let port = config.port;
 

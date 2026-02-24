@@ -12,5 +12,5 @@ export const getSquareName = (index: number): string => {
 export const getSquareColor = (index: number): SquareColor => {
   const [row, column] = [Math.floor(index / 8), index % 8];
 
-  return (row + column) % 2 === 1 ? 'Dark' : 'Light';
+  return (row + column) % 2 === 0 ? 'Dark' : 'Light';
 };
