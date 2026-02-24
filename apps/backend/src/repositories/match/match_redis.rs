@@ -4,7 +4,7 @@ use redis::{aio::MultiplexedConnection, AsyncTypedCommands, RedisError};
 use rust_chess::board::Board;
 
 use crate::{
-    models::r#match::{MatchPlayers, MatchState},
+    models::r#match::{MatchPlayers, MatchResult, MatchState},
     repositories::r#match::{MatchRepository, MatchRepositoryError, MatchRepositoryResult},
     utils::uuid::new_uuid_v4,
 };
@@ -67,6 +67,11 @@ impl MatchRepository for RedisMatchRepository {
                         serde_json::to_string(&new_board).map_err(anyhow::Error::from)?,
                     ),
                     ("move_count", 0.to_string()),
+                    (
+                        "match_result",
+                        serde_json::to_string::<Option<MatchResult>>(&None)
+                            .map_err(anyhow::Error::from)?,
+                    ),
                 ],
             )
             .sadd(format!("player:{}:matches", white_player_id), &match_id)
@@ -96,7 +101,7 @@ impl MatchRepository for RedisMatchRepository {
             .clone()
             .hmget(
                 &format!("matches:{}", match_id),
-                &["game_board", "move_count"],
+                &["game_board", "move_count", "match_result"],
             )
             .await
             .map_err(redis_to_repo_error)?;
@@ -104,6 +109,7 @@ impl MatchRepository for RedisMatchRepository {
         Ok(MatchState {
             board: serde_json::from_str(&match_fields[0]).map_err(anyhow::Error::from)?,
             move_count: match_fields[1].parse().map_err(anyhow::Error::from)?,
+            game_result: serde_json::from_str(&match_fields[2]).map_err(anyhow::Error::from)?,
         })
     }
 
@@ -122,6 +128,11 @@ impl MatchRepository for RedisMatchRepository {
                         serde_json::to_string(&new_state.board).map_err(anyhow::Error::from)?,
                     ),
                     ("move_count", new_state.move_count.to_string()),
+                    (
+                        "match_result",
+                        serde_json::to_string::<Option<MatchResult>>(&new_state.game_result)
+                            .map_err(anyhow::Error::from)?,
+                    ),
                 ],
             )
             .await
