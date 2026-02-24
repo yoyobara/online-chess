@@ -109,7 +109,7 @@ impl MatchRepository for RedisMatchRepository {
         Ok(MatchState {
             board: serde_json::from_str(&match_fields[0]).map_err(anyhow::Error::from)?,
             move_count: match_fields[1].parse().map_err(anyhow::Error::from)?,
-            game_result: serde_json::from_str(&match_fields[2]).map_err(anyhow::Error::from)?,
+            match_result: serde_json::from_str(&match_fields[2]).map_err(anyhow::Error::from)?,
         })
     }
 
@@ -130,7 +130,7 @@ impl MatchRepository for RedisMatchRepository {
                     ("move_count", new_state.move_count.to_string()),
                     (
                         "match_result",
-                        serde_json::to_string::<Option<MatchResult>>(&new_state.game_result)
+                        serde_json::to_string::<Option<MatchResult>>(&new_state.match_result)
                             .map_err(anyhow::Error::from)?,
                     ),
                 ],

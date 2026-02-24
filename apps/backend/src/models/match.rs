@@ -2,6 +2,7 @@ use rust_chess::{board::Board, core::color::Color};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "type", content = "data")]
 pub enum MatchResult {
     Win(Color),
     Draw,
@@ -11,7 +12,7 @@ pub enum MatchResult {
 pub struct MatchState {
     pub board: Board,
     pub move_count: i32,
-    pub game_result: Option<MatchResult>,
+    pub match_result: Option<MatchResult>,
 }
 
 #[derive(Serialize, Debug)]

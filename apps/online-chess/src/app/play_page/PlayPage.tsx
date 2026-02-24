@@ -5,14 +5,16 @@ import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
 import { useRequiredAuth } from '../../contexts/auth';
-import { GameData } from '../../types/game_state';
+import { GameState } from '../../types/game_state';
 import { useUserData } from '../../queries/user';
 
 export interface PlayPageProps {
-  game: GameData;
+  gameState: Exclude<GameState, { type: 'NotJoined' }>;
 }
 
-export const PlayPage: FC<PlayPageProps> = ({ game }) => {
+export const PlayPage: FC<PlayPageProps> = ({ gameState }) => {
+  const { game } = gameState;
+
   const me = useRequiredAuth();
   const opponent = useUserData(game.opponentId);
 
@@ -34,12 +36,16 @@ export const PlayPage: FC<PlayPageProps> = ({ game }) => {
         playerName={me.username}
         playerRating={me.rank}
         variant="white"
+        status={(gameState.type === 'Ended' && gameState.myStatus) || undefined}
         className={styles.player}
       />
       <PlayerPaper
         playerName={opponent?.username ?? null}
         playerRating={opponent?.rank ?? null}
         variant="purple"
+        status={
+          (gameState.type === 'Ended' && gameState.opponentStatus) || undefined
+        }
         className={styles.opponent}
       />
       <div className={styles.buttons}>

@@ -62,7 +62,7 @@ pub async fn handle_client_player_move(
             .board
             .is_player_under_endgame_state(session.opponent_color);
 
-        match_state.game_result = endgame_state.map(|state| match state {
+        match_state.match_result = endgame_state.map(|state| match state {
             EndgameState::Checkmate => MatchResult::Win(session.player_color),
             EndgameState::Stalemate => MatchResult::Draw,
         });
