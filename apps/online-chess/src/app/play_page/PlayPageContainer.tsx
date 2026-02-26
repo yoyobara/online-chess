@@ -21,7 +21,7 @@ const determinePlayerStatus = (
 export const PlayPageContainer: FC = () => {
   const { lastMessage } = useRealtime();
 
-  const [gameState, setGameState] = useState<GameState>({ type: 'NotJoined' });
+  const [gameState, setGameState] = useState<GameState | null>(null);
 
   useEffect(() => {
     if (!lastMessage) return;
@@ -41,7 +41,7 @@ export const PlayPageContainer: FC = () => {
 
       case 'NewState':
         setGameState((prev) => {
-          if (prev.type !== 'Playing') {
+          if (prev?.type !== 'Playing') {
             throw Error('got NewState message not in Playing state');
           }
 
@@ -82,7 +82,7 @@ export const PlayPageContainer: FC = () => {
     }
   }, [lastMessage]);
 
-  if (gameState.type === 'NotJoined') {
+  if (gameState === null) {
     return null;
   }
 

@@ -9,7 +9,7 @@ import { GameState } from '../../types/game_state';
 import { useUserData } from '../../queries/user';
 
 export interface PlayPageProps {
-  gameState: Exclude<GameState, { type: 'NotJoined' }>;
+  gameState: GameState;
 }
 
 export const PlayPage: FC<PlayPageProps> = ({ gameState }) => {
@@ -36,7 +36,7 @@ export const PlayPage: FC<PlayPageProps> = ({ gameState }) => {
         playerName={me.username}
         playerRating={me.rank}
         variant="white"
-        status={(gameState.type === 'Ended' && gameState.myStatus) || undefined}
+        status={gameState.type === 'Ended' ? gameState.myStatus : undefined}
         className={styles.player}
       />
       <PlayerPaper
@@ -44,7 +44,7 @@ export const PlayPage: FC<PlayPageProps> = ({ gameState }) => {
         playerRating={opponent?.rank ?? null}
         variant="purple"
         status={
-          (gameState.type === 'Ended' && gameState.opponentStatus) || undefined
+          gameState.type === 'Ended' ? gameState.opponentStatus : undefined
         }
         className={styles.opponent}
       />

@@ -11,7 +11,6 @@ export type GameData = {
 };
 
 export type GameState =
-  | { type: 'NotJoined' }
   | { type: 'Playing'; game: GameData }
   | {
       type: 'Ended';
