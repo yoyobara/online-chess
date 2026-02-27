@@ -29,7 +29,6 @@ pub async fn realtime_handler(
     State(app_state): State<AppState>,
     Path(match_id): Path<String>,
 ) -> ApiResult<Response<Body>> {
-    println!("calamity what now");
     let in_match = app_state
         .match_repo
         .is_player_in_match(player_id, &match_id)

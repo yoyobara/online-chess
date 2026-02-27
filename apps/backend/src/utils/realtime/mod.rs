@@ -66,7 +66,6 @@ impl RealtimeSession {
     async fn handle_pubsub_msg(&mut self, msg: PubSubMessage) -> anyhow::Result<()> {
         match msg {
             PubSubMessage::PlayerMove(new_state) => {
-                println!("sending new state: {:?}", new_state);
                 self.communicator
                     .send(ServerMessage::NewState(new_state))
                     .await
