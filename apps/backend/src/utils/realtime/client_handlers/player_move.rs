@@ -1,11 +1,11 @@
 use anyhow::Result;
 use rust_chess::{
-    board::{Board, EndgameState},
+    board::EndgameState,
     core::{chess_move::Move as ChessMove, color::Color},
 };
 
 use crate::{
-    models::r#match::{MatchResult, MatchState},
+    models::r#match::MatchResult,
     utils::{
         pubsub::message::PubSubMessage,
         realtime::{

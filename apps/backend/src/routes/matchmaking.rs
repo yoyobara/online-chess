@@ -18,7 +18,7 @@ async fn handle_socket(
     if let Some(popped_player) = player_pop_result {
         match_id = app_state
             .match_repo
-            .register_match(popped_player, player_id)
+            .register_match(popped_player, player_id, app_state.initial_board)
             .await?;
 
         pubsub

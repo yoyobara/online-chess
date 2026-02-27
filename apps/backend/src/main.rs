@@ -10,6 +10,7 @@ mod utils;
 
 use std::sync::Arc;
 
+use rust_chess::board::Board;
 use tokio::net::TcpListener;
 
 use crate::{
@@ -36,7 +37,7 @@ async fn main() -> anyhow::Result<()> {
     let pubsub_factory: Arc<PubSubFactory> =
         Arc::new(move || Box::new(RedisPubSub::new(client.clone())));
 
-    let state = AppState::new(config, pubsub_factory, user_repo, match_repo).await;
+    let state = AppState::new(config, pubsub_factory, user_repo, match_repo, Board::new()).await;
 
     let app = routes::router().with_state(state);
     let listener = TcpListener::bind(("0.0.0.0", port)).await?;

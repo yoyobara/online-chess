@@ -51,9 +51,9 @@ impl MatchRepository for RedisMatchRepository {
         &self,
         white_player_id: i32,
         black_player_id: i32,
+        starting_board: Board,
     ) -> MatchRepositoryResult<String> {
         let match_id = new_uuid_v4();
-        let new_board = Board::new();
 
         let _: () = redis::pipe()
             .atomic()
@@ -64,7 +64,7 @@ impl MatchRepository for RedisMatchRepository {
                     ("black_player_id", black_player_id.to_string()),
                     (
                         "game_board",
-                        serde_json::to_string(&new_board).map_err(anyhow::Error::from)?,
+                        serde_json::to_string(&starting_board).map_err(anyhow::Error::from)?,
                     ),
                     ("move_count", 0.to_string()),
                     (

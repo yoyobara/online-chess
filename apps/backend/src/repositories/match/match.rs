@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 use async_trait::async_trait;
+use rust_chess::board::Board;
 
 use crate::{
     models::r#match::{MatchPlayers, MatchState},
@@ -16,6 +17,7 @@ pub trait MatchRepository: Send + Sync + Debug {
         &self,
         white_player_id: i32,
         black_player_id: i32,
+        starting_board: Board,
     ) -> MatchRepositoryResult<String>;
 
     async fn is_player_in_match(
