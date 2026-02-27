@@ -3,7 +3,7 @@ use futures_util::StreamExt;
 use redis::{AsyncTypedCommands, Client};
 use tokio::sync::mpsc::{self, Receiver};
 
-use crate::utils::pubsub::PubSub;
+use crate::utils::pubsub::{message::PubSubMessage, PubSub};
 
 pub struct RedisPubSub {
     client: Client,
@@ -17,14 +17,18 @@ impl RedisPubSub {
 
 #[async_trait]
 impl PubSub for RedisPubSub {
-    async fn publish(&self, topic: &str, payload: &[u8]) -> anyhow::Result<()> {
+    async fn publish(&self, topic: &str, payload: &PubSubMessage) -> anyhow::Result<()> {
+        let data = serde_json::to_vec(payload)?;
         let mut conn = self.client.get_multiplexed_async_connection().await?;
 
-        conn.publish(topic, payload).await?;
+        conn.publish(topic, data).await?;
         Ok(())
     }
 
-    async fn subscribe(&self, topic: &str) -> anyhow::Result<Receiver<Vec<u8>>> {
+    async fn subscribe(
+        &self,
+        topic: &str,
+    ) -> anyhow::Result<Receiver<anyhow::Result<PubSubMessage>>> {
         let (tx, rx) = mpsc::channel(1024);
 
         let client_clone = self.client.clone();
@@ -41,14 +45,14 @@ impl PubSub for RedisPubSub {
                     break;
                 };
 
-                let payload: Vec<u8> = msg.get_payload()?;
+                let payload_bytes: Vec<u8> = msg.get_payload()?;
+                let payload =
+                    serde_json::from_slice::<PubSubMessage>(&payload_bytes).map_err(Into::into);
 
-                if tx.send(payload).await.is_err() {
-                    break;
-                }
+                tx.send(payload).await?;
             }
 
-            anyhow::Ok(())
+            Ok::<(), anyhow::Error>(())
         });
 
         Ok(rx)

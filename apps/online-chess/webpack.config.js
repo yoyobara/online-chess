@@ -24,6 +24,11 @@ module.exports = {
         target: 'ws://localhost:3000',
         ws: true,
       },
+      {
+        context: ['/join'],
+        target: 'ws://localhost:3000',
+        ws: true,
+      },
     ],
   },
   plugins: [

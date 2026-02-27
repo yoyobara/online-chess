@@ -6,6 +6,7 @@ mod models;
 mod repositories;
 mod routes;
 mod state;
+mod testboard;
 mod utils;
 
 use std::sync::Arc;
@@ -15,8 +16,9 @@ use tokio::net::TcpListener;
 use crate::{
     configs::{load_env, load_pool, load_redis},
     repositories::{r#match::RedisMatchRepository, user::SqlxUserRepository},
-    state::AppState,
-    utils::pubsub::{redis::RedisPubSub, PubSubFactory},
+    state::{AppState, PubSubFactory},
+    testboard::get_test_board,
+    utils::pubsub::redis::RedisPubSub,
 };
 
 #[tokio::main]
@@ -35,7 +37,14 @@ async fn main() -> anyhow::Result<()> {
     let pubsub_factory: Arc<PubSubFactory> =
         Arc::new(move || Box::new(RedisPubSub::new(client.clone())));
 
-    let state = AppState::new(config, pubsub_factory, user_repo, match_repo).await;
+    let state = AppState::new(
+        config,
+        pubsub_factory,
+        user_repo,
+        match_repo,
+        get_test_board(),
+    )
+    .await;
 
     let app = routes::router().with_state(state);
     let listener = TcpListener::bind(("0.0.0.0", port)).await?;

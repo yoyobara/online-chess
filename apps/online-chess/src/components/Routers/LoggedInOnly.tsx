@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/auth';
 import { Navigate } from 'react-router-dom';
 
 export const LoggedInOnly: FC<PropsWithChildren> = ({ children }) => {
-  const auth = useAuth();
+  const me = useAuth();
 
-  return auth ? children : <Navigate to="/" />;
+  return me ? children : <Navigate to="/" />;
 };

@@ -1,44 +1,35 @@
-import { useQuery } from '@tanstack/react-query';
 import { FC, PropsWithChildren, createContext, useContext } from 'react';
+import { useMe } from '../queries/auth/me';
+import { AuthData } from '../types/auth/auth_data';
 
-interface AuthData {
-  id: number;
-  username: string;
-}
-
-const authContext = createContext<AuthData | null>(null);
+const authContext = createContext<AuthData | null | undefined>(undefined);
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { data, isLoading } = useQuery<AuthData | null>({
-    queryKey: ['auth_data'],
-    queryFn: () =>
-      fetch('/api/user/me', { credentials: 'include' }).then((resp) =>
-        resp.ok ? resp.json() : null
-      ),
-  });
+  const { data } = useMe();
 
-  if (isLoading) {
+  if (data === undefined) {
     return null;
   }
 
-  return (
-    <authContext.Provider value={data ?? null}>{children}</authContext.Provider>
-  );
+  return <authContext.Provider value={data}>{children}</authContext.Provider>;
 };
 
 export const useAuth = (): AuthData | null => {
   const context = useContext(authContext);
 
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+
   return context;
 };
 
 export const useRequiredAuth = (): AuthData => {
-  const context = useContext(authContext);
-  if (!context) {
-    throw new Error(
-      'useRequiredAuth must be used within AuthProvider with an authenticated user'
-    );
+  const auth = useAuth();
+
+  if (auth === null) {
+    throw new Error('useRequiredAuth must be used with an authenticated user');
   }
 
-  return context;
+  return auth;
 };

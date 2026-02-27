@@ -1,4 +1,5 @@
-use crate::{extractors::AuthUser, state::AppState};
+use crate::{extractors::AuthUser, state::AppState, utils::pubsub::message::PubSubMessage};
+use anyhow::anyhow;
 use axum::{
     extract::{ws::WebSocket, State, WebSocketUpgrade},
     response::IntoResponse,
@@ -17,13 +18,13 @@ async fn handle_socket(
     if let Some(popped_player) = player_pop_result {
         match_id = app_state
             .match_repo
-            .register_match(popped_player, player_id)
+            .register_match(popped_player, player_id, app_state.initial_board)
             .await?;
 
         pubsub
             .publish(
                 &format!("matchmaking_waiting_users:{}", popped_player),
-                match_id.as_bytes(),
+                &PubSubMessage::MatchmakingMatchId(match_id.clone()),
             )
             .await?;
     } else {
@@ -36,7 +37,10 @@ async fn handle_socket(
             .push_matchmaking_player(player_id)
             .await?;
 
-        match_id = String::from_utf8(rx.recv().await.unwrap())?;
+        match_id = match rx.recv().await.ok_or(anyhow!("reciever closed"))?? {
+            PubSubMessage::MatchmakingMatchId(id) => id,
+            _ => Err(anyhow!("only matchmaking pubsub message is allowed"))?,
+        };
     }
 
     socket

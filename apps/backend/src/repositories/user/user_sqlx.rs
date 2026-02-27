@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    models::user::UserData,
+    models::user::User,
     repositories::user::{error::UserRepositoryResult, user::UserRepository, UserRepositoryError},
 };
 
@@ -31,15 +31,15 @@ fn sqlx_to_repo_error(err: sqlx::Error) -> UserRepositoryError {
 
 #[async_trait]
 impl UserRepository for SqlxUserRepository {
-    async fn get_user(&self, id: i32) -> UserRepositoryResult<UserData> {
-        sqlx::query_as!(UserData, "select * from users where id = $1", id)
+    async fn get_user(&self, id: i32) -> UserRepositoryResult<User> {
+        sqlx::query_as!(User, "select * from users where id = $1", id)
             .fetch_one(&self.pool)
             .await
             .map_err(sqlx_to_repo_error)
     }
 
-    async fn get_by_email(&self, email: String) -> UserRepositoryResult<UserData> {
-        sqlx::query_as!(UserData, "select * from users where email = $1", email)
+    async fn get_by_email(&self, email: String) -> UserRepositoryResult<User> {
+        sqlx::query_as!(User, "select * from users where email = $1", email)
             .fetch_one(&self.pool)
             .await
             .map_err(sqlx_to_repo_error)

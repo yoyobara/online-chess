@@ -28,3 +28,4 @@ redis = { version = "1.0.2", features = ["tokio-comp"] }
 dashmap = "6.1.0"
 futures-util = "0.3.31"
 uuid = { version = "1.19.0", features = ["v4"] }
+rust-chess = { git = "https://github.com/yoyobara/rust-chess.git", branch = "main", features = ["serde-support"] }

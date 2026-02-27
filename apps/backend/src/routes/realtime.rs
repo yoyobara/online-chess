@@ -2,6 +2,7 @@ use crate::{
     error::{ApiError, ApiResult},
     extractors::AuthUser,
     state::AppState,
+    utils::realtime::{client_communication::WsCommunicator, RealtimeSession},
 };
 use axum::{
     body::Body,
@@ -16,7 +17,10 @@ async fn handle_socket(
     match_id: String,
     app_state: AppState,
 ) -> anyhow::Result<()> {
-    unimplemented!()
+    let client_communicator = Box::new(WsCommunicator::new(socket));
+    let session = RealtimeSession::new(app_state, client_communicator, player_id, match_id).await?;
+
+    session.mainloop().await
 }
 
 pub async fn realtime_handler(
@@ -32,9 +36,9 @@ pub async fn realtime_handler(
 
     in_match
         .then_some(ws.on_upgrade(async move |socket| {
-            handle_socket(socket, player_id, match_id, app_state)
-                .await
-                .unwrap()
+            if let Err(e) = handle_socket(socket, player_id, match_id, app_state).await {
+                eprintln!("{}", e);
+            }
         }))
         .ok_or(ApiError::UserNotInMatch)
 }

@@ -3,6 +3,9 @@
     height: 100%;
 
     position: relative;
+    display: grid;
+    grid-template-rows: repeat(8, 1fr);
+    grid-template-columns: repeat(8, 1fr);
 }
 
 .board_img {
@@ -15,5 +18,19 @@
 
 .piece {
     position: absolute;
+    z-index: 2;
+    user-select: none;
+}
+
+.square {
+    position: absolute;
     z-index: 1;
+
+    &.light {
+        background-color: #f0d9b5;
+    }
+
+    &.dark {
+        background-color: #b58863;
+    }
 }

@@ -4,8 +4,9 @@ import { LoggedInOnly } from '../components/Routers/LoggedInOnly';
 import { LandingPage } from './landing_page/LandingPage';
 import { SignInModal } from './auth_modals/SignInModal';
 import { SignUpModal } from './auth_modals/SignUpModal';
-import { PlayPage } from './play_page/PlayPage';
 import { HomePage } from './home_page/HomePage';
+import { PlayPageContainer } from './play_page/PlayPageContainer';
+import { PlayPageRealtimeProvider } from './play_page/PlayPageRealtimeProvider';
 
 export function App() {
   return (
@@ -43,10 +44,12 @@ export function App() {
         }
       />
       <Route
-        path="/play"
+        path="/play/:match_id"
         element={
           <LoggedInOnly>
-            <PlayPage />
+            <PlayPageRealtimeProvider>
+              <PlayPageContainer />
+            </PlayPageRealtimeProvider>
           </LoggedInOnly>
         }
       />

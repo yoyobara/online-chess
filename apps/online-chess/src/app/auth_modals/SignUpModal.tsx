@@ -5,19 +5,11 @@ import { Button } from '../../components/Button/Button';
 import { Input } from '../../components/Input/Input';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios, { isAxiosError } from 'axios';
-
-interface SignUpInputs {
-  email: string;
-  username: string;
-  password: string;
-  confirmPassword: string;
-}
+import { SignUpInputs } from '../../types/auth/sign_up';
+import { useSignUp } from '../../queries/auth/sign_up';
 
 export const SignUpModal: FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const {
     register,
@@ -27,30 +19,7 @@ export const SignUpModal: FC = () => {
     formState: { errors },
   } = useForm<SignUpInputs>();
 
-  const signUpMutation = useMutation({
-    mutationFn: ({ confirmPassword, ...signUpRequest }: SignUpInputs) =>
-      axios
-        .post('/api/auth/register', signUpRequest, { withCredentials: true })
-        .then((res) => res.data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auth_data'] });
-      navigate('/home');
-    },
-    onError: (e) => {
-      if (isAxiosError(e)) {
-        switch (e.status) {
-          case 409:
-            setError('root', {
-              message: 'a user with this email or username already exists',
-            });
-            break;
-
-          default:
-            break;
-        }
-      }
-    },
-  });
+  const { signUpMutation } = useSignUp(setError);
 
   const onSubmit: SubmitHandler<SignUpInputs> = (data) =>
     signUpMutation.mutate(data);
