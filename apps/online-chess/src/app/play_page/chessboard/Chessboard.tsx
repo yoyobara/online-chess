@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import styles from './Chessboard.module.scss';
 import { Square } from './square';
 import { PieceComponent } from './piece';
@@ -8,37 +8,51 @@ import { PieceColor } from '../../../types/piece';
 import { getSquareName } from '../../../utils/square';
 import { useRealtime } from '../../../contexts/realtime';
 import { getPieceByIndex } from '../../../utils/board';
+import { Move } from '../../../types/move';
+import _ from 'lodash';
 
 interface ChessBoardProps {
   board: Board;
   myColor: PieceColor;
   disableDrag: true | PieceColor;
+  setWaitingForMoveResponse: (optimisticMove: Move) => void;
+  optimisticMove?: Move;
 }
 
 export const Chessboard: FC<ChessBoardProps> = ({
   board,
   myColor,
   disableDrag,
+  setWaitingForMoveResponse,
+  optimisticMove,
 }) => {
   const { sendMessage } = useRealtime();
+
+  const optimisticBoard = useMemo(() => {
+    const newBoard = _.cloneDeep(board);
+    if (optimisticMove) {
+      newBoard.state[optimisticMove.destIndex] =
+        newBoard.state[optimisticMove.srcIndex];
+      newBoard.state[optimisticMove.srcIndex] = null;
+    }
+
+    return newBoard;
+  }, [board, optimisticMove]);
 
   const handleMove = (srcIndex: number, destIndex: number) => {
     if (srcIndex === destIndex) {
       return;
     }
 
-    const src = getSquareName(srcIndex);
-    const dest = getSquareName(destIndex);
-
-    console.log(`${src} to ${dest}`);
     sendMessage({
       type: 'PlayerMove',
       data: {
-        src_square: src,
-        dest_square: dest,
+        src_square: getSquareName(srcIndex),
+        dest_square: getSquareName(destIndex),
         captured_piece: getPieceByIndex(board, destIndex)?.piece_type ?? null,
       },
     });
+    setWaitingForMoveResponse({ srcIndex, destIndex });
   };
 
   const onDragEnd = (ev: DragEndEvent) => {
@@ -53,7 +67,7 @@ export const Chessboard: FC<ChessBoardProps> = ({
   return (
     <DndContext onDragEnd={onDragEnd}>
       <div className={styles.chessboard}>
-        {board.state.map((piece, i) => (
+        {optimisticBoard.state.map((piece, i) => (
           <>
             <Square squareNumber={i} index={myColor === 'White' ? i : 63 - i} />
             {piece ? (

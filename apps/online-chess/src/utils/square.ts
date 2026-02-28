@@ -1,10 +1,10 @@
-import { SquareColor } from '../types/square';
+import { File, Rank, Square, SquareColor } from '../types/square';
 
-export const getSquareName = (index: number): string => {
+export const getSquareName = (index: number): Square => {
   const [row, column] = [Math.floor(index / 8), index % 8];
 
-  const rank = row + 1;
-  const file = 'ABCDEFGH'.at(column);
+  const rank = (row + 1).toString() as File;
+  const file = 'ABCDEFGH'.at(column) as Rank;
 
   return `${file}${rank}`;
 };
