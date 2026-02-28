@@ -7,12 +7,17 @@ import { Chessboard } from './chessboard/Chessboard';
 import { useRequiredAuth } from '../../contexts/auth';
 import { GameState } from '../../types/game_state';
 import { useUserData } from '../../queries/user';
+import { Move } from '../../types/move';
 
 export interface PlayPageProps {
   gameState: GameState;
+  setWaitingForMoveResponse: (optimsiticMove: Move) => void;
 }
 
-export const PlayPage: FC<PlayPageProps> = ({ gameState }) => {
+export const PlayPage: FC<PlayPageProps> = ({
+  gameState,
+  setWaitingForMoveResponse,
+}) => {
   const { game } = gameState;
 
   const me = useRequiredAuth();
@@ -28,6 +33,12 @@ export const PlayPage: FC<PlayPageProps> = ({ gameState }) => {
           board={game.currentBoard}
           myColor={game.myColor}
           disableDrag={isMyTurn ? opponentColor : true}
+          setWaitingForMoveResponse={setWaitingForMoveResponse}
+          optimisticMove={
+            gameState.type === 'WaitForMoveResponse'
+              ? gameState.optimisticMove
+              : undefined
+          }
         />
       </div>
       <Paper className={styles.chat}></Paper>

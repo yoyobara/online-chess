@@ -1,9 +1,10 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useRealtime } from '../../contexts/realtime';
 import { PlayPage } from './PlayPage';
 import { GameState, PlayerStatus } from '../../types/game_state';
 import { MatchResult } from '../../types/match';
 import { PieceColor } from '../../types/piece';
+import { Move } from '../../types/move';
 
 const determinePlayerStatus = (
   myColor: PieceColor,
@@ -24,7 +25,12 @@ export const PlayPageContainer: FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
 
   useEffect(() => {
+    console.log('state: ', gameState?.type);
+  }, [gameState]);
+
+  useEffect(() => {
     if (!lastMessage) return;
+    console.log('got message: ', lastMessage);
 
     switch (lastMessage.type) {
       case 'JoinResponse':
@@ -41,8 +47,8 @@ export const PlayPageContainer: FC = () => {
 
       case 'NewState':
         setGameState((prev) => {
-          if (prev?.type !== 'Playing') {
-            throw Error('got NewState message not in Playing state');
+          if (!prev || prev.type === 'Ended') {
+            throw Error('got NewState message while not playing');
           }
 
           console.log(lastMessage.data.match_result);
@@ -78,13 +84,41 @@ export const PlayPageContainer: FC = () => {
         break;
 
       case 'MoveResult':
-        break;
+        if (!lastMessage.data) {
+          setGameState((prev) => {
+            if (prev?.type !== 'WaitForMoveResponse') {
+              throw Error('got bad move message not when playing');
+            }
+
+            return {
+              type: 'Playing',
+              game: prev.game,
+            };
+          });
+        }
     }
   }, [lastMessage]);
+
+  const setWaitingForMoveResponse = useCallback((optimisticMove: Move) => {
+    setGameState((prev) => {
+      if (prev?.type !== 'Playing') throw Error('not currently playing..');
+
+      return {
+        ...prev,
+        type: 'WaitForMoveResponse',
+        optimisticMove,
+      };
+    });
+  }, []);
 
   if (gameState === null) {
     return null;
   }
 
-  return <PlayPage gameState={gameState} />;
+  return (
+    <PlayPage
+      gameState={gameState}
+      setWaitingForMoveResponse={setWaitingForMoveResponse}
+    />
+  );
 };
