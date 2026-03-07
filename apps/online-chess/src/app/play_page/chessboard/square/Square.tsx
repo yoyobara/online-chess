@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import styles from './Chessboard.module.scss';
+import styles from './Square.module.scss';
 import { useDroppable } from '@dnd-kit/core';
-import { getSquareColor, getSquareName } from '../../../utils/square';
+import { getSquareColor, getSquareName } from '../../../../utils/square';
 
 export interface SquareProps {
   squareNumber: number;

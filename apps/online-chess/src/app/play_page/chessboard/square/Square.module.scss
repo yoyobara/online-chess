@@ -1,0 +1,12 @@
+.square {
+    position: absolute;
+    z-index: 1;
+
+    &.light {
+        background-color: #f0d9b5;
+    }
+
+    &.dark {
+        background-color: #b58863;
+    }
+}

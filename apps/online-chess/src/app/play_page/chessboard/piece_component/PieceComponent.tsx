@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { Piece, PieceColor } from '../../../types/piece';
+import { Piece, PieceColor } from '../../../../types/piece';
 
-import styles from './Chessboard.module.scss';
-import { getPieceSvg } from '../../../utils/piece';
+import styles from './PieceComponent.module.scss';
+import { getPieceSvg } from '../../../../utils/piece';
 import { useDraggable } from '@dnd-kit/core';
 
 export interface PieceComponentProps {
