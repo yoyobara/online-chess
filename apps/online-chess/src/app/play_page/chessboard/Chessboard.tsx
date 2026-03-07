@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 import styles from './Chessboard.module.scss';
-import { Square } from './square';
-import { PieceComponent } from './piece';
+import { Square } from './Square';
+import { PieceComponent } from './PieceComponent';
 import { Board } from '../../../types/board';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { PieceColor } from '../../../types/piece';
