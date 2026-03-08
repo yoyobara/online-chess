@@ -1,4 +1,5 @@
 use axum::{extract::State, http::StatusCode, Json};
+use secrecy::SecretString;
 use serde::Deserialize;
 use tower_cookies::Cookies;
 
@@ -13,7 +14,7 @@ use crate::{
 pub struct RegisterRequest {
     pub email: String,
     pub username: String,
-    pub password: String,
+    pub password: SecretString,
 }
 
 pub async fn register_handler(
@@ -25,7 +26,7 @@ pub async fn register_handler(
         password,
     }): Json<RegisterRequest>,
 ) -> ApiResult<StatusCode> {
-    let password_hash = hash_password(&password.into())?;
+    let password_hash = hash_password(&password)?;
 
     let created_user_id = state
         .user_repo
