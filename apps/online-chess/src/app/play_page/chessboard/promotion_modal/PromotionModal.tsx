@@ -25,7 +25,6 @@ export const PromotionModal: FC<PromotionModalProps> = ({
           variant="white"
           onClick={() => {
             onPieceSelect(pieceType);
-            onClose();
           }}
           key={pieceType}
         >

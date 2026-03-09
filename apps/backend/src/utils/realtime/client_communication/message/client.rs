@@ -6,6 +6,7 @@ pub struct PlayerMoveData {
     pub src_square: Square,
     pub dest_square: Square,
     pub captured_piece: Option<PieceType>,
+    pub promotion: Option<PieceType>,
 }
 
 #[derive(Debug, Deserialize)]

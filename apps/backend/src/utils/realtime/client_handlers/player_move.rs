@@ -23,7 +23,7 @@ pub async fn handle_client_player_move(
         move_data.src_square,
         move_data.dest_square,
         move_data.captured_piece,
-        None,
+        move_data.promotion,
     );
 
     let mut match_state = session

@@ -16,14 +16,24 @@ interface ChessBoardProps {
   myColor: PieceColor;
   disableDrag: true | PieceColor;
   setWaitingForMoveResponse: (optimisticMove: Move) => void;
+  setWaitingForPromotionChoice: (move: Move) => void;
   optimisticMove?: Move;
 }
+
+const isOnPromotionRow = (squareIndex: number, myColor: PieceColor) => {
+  if (myColor === 'White') {
+    return squareIndex > 55;
+  } else {
+    return squareIndex < 8;
+  }
+};
 
 export const Chessboard: FC<ChessBoardProps> = ({
   board,
   myColor,
   disableDrag,
   setWaitingForMoveResponse,
+  setWaitingForPromotionChoice,
   optimisticMove,
 }) => {
   const { sendMessage } = useRealtime();
@@ -44,15 +54,23 @@ export const Chessboard: FC<ChessBoardProps> = ({
       return;
     }
 
-    sendMessage({
-      type: 'PlayerMove',
-      data: {
-        src_square: getSquareName(srcIndex),
-        dest_square: getSquareName(destIndex),
-        captured_piece: getPieceByIndex(board, destIndex)?.piece_type ?? null,
-      },
-    });
-    setWaitingForMoveResponse({ srcIndex, destIndex });
+    const movedPiece = board.state[srcIndex]?.piece_type;
+    const capturedPiece = board.state[destIndex]?.piece_type ?? null;
+
+    if (movedPiece === 'Pawn' && isOnPromotionRow(destIndex, myColor)) {
+      setWaitingForPromotionChoice({ srcIndex, destIndex, capturedPiece });
+    } else {
+      sendMessage({
+        type: 'PlayerMove',
+        data: {
+          src_square: getSquareName(srcIndex),
+          dest_square: getSquareName(destIndex),
+          captured_piece: getPieceByIndex(board, destIndex)?.piece_type ?? null,
+          promotion: null,
+        },
+      });
+      setWaitingForMoveResponse({ srcIndex, destIndex, capturedPiece });
+    }
   };
 
   const onDragEnd = (ev: DragEndEvent) => {
