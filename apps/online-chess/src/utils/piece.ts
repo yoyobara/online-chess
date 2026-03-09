@@ -11,7 +11,7 @@ import knightB from '../assets/pieces/knight-b.svg';
 import pawnW from '../assets/pieces/pawn-w.svg';
 import pawnB from '../assets/pieces/pawn-b.svg';
 
-import { Piece } from '../types/piece';
+import { Piece, PieceColor } from '../types/piece';
 
 export const getPieceSvg = (piece: Piece): string => {
   const { piece_type, piece_color } = piece;
@@ -30,4 +30,8 @@ export const getPieceSvg = (piece: Piece): string => {
     case 'Pawn':
       return piece_color === 'White' ? pawnW : pawnB;
   }
+};
+
+export const invertColor = (color: PieceColor) => {
+  return color === 'White' ? 'Black' : 'White';
 };

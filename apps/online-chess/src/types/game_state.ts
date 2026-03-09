@@ -1,13 +1,13 @@
 import { Board } from './board';
+import { MatchResult } from './match';
 import { Move } from './move';
 import { PieceColor } from './piece';
 
-export type PlayerStatus = 'win' | 'lose' | 'draw';
-
 export type GameData = {
   currentBoard: Board;
-  myColor: PieceColor;
   moveCount: number;
+  myColor: PieceColor;
+  opponentColor: PieceColor;
   opponentId: number;
 };
 
@@ -26,6 +26,5 @@ export type GameState =
   | {
       type: 'Ended';
       game: GameData;
-      myStatus: PlayerStatus;
-      opponentStatus: PlayerStatus;
+      result: MatchResult;
     };

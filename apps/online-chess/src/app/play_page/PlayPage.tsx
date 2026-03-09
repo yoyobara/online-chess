@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
@@ -10,6 +10,7 @@ import { useUserData } from '../../queries/user';
 import { Move } from '../../types/move';
 import { PromotionModal } from './chessboard/promotion_modal/PromotionModal';
 import { PieceType } from '../../types/piece';
+import { determinePlayerStatus } from '../../utils/match';
 
 export interface PlayPageProps {
   gameState: GameState;
@@ -31,7 +32,6 @@ export const PlayPage: FC<PlayPageProps> = ({
   const me = useRequiredAuth();
   const opponent = useUserData(game.opponentId);
 
-  const opponentColor = game.myColor === 'White' ? 'Black' : 'White';
   const isMyTurn = game.moveCount % 2 === (game.myColor === 'White' ? 0 : 1);
 
   return (
@@ -40,7 +40,7 @@ export const PlayPage: FC<PlayPageProps> = ({
         <Chessboard
           board={game.currentBoard}
           myColor={game.myColor}
-          disableDrag={isMyTurn ? opponentColor : true}
+          disableDrag={isMyTurn ? game.opponentColor : true}
           setWaitingForMoveResponse={setWaitingForMoveResponse}
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
           optimisticMove={
@@ -56,7 +56,11 @@ export const PlayPage: FC<PlayPageProps> = ({
         playerName={me.username}
         playerRating={me.rank}
         variant="white"
-        status={gameState.type === 'Ended' ? gameState.myStatus : undefined}
+        status={
+          gameState.type === 'Ended'
+            ? determinePlayerStatus(game.myColor, gameState.result)
+            : undefined
+        }
         className={styles.player}
       />
       <PlayerPaper
@@ -64,7 +68,9 @@ export const PlayPage: FC<PlayPageProps> = ({
         playerRating={opponent?.rank ?? null}
         variant="purple"
         status={
-          gameState.type === 'Ended' ? gameState.opponentStatus : undefined
+          gameState.type === 'Ended'
+            ? determinePlayerStatus(game.opponentColor, gameState.result)
+            : undefined
         }
         className={styles.opponent}
       />
