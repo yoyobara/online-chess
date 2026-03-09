@@ -9,6 +9,7 @@ export type ClientMessage =
       data: {
         src_square: string;
         dest_square: string;
+        promotion: PieceType | null;
         captured_piece: PieceType | null;
       };
     };

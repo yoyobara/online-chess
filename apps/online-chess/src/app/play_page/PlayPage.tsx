@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
@@ -8,15 +8,23 @@ import { useRequiredAuth } from '../../contexts/auth';
 import { GameState } from '../../types/game_state';
 import { useUserData } from '../../queries/user';
 import { Move } from '../../types/move';
+import { PromotionModal } from './chessboard/promotion_modal/PromotionModal';
+import { PieceType } from '../../types/piece';
 
 export interface PlayPageProps {
   gameState: GameState;
   setWaitingForMoveResponse: (optimsiticMove: Move) => void;
+  setWaitingForPromotionChoice: (move: Move) => void;
+  onPromotionModalClose: () => void;
+  onPromotionModalSelect: (pieceType: PieceType) => void;
 }
 
 export const PlayPage: FC<PlayPageProps> = ({
   gameState,
   setWaitingForMoveResponse,
+  setWaitingForPromotionChoice,
+  onPromotionModalClose,
+  onPromotionModalSelect,
 }) => {
   const { game } = gameState;
 
@@ -34,6 +42,7 @@ export const PlayPage: FC<PlayPageProps> = ({
           myColor={game.myColor}
           disableDrag={isMyTurn ? opponentColor : true}
           setWaitingForMoveResponse={setWaitingForMoveResponse}
+          setWaitingForPromotionChoice={setWaitingForPromotionChoice}
           optimisticMove={
             gameState.type === 'WaitForMoveResponse'
               ? gameState.optimisticMove
@@ -63,6 +72,13 @@ export const PlayPage: FC<PlayPageProps> = ({
         <Button variant="red">Resign</Button>
         <Button variant="white">Offer Draw</Button>
       </div>
+      {gameState.type === 'WaitForPromotionChoice' && (
+        <PromotionModal
+          color={game.myColor}
+          onClose={onPromotionModalClose}
+          onPieceSelect={onPromotionModalSelect}
+        />
+      )}
     </div>
   );
 };

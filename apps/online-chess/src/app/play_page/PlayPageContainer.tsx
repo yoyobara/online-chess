@@ -3,8 +3,9 @@ import { useRealtime } from '../../contexts/realtime';
 import { PlayPage } from './PlayPage';
 import { GameState, PlayerStatus } from '../../types/game_state';
 import { MatchResult } from '../../types/match';
-import { PieceColor } from '../../types/piece';
+import { PieceColor, PieceType } from '../../types/piece';
 import { Move } from '../../types/move';
+import { getSquareName } from '../../utils/square';
 
 const determinePlayerStatus = (
   myColor: PieceColor,
@@ -20,7 +21,7 @@ const determinePlayerStatus = (
 };
 
 export const PlayPageContainer: FC = () => {
-  const { lastMessage } = useRealtime();
+  const { lastMessage, sendMessage } = useRealtime();
 
   const [gameState, setGameState] = useState<GameState | null>(null);
 
@@ -101,7 +102,8 @@ export const PlayPageContainer: FC = () => {
 
   const setWaitingForMoveResponse = useCallback((optimisticMove: Move) => {
     setGameState((prev) => {
-      if (prev?.type !== 'Playing') throw Error('not currently playing..');
+      if (prev?.type !== 'Playing' && prev?.type !== 'WaitForPromotionChoice')
+        throw Error('not currently playing..');
 
       return {
         ...prev,
@@ -111,6 +113,51 @@ export const PlayPageContainer: FC = () => {
     });
   }, []);
 
+  const setWaitingForPromotionChoice = useCallback((move: Move) => {
+    setGameState((prev) => {
+      if (prev?.type !== 'Playing') throw Error('not currently playing..');
+
+      return {
+        ...prev,
+        type: 'WaitForPromotionChoice',
+        optimisticMove: move,
+      };
+    });
+  }, []);
+
+  const onPromotionModalClose = useCallback(() => {
+    setGameState((prev) => {
+      if (prev?.type !== 'WaitForPromotionChoice')
+        throw Error('not waiting for promotion choice..');
+
+      return {
+        ...prev,
+        type: 'Playing',
+      };
+    });
+  }, []);
+
+  const onPromotionModalSelect = useCallback(
+    (pieceType: PieceType) => {
+      if (gameState?.type !== 'WaitForPromotionChoice') {
+        throw Error('not waiting for promotion choice..');
+      }
+
+      sendMessage({
+        type: 'PlayerMove',
+        data: {
+          src_square: getSquareName(gameState.optimisticMove.srcIndex),
+          dest_square: getSquareName(gameState.optimisticMove.destIndex),
+          captured_piece: gameState.optimisticMove.capturedPiece,
+          promotion: pieceType,
+        },
+      });
+
+      setWaitingForMoveResponse(gameState.optimisticMove);
+    },
+    [gameState, sendMessage, setWaitingForMoveResponse]
+  );
+
   if (gameState === null) {
     return null;
   }
@@ -119,6 +166,9 @@ export const PlayPageContainer: FC = () => {
     <PlayPage
       gameState={gameState}
       setWaitingForMoveResponse={setWaitingForMoveResponse}
+      setWaitingForPromotionChoice={setWaitingForPromotionChoice}
+      onPromotionModalClose={onPromotionModalClose}
+      onPromotionModalSelect={onPromotionModalSelect}
     />
   );
 };

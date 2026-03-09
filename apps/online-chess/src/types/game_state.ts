@@ -19,6 +19,11 @@ export type GameState =
       optimisticMove: Move;
     }
   | {
+      type: 'WaitForPromotionChoice';
+      game: GameData;
+      optimisticMove: Move;
+    }
+  | {
       type: 'Ended';
       game: GameData;
       myStatus: PlayerStatus;
