@@ -27,7 +27,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
     }
 
     case 'NewState': {
-      if (state?.type !== 'Playing') {
+      if (state?.type !== 'Playing' && state?.type !== 'WaitForMoveResponse') {
         throw Error('got NewState message while not playing');
       }
 

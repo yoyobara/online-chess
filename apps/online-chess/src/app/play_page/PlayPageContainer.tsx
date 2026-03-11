@@ -12,6 +12,11 @@ export const PlayPageContainer: FC = () => {
   const [gameState, dispatch] = useReducer(gameStateReducer, null);
 
   useEffect(() => {
+    console.log('current state', gameState);
+  }, [gameState]);
+
+  useEffect(() => {
+    console.log('recieved', lastMessage);
     if (lastMessage) dispatch(lastMessage);
   }, [lastMessage]);
 
