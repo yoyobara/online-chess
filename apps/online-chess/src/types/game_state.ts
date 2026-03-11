@@ -1,3 +1,4 @@
+import { ServerMessage } from '../utils/realtime/message';
 import { Board } from './board';
 import { MatchResult } from './match';
 import { Move } from './move';
@@ -28,3 +29,9 @@ export type GameState =
       game: GameData;
       result: MatchResult;
     };
+
+export type GameStateAction =
+  | ServerMessage
+  | { type: 'WaitingForMoveResponse'; move: Move }
+  | { type: 'WaitingForPromotionChoice'; move: Move }
+  | { type: 'PromotionModalClose' };

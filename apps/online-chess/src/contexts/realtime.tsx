@@ -32,7 +32,7 @@ export const RealtimeProvider: FC<PropsWithChildren & { matchId: string }> = ({
 
   const sendMessage = useCallback(
     (msg: ClientMessage) => {
-      console.log(msg);
+      console.log('sent', msg);
       sendJsonMessage(msg);
     },
     [sendJsonMessage]
