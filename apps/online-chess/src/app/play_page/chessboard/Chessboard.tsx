@@ -7,7 +7,6 @@ import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { PieceColor } from '../../../types/piece';
 import { getSquareName } from '../../../utils/square';
 import { useRealtime } from '../../../contexts/realtime';
-import { getPieceByIndex } from '../../../utils/board';
 import { Move } from '../../../types/move';
 import _ from 'lodash';
 
@@ -16,7 +15,7 @@ interface ChessBoardProps {
   myColor: PieceColor;
   disableDrag: true | PieceColor;
   setWaitingForMoveResponse: (optimisticMove: Move) => void;
-  setWaitingForPromotionChoice: (move: Move) => void;
+  setWaitingForPromotionChoice: (move: Omit<Move, 'promotion'>) => void;
   optimisticMove?: Move;
 }
 
@@ -55,21 +54,26 @@ export const Chessboard: FC<ChessBoardProps> = ({
     }
 
     const movedPiece = board.state[srcIndex]?.piece_type;
-    const capturedPiece = board.state[destIndex]?.piece_type ?? null;
+    const moveType = board.state[destIndex] === null ? 'Quiet' : 'Capture';
 
     if (movedPiece === 'Pawn' && isOnPromotionRow(destIndex, myColor)) {
-      setWaitingForPromotionChoice({ srcIndex, destIndex, capturedPiece });
+      setWaitingForPromotionChoice({ srcIndex, destIndex, moveType });
     } else {
       sendMessage({
         type: 'PlayerMove',
         data: {
           src_square: getSquareName(srcIndex),
           dest_square: getSquareName(destIndex),
-          captured_piece: getPieceByIndex(board, destIndex)?.piece_type ?? null,
           promotion: null,
+          move_type: moveType,
         },
       });
-      setWaitingForMoveResponse({ srcIndex, destIndex, capturedPiece });
+      setWaitingForMoveResponse({
+        srcIndex,
+        destIndex,
+        moveType,
+        promotion: null,
+      });
     }
   };
 

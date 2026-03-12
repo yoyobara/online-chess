@@ -15,7 +15,7 @@ import { determinePlayerStatus } from '../../utils/match';
 export interface PlayPageProps {
   gameState: GameState;
   setWaitingForMoveResponse: (optimsiticMove: Move) => void;
-  setWaitingForPromotionChoice: (move: Move) => void;
+  setWaitingForPromotionChoice: (move: Omit<Move, 'promotion'>) => void;
   onPromotionModalClose: () => void;
   onPromotionModalSelect: (pieceType: PieceType) => void;
 }

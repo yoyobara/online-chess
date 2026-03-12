@@ -1,12 +1,12 @@
-use rust_chess::core::{piece::PieceType, square::Square};
+use rust_chess::core::{chess_move::MoveType, piece::PieceType, square::Square};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct PlayerMoveData {
     pub src_square: Square,
     pub dest_square: Square,
-    pub captured_piece: Option<PieceType>,
     pub promotion: Option<PieceType>,
+    pub move_type: MoveType,
 }
 
 #[derive(Debug, Deserialize)]

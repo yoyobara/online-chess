@@ -27,12 +27,15 @@ export const PlayPageContainer: FC = () => {
     });
   }, []);
 
-  const setWaitingForPromotionChoice = useCallback((move: Move) => {
-    dispatch({
-      type: 'WaitingForPromotionChoice',
-      move,
-    });
-  }, []);
+  const setWaitingForPromotionChoice = useCallback(
+    (move: Omit<Move, 'promotion'>) => {
+      dispatch({
+        type: 'WaitingForPromotionChoice',
+        move,
+      });
+    },
+    []
+  );
 
   const onPromotionModalClose = useCallback(() => {
     dispatch({
@@ -51,12 +54,15 @@ export const PlayPageContainer: FC = () => {
         data: {
           src_square: getSquareName(gameState.optimisticMove.srcIndex),
           dest_square: getSquareName(gameState.optimisticMove.destIndex),
-          captured_piece: gameState.optimisticMove.capturedPiece,
           promotion: pieceType,
+          move_type: gameState.optimisticMove.moveType,
         },
       });
 
-      setWaitingForMoveResponse(gameState.optimisticMove);
+      setWaitingForMoveResponse({
+        ...gameState.optimisticMove,
+        promotion: pieceType,
+      });
     },
     [gameState, sendMessage, setWaitingForMoveResponse]
   );

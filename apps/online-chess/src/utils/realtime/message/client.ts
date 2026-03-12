@@ -1,3 +1,4 @@
+import { MoveType } from '../../../types/move';
 import { PieceType } from '../../../types/piece';
 
 export type ClientMessage =
@@ -10,6 +11,6 @@ export type ClientMessage =
         src_square: string;
         dest_square: string;
         promotion: PieceType | null;
-        captured_piece: PieceType | null;
+        move_type: MoveType;
       };
     };

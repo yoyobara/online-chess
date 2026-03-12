@@ -1,7 +1,7 @@
 use anyhow::Result;
 use rust_chess::{
     board::EndgameState,
-    core::{chess_move::Move as ChessMove, color::Color},
+    core::{chess_move::Move, color::Color},
 };
 
 use crate::{
@@ -19,11 +19,11 @@ pub async fn handle_client_player_move(
     session: &mut RealtimeSession,
     move_data: PlayerMoveData,
 ) -> Result<()> {
-    let mv = ChessMove::new(
+    let mv = Move::new(
         move_data.src_square,
         move_data.dest_square,
-        move_data.captured_piece,
         move_data.promotion,
+        move_data.move_type,
     );
 
     let mut match_state = session
