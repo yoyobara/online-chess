@@ -28,7 +28,6 @@ pub struct RealtimeSession {
 
     match_id: String,
 
-    player_id: i32,
     player_color: Color,
 
     opponent_id: i32,
@@ -56,7 +55,6 @@ impl RealtimeSession {
             communicator,
             pubsub,
             match_id,
-            player_id,
             player_color,
             opponent_id,
             opponent_color,

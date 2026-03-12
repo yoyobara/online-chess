@@ -9,7 +9,11 @@ pub struct User {
     pub email: String,
     pub password_hash: String,
     pub rank: i32,
+
+    #[allow(dead_code)]
     pub created_at: NaiveDateTime,
+
+    #[allow(dead_code)]
     pub updated_at: Option<NaiveDateTime>,
 }
 
