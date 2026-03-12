@@ -1629,8 +1629,8 @@ dependencies = [
 
 [[package]]
 name = "rust-chess"
-version = "0.2.0"
-source = "git+https://github.com/yoyobara/rust-chess.git?tag=v0.3.0#d6b1e368e0c22584be751f4f34074ba1b91674e4"
+version = "0.3.1"
+source = "git+https://github.com/yoyobara/rust-chess.git?tag=v0.3.1#2b7dafc897642b92898c486981739a517ad8df0d"
 dependencies = [
  "serde",
  "serde-big-array",
