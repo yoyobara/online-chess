@@ -15,7 +15,7 @@ import { determinePlayerStatus } from '../../utils/match';
 export interface PlayPageProps {
   gameState: GameState;
   setWaitingForMoveResponse: (optimsiticMove: Move) => void;
-  setWaitingForPromotionChoice: (move: Omit<Move, 'promotion'>) => void;
+  setWaitingForPromotionChoice: (move: Move) => void;
   onPromotionModalClose: () => void;
   onPromotionModalSelect: (pieceType: PieceType) => void;
 }
@@ -44,7 +44,8 @@ export const PlayPage: FC<PlayPageProps> = ({
           setWaitingForMoveResponse={setWaitingForMoveResponse}
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
           optimisticMove={
-            gameState.type === 'WaitForMoveResponse'
+            gameState.type === 'WaitForMoveResponse' ||
+            gameState.type === 'WaitForPromotionChoice'
               ? gameState.optimisticMove
               : undefined
           }

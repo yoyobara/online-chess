@@ -15,7 +15,7 @@ interface ChessBoardProps {
   myColor: PieceColor;
   disableDrag: true | PieceColor;
   setWaitingForMoveResponse: (optimisticMove: Move) => void;
-  setWaitingForPromotionChoice: (move: Omit<Move, 'promotion'>) => void;
+  setWaitingForPromotionChoice: (move: Move) => void;
   optimisticMove?: Move;
 }
 
@@ -57,7 +57,12 @@ export const Chessboard: FC<ChessBoardProps> = ({
     const moveType = board.state[destIndex] === null ? 'Quiet' : 'Capture';
 
     if (movedPiece === 'Pawn' && isOnPromotionRow(destIndex, myColor)) {
-      setWaitingForPromotionChoice({ srcIndex, destIndex, moveType });
+      setWaitingForPromotionChoice({
+        srcIndex,
+        destIndex,
+        moveType,
+        promotion: null,
+      });
     } else {
       sendMessage({
         type: 'PlayerMove',

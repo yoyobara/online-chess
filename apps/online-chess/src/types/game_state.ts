@@ -22,7 +22,7 @@ export type GameState =
   | {
       type: 'WaitForPromotionChoice';
       game: GameData;
-      optimisticMove: Omit<Move, 'promotion'>;
+      optimisticMove: Move;
     }
   | {
       type: 'Ended';
@@ -33,5 +33,5 @@ export type GameState =
 export type GameStateAction =
   | ServerMessage
   | { type: 'WaitingForMoveResponse'; move: Move }
-  | { type: 'WaitingForPromotionChoice'; move: Omit<Move, 'promotion'> }
+  | { type: 'WaitingForPromotionChoice'; move: Move }
   | { type: 'PromotionModalClose' };

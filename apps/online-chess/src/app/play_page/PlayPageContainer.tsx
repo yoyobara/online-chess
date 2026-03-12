@@ -27,15 +27,12 @@ export const PlayPageContainer: FC = () => {
     });
   }, []);
 
-  const setWaitingForPromotionChoice = useCallback(
-    (move: Omit<Move, 'promotion'>) => {
-      dispatch({
-        type: 'WaitingForPromotionChoice',
-        move,
-      });
-    },
-    []
-  );
+  const setWaitingForPromotionChoice = useCallback((move: Move) => {
+    dispatch({
+      type: 'WaitingForPromotionChoice',
+      move,
+    });
+  }, []);
 
   const onPromotionModalClose = useCallback(() => {
     dispatch({
