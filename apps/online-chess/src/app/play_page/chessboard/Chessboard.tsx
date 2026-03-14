@@ -9,6 +9,7 @@ import { getSquareName } from '../../../utils/square';
 import { useRealtime } from '../../../contexts/realtime';
 import { Move } from '../../../types/move';
 import _ from 'lodash';
+import { determineMoveType, isOnPromotionRow } from '../../../utils/board';
 
 interface ChessBoardProps {
   board: Board;
@@ -18,14 +19,6 @@ interface ChessBoardProps {
   setWaitingForPromotionChoice: (move: Move) => void;
   optimisticMove?: Move;
 }
-
-const isOnPromotionRow = (squareIndex: number, myColor: PieceColor) => {
-  if (myColor === 'White') {
-    return squareIndex > 55;
-  } else {
-    return squareIndex < 8;
-  }
-};
 
 export const Chessboard: FC<ChessBoardProps> = ({
   board,
@@ -54,7 +47,7 @@ export const Chessboard: FC<ChessBoardProps> = ({
     }
 
     const movedPiece = board.state[srcIndex]?.piece_type;
-    const moveType = board.state[destIndex] === null ? 'Quiet' : 'Capture';
+    const moveType = determineMoveType(board, srcIndex, destIndex);
 
     if (movedPiece === 'Pawn' && isOnPromotionRow(destIndex, myColor)) {
       setWaitingForPromotionChoice({
