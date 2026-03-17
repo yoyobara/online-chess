@@ -1,10 +1,8 @@
 import { PieceType } from './piece';
 
-export type MoveType =
-  | 'Quiet'
-  | 'Capture'
-  | 'QueensideCastling'
-  | 'KingsideCastling';
+export type CastlingType = 'QueensideCastling' | 'KingsideCastling';
+
+export type MoveType = 'Quiet' | 'Capture' | CastlingType;
 
 export type Move = {
   srcIndex: number;

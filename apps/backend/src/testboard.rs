@@ -10,6 +10,7 @@ pub fn get_test_board() -> Board {
     b.set(Square::E8, Some(Piece::new(PieceType::King, Color::Black)));
     b.set(Square::H1, Some(Piece::new(PieceType::Rook, Color::White)));
     b.set(Square::A8, Some(Piece::new(PieceType::Rook, Color::Black)));
+    b.set(Square::H7, Some(Piece::new(PieceType::Pawn, Color::White)));
 
     b
 }
