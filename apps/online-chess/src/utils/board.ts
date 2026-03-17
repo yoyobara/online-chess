@@ -1,5 +1,5 @@
 import { Board } from '../types/board';
-import { MoveType } from '../types/move';
+import { CastlingType, MoveType } from '../types/move';
 import { Piece, PieceColor } from '../types/piece';
 
 export const getPieceByIndex = (
@@ -35,4 +35,30 @@ export const determineMoveType = (
   } else {
     return 'Capture';
   }
+};
+
+const CASTLING_MOVES: Record<
+  `${PieceColor}-${CastlingType}`,
+  { rookSrc: number; rookDest: number }
+> = {
+  'White-KingsideCastling': {
+    rookSrc: 7,
+    rookDest: 5,
+  },
+  'White-QueensideCastling': {
+    rookSrc: 0,
+    rookDest: 3,
+  },
+  'Black-KingsideCastling': {
+    rookSrc: 63,
+    rookDest: 61,
+  },
+  'Black-QueensideCastling': {
+    rookSrc: 56,
+    rookDest: 59,
+  },
+};
+
+export const getCastlingMove = (color: PieceColor, type: CastlingType) => {
+  return CASTLING_MOVES[`${color}-${type}`];
 };
