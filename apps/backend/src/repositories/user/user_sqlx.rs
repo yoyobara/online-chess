@@ -17,32 +17,20 @@ impl SqlxUserRepository {
     }
 }
 
-fn sqlx_to_repo_error(err: sqlx::Error) -> UserRepositoryError {
-    match err {
-        sqlx::Error::RowNotFound => UserRepositoryError::UserNotFound,
-        sqlx::Error::Database(db_err) if db_err.constraint().is_some() => {
-            let violated_constraint = db_err.constraint().unwrap();
-
-            UserRepositoryError::ConstraintViolation(violated_constraint.to_owned())
-        }
-        _ => UserRepositoryError::Db(err.into()),
-    }
-}
-
 #[async_trait]
 impl UserRepository for SqlxUserRepository {
     async fn get_user(&self, id: i32) -> UserRepositoryResult<User> {
         sqlx::query_as!(User, "select * from users where id = $1", id)
             .fetch_one(&self.pool)
             .await
-            .map_err(sqlx_to_repo_error)
+            .map_err(Into::into)
     }
 
     async fn get_by_email(&self, email: String) -> UserRepositoryResult<User> {
         sqlx::query_as!(User, "select * from users where email = $1", email)
             .fetch_one(&self.pool)
             .await
-            .map_err(sqlx_to_repo_error)
+            .map_err(Into::into)
     }
     async fn create_user(
         &self,
@@ -60,6 +48,20 @@ impl UserRepository for SqlxUserRepository {
         )
         .fetch_one(&self.pool)
         .await
-        .map_err(sqlx_to_repo_error)
+        .map_err(Into::into)
+    }
+}
+
+impl From<sqlx::Error> for UserRepositoryError {
+    fn from(err: sqlx::Error) -> Self {
+        match err {
+            sqlx::Error::RowNotFound => UserRepositoryError::UserNotFound,
+            sqlx::Error::Database(db_err) if db_err.constraint().is_some() => {
+                let violated_constraint = db_err.constraint().unwrap();
+
+                UserRepositoryError::ConstraintViolation(violated_constraint.to_owned())
+            }
+            _ => UserRepositoryError::Db(err.into()),
+        }
     }
 }

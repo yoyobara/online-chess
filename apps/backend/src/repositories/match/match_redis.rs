@@ -1,6 +1,7 @@
-use anyhow::anyhow;
+use std::num::ParseIntError;
+
 use async_trait::async_trait;
-use redis::{aio::MultiplexedConnection, AsyncTypedCommands, RedisError};
+use redis::{aio::MultiplexedConnection, AsyncTypedCommands};
 use rust_chess::board::Board;
 
 use crate::{
@@ -20,10 +21,6 @@ impl RedisMatchRepository {
     }
 }
 
-fn redis_to_repo_error(err: RedisError) -> MatchRepositoryError {
-    MatchRepositoryError::Unknown(anyhow!(err))
-}
-
 #[async_trait]
 impl MatchRepository for RedisMatchRepository {
     async fn pop_matchmaking_player(&self) -> MatchRepositoryResult<Option<i32>> {
@@ -31,8 +28,7 @@ impl MatchRepository for RedisMatchRepository {
             .connection
             .clone()
             .lpop("matchmaking:waiting_players", None)
-            .await
-            .map_err(redis_to_repo_error)?;
+            .await?;
 
         Ok(opt)
     }
@@ -41,8 +37,7 @@ impl MatchRepository for RedisMatchRepository {
         self.connection
             .clone()
             .lpush("matchmaking:waiting_players", player_id)
-            .await
-            .map_err(redis_to_repo_error)?;
+            .await?;
 
         Ok(())
     }
@@ -62,23 +57,18 @@ impl MatchRepository for RedisMatchRepository {
                 &[
                     ("white_player_id", white_player_id.to_string()),
                     ("black_player_id", black_player_id.to_string()),
-                    (
-                        "game_board",
-                        serde_json::to_string(&starting_board).map_err(anyhow::Error::from)?,
-                    ),
+                    ("game_board", serde_json::to_string(&starting_board)?),
                     ("move_count", 0.to_string()),
                     (
                         "match_result",
-                        serde_json::to_string::<Option<MatchResult>>(&None)
-                            .map_err(anyhow::Error::from)?,
+                        serde_json::to_string::<Option<MatchResult>>(&None)?,
                     ),
                 ],
             )
             .sadd(format!("player:{}:matches", white_player_id), &match_id)
             .sadd(format!("player:{}:matches", black_player_id), &match_id)
             .query_async(&mut self.connection.clone())
-            .await
-            .map_err(redis_to_repo_error)?;
+            .await?;
 
         Ok(match_id)
     }
@@ -92,7 +82,7 @@ impl MatchRepository for RedisMatchRepository {
             .clone()
             .sismember(format!("player:{}:matches", player_id), &match_id)
             .await
-            .map_err(redis_to_repo_error)
+            .map_err(Into::into)
     }
 
     async fn get_match_state(&self, match_id: &str) -> MatchRepositoryResult<MatchState> {
@@ -103,13 +93,12 @@ impl MatchRepository for RedisMatchRepository {
                 &format!("matches:{}", match_id),
                 &["game_board", "move_count", "match_result"],
             )
-            .await
-            .map_err(redis_to_repo_error)?;
+            .await?;
 
         Ok(MatchState {
-            board: serde_json::from_str(&match_fields[0]).map_err(anyhow::Error::from)?,
-            move_count: match_fields[1].parse().map_err(anyhow::Error::from)?,
-            match_result: serde_json::from_str(&match_fields[2]).map_err(anyhow::Error::from)?,
+            board: serde_json::from_str(&match_fields[0])?,
+            move_count: match_fields[1].parse()?,
+            match_result: serde_json::from_str(&match_fields[2])?,
         })
     }
 
@@ -123,20 +112,15 @@ impl MatchRepository for RedisMatchRepository {
             .hset_multiple(
                 format!("matches:{}", match_id),
                 &[
-                    (
-                        "game_board",
-                        serde_json::to_string(&new_state.board).map_err(anyhow::Error::from)?,
-                    ),
+                    ("game_board", serde_json::to_string(&new_state.board)?),
                     ("move_count", new_state.move_count.to_string()),
                     (
                         "match_result",
-                        serde_json::to_string::<Option<MatchResult>>(&new_state.match_result)
-                            .map_err(anyhow::Error::from)?,
+                        serde_json::to_string::<Option<MatchResult>>(&new_state.match_result)?,
                     ),
                 ],
             )
-            .await
-            .map_err(redis_to_repo_error)?;
+            .await?;
 
         Ok(())
     }
@@ -149,12 +133,29 @@ impl MatchRepository for RedisMatchRepository {
                 &format!("matches:{}", match_id),
                 &["white_player_id", "black_player_id"],
             )
-            .await
-            .map_err(redis_to_repo_error)?;
+            .await?;
 
         Ok(MatchPlayers {
-            white_player_id: players[0].parse::<i32>().map_err(anyhow::Error::from)?,
-            black_player_id: players[1].parse::<i32>().map_err(anyhow::Error::from)?,
+            white_player_id: players[0].parse::<i32>()?,
+            black_player_id: players[1].parse::<i32>()?,
         })
+    }
+}
+
+impl From<redis::RedisError> for MatchRepositoryError {
+    fn from(err: redis::RedisError) -> Self {
+        MatchRepositoryError::Unknown(err.into())
+    }
+}
+
+impl From<serde_json::Error> for MatchRepositoryError {
+    fn from(err: serde_json::Error) -> Self {
+        MatchRepositoryError::Unknown(err.into())
+    }
+}
+
+impl From<ParseIntError> for MatchRepositoryError {
+    fn from(err: ParseIntError) -> Self {
+        MatchRepositoryError::Unknown(err.into())
     }
 }
