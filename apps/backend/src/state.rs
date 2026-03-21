@@ -4,7 +4,7 @@ use rust_chess::board::Board;
 
 use crate::{
     configs::Config,
-    repositories::{r#match::MatchRepository, user::UserRepository},
+    repositories::{ephemeral_match::EphemeralMatchRepository, user::UserRepository},
     utils::pubsub::PubSub,
 };
 
@@ -15,7 +15,7 @@ pub struct AppState {
     pub config: Arc<Config>,
     pub pubsub_factory: Arc<PubSubFactory>,
     pub user_repo: Arc<dyn UserRepository>,
-    pub match_repo: Arc<dyn MatchRepository>,
+    pub match_repo: Arc<dyn EphemeralMatchRepository>,
     pub initial_board: Board,
 }
 
@@ -24,7 +24,7 @@ impl AppState {
         config: Arc<Config>,
         pubsub_factory: Arc<PubSubFactory>,
         user_repo: Arc<dyn UserRepository>,
-        match_repo: Arc<dyn MatchRepository>,
+        match_repo: Arc<dyn EphemeralMatchRepository>,
         initial_board: Board,
     ) -> Self {
         Self {

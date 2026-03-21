@@ -15,7 +15,7 @@ use tokio::net::TcpListener;
 
 use crate::{
     configs::{load_env, load_pool, load_redis},
-    repositories::{r#match::RedisMatchRepository, user::SqlxUserRepository},
+    repositories::{ephemeral_match::RedisEphemeralMatchRepository, user::SqlxUserRepository},
     state::{AppState, PubSubFactory},
     testboard::get_test_board,
     utils::pubsub::redis::RedisPubSub,
@@ -30,7 +30,7 @@ async fn main() -> anyhow::Result<()> {
     let client = load_redis(&config.redis_url).await?;
 
     let user_repo = Arc::new(SqlxUserRepository::new(pool.clone()));
-    let match_repo = Arc::new(RedisMatchRepository::new(
+    let match_repo = Arc::new(RedisEphemeralMatchRepository::new(
         client.get_multiplexed_async_connection().await?,
     ));
 

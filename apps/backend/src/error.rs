@@ -2,7 +2,9 @@ use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde_json::json;
 use thiserror::Error;
 
-use crate::repositories::{r#match::MatchRepositoryError, user::UserRepositoryError};
+use crate::repositories::{
+    ephemeral_match::EphemeralMatchRepositoryError, user::UserRepositoryError,
+};
 
 #[derive(Error, Debug)]
 pub enum ApiError {
@@ -55,10 +57,10 @@ impl From<UserRepositoryError> for ApiError {
     }
 }
 
-impl From<MatchRepositoryError> for ApiError {
-    fn from(value: MatchRepositoryError) -> Self {
+impl From<EphemeralMatchRepositoryError> for ApiError {
+    fn from(value: EphemeralMatchRepositoryError) -> Self {
         match value {
-            MatchRepositoryError::Unknown(err) => Self::InternalServerError(err),
+            EphemeralMatchRepositoryError::Unknown(err) => Self::InternalServerError(err),
         }
     }
 }

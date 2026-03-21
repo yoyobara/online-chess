@@ -6,24 +6,26 @@ use rust_chess::board::Board;
 
 use crate::{
     models::r#match::{MatchPlayers, MatchResult, MatchState},
-    repositories::r#match::{MatchRepository, MatchRepositoryError, MatchRepositoryResult},
+    repositories::ephemeral_match::{
+        EphemeralMatchRepository, EphemeralMatchRepositoryError, EphemeralMatchRepositoryResult,
+    },
     utils::uuid::new_uuid_v4,
 };
 
 #[derive(Debug)]
-pub struct RedisMatchRepository {
+pub struct RedisEphemeralMatchRepository {
     connection: MultiplexedConnection,
 }
 
-impl RedisMatchRepository {
+impl RedisEphemeralMatchRepository {
     pub fn new(connection: MultiplexedConnection) -> Self {
         Self { connection }
     }
 }
 
 #[async_trait]
-impl MatchRepository for RedisMatchRepository {
-    async fn pop_matchmaking_player(&self) -> MatchRepositoryResult<Option<i32>> {
+impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
+    async fn pop_matchmaking_player(&self) -> EphemeralMatchRepositoryResult<Option<i32>> {
         let opt: Option<i32> = self
             .connection
             .clone()
@@ -33,7 +35,7 @@ impl MatchRepository for RedisMatchRepository {
         Ok(opt)
     }
 
-    async fn push_matchmaking_player(&self, player_id: i32) -> MatchRepositoryResult<()> {
+    async fn push_matchmaking_player(&self, player_id: i32) -> EphemeralMatchRepositoryResult<()> {
         self.connection
             .clone()
             .lpush("matchmaking:waiting_players", player_id)
@@ -47,7 +49,7 @@ impl MatchRepository for RedisMatchRepository {
         white_player_id: i32,
         black_player_id: i32,
         starting_board: Board,
-    ) -> MatchRepositoryResult<String> {
+    ) -> EphemeralMatchRepositoryResult<String> {
         let match_id = new_uuid_v4();
 
         let _: () = redis::pipe()
@@ -77,20 +79,20 @@ impl MatchRepository for RedisMatchRepository {
         &self,
         player_id: i32,
         match_id: &str,
-    ) -> MatchRepositoryResult<bool> {
+    ) -> EphemeralMatchRepositoryResult<bool> {
         self.connection
             .clone()
-            .sismember(format!("player:{}:matches", player_id), &match_id)
+            .sismember(format!("player:{}:matches", player_id), match_id)
             .await
             .map_err(Into::into)
     }
 
-    async fn get_match_state(&self, match_id: &str) -> MatchRepositoryResult<MatchState> {
+    async fn get_match_state(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchState> {
         let match_fields = self
             .connection
             .clone()
             .hmget(
-                &format!("matches:{}", match_id),
+                format!("matches:{}", match_id),
                 &["game_board", "move_count", "match_result"],
             )
             .await?;
@@ -106,7 +108,7 @@ impl MatchRepository for RedisMatchRepository {
         &self,
         match_id: &str,
         new_state: &MatchState,
-    ) -> MatchRepositoryResult<()> {
+    ) -> EphemeralMatchRepositoryResult<()> {
         self.connection
             .clone()
             .hset_multiple(
@@ -125,12 +127,12 @@ impl MatchRepository for RedisMatchRepository {
         Ok(())
     }
 
-    async fn get_players(&self, match_id: &str) -> MatchRepositoryResult<MatchPlayers> {
+    async fn get_players(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchPlayers> {
         let players = self
             .connection
             .clone()
             .hmget(
-                &format!("matches:{}", match_id),
+                format!("matches:{}", match_id),
                 &["white_player_id", "black_player_id"],
             )
             .await?;
@@ -142,20 +144,20 @@ impl MatchRepository for RedisMatchRepository {
     }
 }
 
-impl From<redis::RedisError> for MatchRepositoryError {
+impl From<redis::RedisError> for EphemeralMatchRepositoryError {
     fn from(err: redis::RedisError) -> Self {
-        MatchRepositoryError::Unknown(err.into())
+        EphemeralMatchRepositoryError::Unknown(err.into())
     }
 }
 
-impl From<serde_json::Error> for MatchRepositoryError {
+impl From<serde_json::Error> for EphemeralMatchRepositoryError {
     fn from(err: serde_json::Error) -> Self {
-        MatchRepositoryError::Unknown(err.into())
+        EphemeralMatchRepositoryError::Unknown(err.into())
     }
 }
 
-impl From<ParseIntError> for MatchRepositoryError {
+impl From<ParseIntError> for EphemeralMatchRepositoryError {
     fn from(err: ParseIntError) -> Self {
-        MatchRepositoryError::Unknown(err.into())
+        EphemeralMatchRepositoryError::Unknown(err.into())
     }
 }

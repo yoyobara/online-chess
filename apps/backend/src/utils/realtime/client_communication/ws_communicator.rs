@@ -32,7 +32,7 @@ impl ClientCommunicator for WsCommunicator {
             res.map_err(|e| anyhow::anyhow!(e)) // Convert socket errors to anyhow
                 .and_then(|msg| {
                     let text = msg.to_text()?;
-                    Ok(serde_json::from_str::<ClientMessage>(&text)?)
+                    Ok(serde_json::from_str::<ClientMessage>(text)?)
                 })
         })
     }

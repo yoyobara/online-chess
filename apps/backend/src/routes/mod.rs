@@ -5,7 +5,6 @@ mod realtime;
 use axum::{routing::any, Router};
 use tower_cookies::CookieManagerLayer;
 use tower_http::trace::TraceLayer;
-use tracing_subscriber;
 
 use crate::{
     routes::{matchmaking::matchmaking_handler, realtime::realtime_handler},
