@@ -37,7 +37,7 @@ pub async fn realtime_handler(
     in_match
         .then_some(ws.on_upgrade(async move |socket| {
             if let Err(e) = handle_socket(socket, player_id, match_id, app_state).await {
-                eprintln!("{}", e);
+                eprintln!("error in {}: {}", e.backtrace(), e);
             }
         }))
         .ok_or(ApiError::UserNotInMatch)
