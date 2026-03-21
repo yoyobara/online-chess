@@ -13,5 +13,6 @@ pub trait UserRepository: Send + Sync + Debug {
         username: String,
         email: String,
         password_hash: String,
+        initial_rank: i32,
     ) -> UserRepositoryResult<i32>;
 }

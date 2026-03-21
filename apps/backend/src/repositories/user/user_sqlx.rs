@@ -49,12 +49,14 @@ impl UserRepository for SqlxUserRepository {
         username: String,
         email: String,
         password_hash: String,
+        initial_rank: i32,
     ) -> UserRepositoryResult<i32> {
         sqlx::query_scalar!(
-            "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id;",
+            "INSERT INTO users (username, email, password_hash, rank) VALUES ($1, $2, $3, $4) RETURNING id;",
             username,
             email,
-            password_hash
+            password_hash,
+            initial_rank
         )
         .fetch_one(&self.pool)
         .await

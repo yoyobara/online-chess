@@ -4,6 +4,7 @@ use serde::Deserialize;
 use tower_cookies::Cookies;
 
 use crate::{
+    constants::user::INITIAL_RANK,
     error::ApiResult,
     extractors::AuthUser,
     state::AppState,
@@ -30,7 +31,7 @@ pub async fn register_handler(
 
     let created_user_id = state
         .user_repo
-        .create_user(username, email, password_hash)
+        .create_user(username, email, password_hash, INITIAL_RANK)
         .await?;
 
     cookies.add(create_auth_cookie(
