@@ -142,6 +142,21 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
             black_player_id: players[1].parse::<i32>()?,
         })
     }
+
+    async fn finalize_match(
+        &self,
+        match_id: &str,
+        white_player_id: i32,
+        black_player_id: i32,
+    ) -> EphemeralMatchRepositoryResult<()> {
+        redis::pipe()
+            .atomic()
+            .del(format!("matches:{}", match_id))
+            .srem(format!("player:{}:matches", white_player_id), match_id)
+            .srem(format!("player:{}:matches", black_player_id), match_id);
+
+        Ok(())
+    }
 }
 
 impl From<redis::RedisError> for EphemeralMatchRepositoryError {

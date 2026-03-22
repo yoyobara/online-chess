@@ -11,6 +11,6 @@ pub trait PersistentMatchRepository: Send + Sync + Debug {
         &self,
         white_player_id: i32,
         black_player_id: i32,
-        ending_state: MatchState,
+        ending_state: &MatchState,
     ) -> PersistentMatchRepositoryResult<i32>;
 }

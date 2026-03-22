@@ -1,7 +1,7 @@
 use rust_chess::{board::Board, core::color::Color};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 #[serde(tag = "type", content = "data")]
 pub enum MatchResult {
     Win(Color),

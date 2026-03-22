@@ -30,7 +30,7 @@ pub async fn realtime_handler(
     Path(match_id): Path<String>,
 ) -> ApiResult<Response<Body>> {
     let in_match = app_state
-        .match_repo
+        .ephemeral_match_repo
         .is_player_in_match(player_id, &match_id)
         .await?;
 

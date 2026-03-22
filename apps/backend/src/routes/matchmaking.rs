@@ -13,11 +13,14 @@ async fn handle_socket(
 ) -> anyhow::Result<()> {
     let pubsub = (app_state.pubsub_factory)();
     let match_id;
-    let player_pop_result = app_state.match_repo.pop_matchmaking_player().await?;
+    let player_pop_result = app_state
+        .ephemeral_match_repo
+        .pop_matchmaking_player()
+        .await?;
 
     if let Some(popped_player) = player_pop_result {
         match_id = app_state
-            .match_repo
+            .ephemeral_match_repo
             .register_match(popped_player, player_id, app_state.initial_board)
             .await?;
 
@@ -33,7 +36,7 @@ async fn handle_socket(
             .await?;
 
         app_state
-            .match_repo
+            .ephemeral_match_repo
             .push_matchmaking_player(player_id)
             .await?;
 

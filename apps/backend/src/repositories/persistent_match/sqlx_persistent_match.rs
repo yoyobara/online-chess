@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use async_trait::async_trait;
-use rust_chess::{board::Board, core::color::Color};
+use rust_chess::core::color::Color;
 use sqlx::{Pool, Postgres};
 
 use crate::{
@@ -36,7 +36,7 @@ impl PersistentMatchRepository for SqlxPersistentMatchRepository {
         &self,
         white_player_id: i32,
         black_player_id: i32,
-        ending_state: MatchState,
+        ending_state: &MatchState,
     ) -> PersistentMatchRepositoryResult<i32> {
         let result: PersistentMatchResult = match ending_state.match_result {
             Some(MatchResult::Win(Color::White)) => PersistentMatchResult::WhiteWon,

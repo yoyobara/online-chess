@@ -27,6 +27,7 @@ pub trait EphemeralMatchRepository: Send + Sync + Debug {
     ) -> EphemeralMatchRepositoryResult<bool>;
 
     async fn get_match_state(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchState>;
+
     async fn update_match_state(
         &self,
         match_id: &str,
@@ -34,4 +35,11 @@ pub trait EphemeralMatchRepository: Send + Sync + Debug {
     ) -> EphemeralMatchRepositoryResult<()>;
 
     async fn get_players(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchPlayers>;
+
+    async fn finalize_match(
+        &self,
+        match_id: &str,
+        white_player_id: i32,
+        black_player_id: i32,
+    ) -> EphemeralMatchRepositoryResult<()>;
 }

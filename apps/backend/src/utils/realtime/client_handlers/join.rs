@@ -6,7 +6,7 @@ use crate::{
 pub async fn handle_client_join(session: &mut RealtimeSession) -> anyhow::Result<()> {
     let match_state = session
         .app_state
-        .match_repo
+        .ephemeral_match_repo
         .get_match_state(&session.match_id)
         .await?;
 

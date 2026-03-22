@@ -28,6 +28,7 @@ pub struct RealtimeSession {
 
     match_id: String,
 
+    player_id: i32,
     player_color: Color,
 
     opponent_id: i32,
@@ -43,7 +44,10 @@ impl RealtimeSession {
     ) -> anyhow::Result<Self> {
         let pubsub = (app_state.pubsub_factory)();
 
-        let players = app_state.match_repo.get_players(&match_id).await?;
+        let players = app_state
+            .ephemeral_match_repo
+            .get_players(&match_id)
+            .await?;
         let (player_color, opponent_color, opponent_id) = if player_id == players.white_player_id {
             (Color::White, Color::Black, players.black_player_id)
         } else {
@@ -55,6 +59,7 @@ impl RealtimeSession {
             communicator,
             pubsub,
             match_id,
+            player_id,
             player_color,
             opponent_id,
             opponent_color,
