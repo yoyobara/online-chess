@@ -23,7 +23,7 @@ impl SqlxPersistentMatchRepository {
 }
 
 #[derive(sqlx::Type)]
-#[sqlx(type_name = "match_result_enum", rename_all = "lowercase")]
+#[sqlx(type_name = "match_result_enum", rename_all = "snake_case")]
 enum PersistentMatchResult {
     WhiteWon,
     BlackWon,
