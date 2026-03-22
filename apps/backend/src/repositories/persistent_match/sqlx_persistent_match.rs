@@ -38,14 +38,11 @@ impl PersistentMatchRepository for SqlxPersistentMatchRepository {
         black_player_id: i32,
         ending_state: &MatchState,
     ) -> PersistentMatchRepositoryResult<i32> {
-        let result: PersistentMatchResult = match ending_state.match_result {
-            Some(MatchResult::Win(Color::White)) => PersistentMatchResult::WhiteWon,
-            Some(MatchResult::Win(Color::Black)) => PersistentMatchResult::BlackWon,
-            Some(MatchResult::Draw) => PersistentMatchResult::Draw,
-            None => return Err(anyhow!("no match result").into()),
-        };
-
         let board_json = serde_json::to_string(&ending_state.board)?;
+        let result: PersistentMatchResult = ending_state
+            .match_result
+            .ok_or(anyhow!("game is not over!"))?
+            .into();
 
         sqlx::query_scalar!(
             "INSERT INTO matches (white_player_id, black_player_id, ending_board, move_count, match_result) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
@@ -58,6 +55,16 @@ impl PersistentMatchRepository for SqlxPersistentMatchRepository {
         .fetch_one(&self.pool)
         .await
         .map_err(Into::into)
+    }
+}
+
+impl From<MatchResult> for PersistentMatchResult {
+    fn from(result: MatchResult) -> Self {
+        match result {
+            MatchResult::Win(Color::White) => PersistentMatchResult::WhiteWon,
+            MatchResult::Win(Color::Black) => PersistentMatchResult::BlackWon,
+            MatchResult::Draw => PersistentMatchResult::Draw,
+        }
     }
 }
 

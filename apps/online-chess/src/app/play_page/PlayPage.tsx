@@ -40,7 +40,9 @@ export const PlayPage: FC<PlayPageProps> = ({
         <Chessboard
           board={game.currentBoard}
           myColor={game.myColor}
-          disableDrag={isMyTurn ? game.opponentColor : true}
+          disableDrag={
+            isMyTurn && gameState.type !== 'Ended' ? game.opponentColor : true
+          }
           setWaitingForMoveResponse={setWaitingForMoveResponse}
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
           optimisticMove={
