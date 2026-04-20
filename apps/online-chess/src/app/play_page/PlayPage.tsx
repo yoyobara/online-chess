@@ -55,7 +55,7 @@ export const PlayPage: FC<PlayPageProps> = ({
     }
 
     return;
-  }, [gameState, navigate]);
+  }, [game.opponentId, gameState, navigate, queryClient]);
 
   return (
     <div className={styles.play_page}>
@@ -64,7 +64,7 @@ export const PlayPage: FC<PlayPageProps> = ({
           board={game.currentBoard}
           myColor={game.myColor}
           disableDrag={
-            isMyTurn && gameState.type !== 'Ended' ? game.opponentColor : true
+            gameState.type === 'Playing' && isMyTurn ? game.opponentColor : true
           }
           setWaitingForMoveResponse={setWaitingForMoveResponse}
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}

@@ -9,6 +9,11 @@ import { getSquareName } from '../../../utils/square';
 import { useRealtime } from '../../../contexts/realtime';
 import { Move } from '../../../types/move';
 import _ from 'lodash';
+import {
+  determineMoveType,
+  getCastlingMove,
+  isOnPromotionRow,
+} from '../../../utils/board';
 
 interface ChessBoardProps {
   board: Board;
@@ -18,14 +23,6 @@ interface ChessBoardProps {
   setWaitingForPromotionChoice: (move: Move) => void;
   optimisticMove?: Move;
 }
-
-const isOnPromotionRow = (squareIndex: number, myColor: PieceColor) => {
-  if (myColor === 'White') {
-    return squareIndex > 55;
-  } else {
-    return squareIndex < 8;
-  }
-};
 
 export const Chessboard: FC<ChessBoardProps> = ({
   board,
@@ -43,10 +40,26 @@ export const Chessboard: FC<ChessBoardProps> = ({
       newBoard.state[optimisticMove.destIndex] =
         newBoard.state[optimisticMove.srcIndex];
       newBoard.state[optimisticMove.srcIndex] = null;
+
+      if (optimisticMove.promotion) {
+        newBoard.state[optimisticMove.destIndex]!.piece_type =
+          optimisticMove.promotion;
+      }
+
+      if (
+        optimisticMove.moveType === 'KingsideCastling' ||
+        optimisticMove.moveType === 'QueensideCastling'
+      ) {
+        const castlingMove = getCastlingMove(myColor, optimisticMove.moveType);
+
+        newBoard.state[castlingMove.rookDest] =
+          newBoard.state[castlingMove.rookSrc];
+        newBoard.state[castlingMove.rookSrc] = null;
+      }
     }
 
     return newBoard;
-  }, [board, optimisticMove]);
+  }, [board, optimisticMove, myColor]);
 
   const handleMove = (srcIndex: number, destIndex: number) => {
     if (srcIndex === destIndex) {
@@ -54,7 +67,7 @@ export const Chessboard: FC<ChessBoardProps> = ({
     }
 
     const movedPiece = board.state[srcIndex]?.piece_type;
-    const moveType = board.state[destIndex] === null ? 'Quiet' : 'Capture';
+    const moveType = determineMoveType(board, srcIndex, destIndex);
 
     if (movedPiece === 'Pawn' && isOnPromotionRow(destIndex, myColor)) {
       setWaitingForPromotionChoice({
