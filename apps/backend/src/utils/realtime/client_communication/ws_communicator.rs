@@ -1,3 +1,4 @@
+use anyhow::Ok;
 use async_trait::async_trait;
 use axum::extract::ws::{Message, WebSocket};
 
@@ -29,11 +30,11 @@ impl ClientCommunicator for WsCommunicator {
         let raw = self.socket.recv().await;
 
         raw.map(|res| {
-            res.map_err(|e| anyhow::anyhow!(e)) // Convert socket errors to anyhow
-                .and_then(|msg| {
-                    let text = msg.to_text()?;
-                    Ok(serde_json::from_str::<ClientMessage>(&text)?)
-                })
+            let msg = res?;
+            let text = msg.to_text()?;
+            let client_msg: ClientMessage = serde_json::from_str(text)?;
+
+            Ok(client_msg)
         })
     }
 }

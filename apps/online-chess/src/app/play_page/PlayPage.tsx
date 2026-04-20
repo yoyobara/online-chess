@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import styles from './PlayPage.module.scss';
 import { Button } from '../../components/Button/Button';
 import { Paper } from '../../components/Paper/Paper';
@@ -11,6 +11,8 @@ import { Move } from '../../types/move';
 import { PromotionModal } from './chessboard/promotion_modal/PromotionModal';
 import { PieceType } from '../../types/piece';
 import { determinePlayerStatus } from '../../utils/match';
+import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface PlayPageProps {
   gameState: GameState;
@@ -29,10 +31,31 @@ export const PlayPage: FC<PlayPageProps> = ({
 }) => {
   const { game } = gameState;
 
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const me = useRequiredAuth();
   const opponent = useUserData(game.opponentId);
 
   const isMyTurn = game.moveCount % 2 === (game.myColor === 'White' ? 0 : 1);
+
+  useEffect(() => {
+    if (gameState.type === 'Ended') {
+      queryClient.invalidateQueries({
+        queryKey: ['auth_data', 'user', game.opponentId],
+      });
+
+      const backToLobbyTimeout = setTimeout(() => {
+        navigate('/home');
+      }, 5000);
+
+      return () => {
+        clearTimeout(backToLobbyTimeout);
+      };
+    }
+
+    return;
+  }, [game.opponentId, gameState, navigate, queryClient]);
 
   return (
     <div className={styles.play_page}>

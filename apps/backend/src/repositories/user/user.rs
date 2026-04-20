@@ -2,7 +2,10 @@ use std::fmt::Debug;
 
 use async_trait::async_trait;
 
-use crate::{models::user::User, repositories::user::error::UserRepositoryResult};
+use crate::{
+    models::{r#match::MatchResult, user::User},
+    repositories::user::error::UserRepositoryResult,
+};
 
 #[async_trait]
 pub trait UserRepository: Send + Sync + Debug {
@@ -13,5 +16,12 @@ pub trait UserRepository: Send + Sync + Debug {
         username: String,
         email: String,
         password_hash: String,
+        initial_rank: i32,
     ) -> UserRepositoryResult<i32>;
+    async fn update_users_ranks_elo(
+        &self,
+        white_player_id: i32,
+        black_player_id: i32,
+        result: MatchResult,
+    ) -> UserRepositoryResult<()>;
 }

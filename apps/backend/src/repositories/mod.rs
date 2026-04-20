@@ -1,2 +1,3 @@
-pub mod r#match;
+pub mod ephemeral_match;
+pub mod persistent_match;
 pub mod user;

@@ -1,1 +1,1 @@
-pub const AUTH_COOKIE_NAME: &'static str = "ChessAuth";
+pub const AUTH_COOKIE_NAME: &str = "ChessAuth";
