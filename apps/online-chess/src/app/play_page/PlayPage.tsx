@@ -68,12 +68,6 @@ export const PlayPage: FC<PlayPageProps> = ({
           }
           setWaitingForMoveResponse={setWaitingForMoveResponse}
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
-          optimisticMove={
-            gameState.type === 'WaitForMoveResponse' ||
-            gameState.type === 'WaitForPromotionChoice'
-              ? gameState.optimisticMove
-              : undefined
-          }
         />
       </div>
       <Paper className={styles.chat}></Paper>
