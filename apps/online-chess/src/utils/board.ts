@@ -1,5 +1,6 @@
+import _ from 'lodash';
 import { Board } from '../types/board';
-import { CastlingType, MoveType } from '../types/move';
+import { Move, CastlingType, MoveType } from '../types/move';
 import { Piece, PieceColor } from '../types/piece';
 
 export const getPieceByIndex = (
@@ -61,4 +62,33 @@ const CASTLING_MOVES: Record<
 
 export const getCastlingMove = (color: PieceColor, type: CastlingType) => {
   return CASTLING_MOVES[`${color}-${type}`];
+};
+
+export const applyMove = (
+  board: Board,
+  move: Move,
+  myColor: PieceColor
+): Board => {
+  const newBoard = _.cloneDeep(board);
+  const { srcIndex, destIndex, promotion, moveType } = move;
+
+  newBoard.state[destIndex] = newBoard.state[srcIndex];
+  newBoard.state[srcIndex] = null;
+
+  if (promotion) {
+    newBoard.state[destIndex]!.piece_type = promotion;
+  }
+
+  if (
+    moveType === 'KingsideCastling' ||
+    moveType === 'QueensideCastling'
+  ) {
+    const castlingMove = getCastlingMove(myColor, moveType);
+
+    newBoard.state[castlingMove.rookDest] =
+      newBoard.state[castlingMove.rookSrc];
+    newBoard.state[castlingMove.rookSrc] = null;
+  }
+
+  return newBoard;
 };
