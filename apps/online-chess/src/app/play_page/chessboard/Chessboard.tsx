@@ -9,9 +9,9 @@ import { getSquareName } from '../../../utils/square';
 import { useRealtime } from '../../../contexts/realtime';
 import { Move } from '../../../types/move';
 import {
-  determineMoveType,
   isOnPromotionRow,
 } from '../../../utils/board';
+import { determineMoveType } from '../../../utils/move';
 
 interface ChessBoardProps {
   board: Board;

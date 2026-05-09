@@ -11,7 +11,7 @@ import knightB from '../assets/pieces/knight-b.svg';
 import pawnW from '../assets/pieces/pawn-w.svg';
 import pawnB from '../assets/pieces/pawn-b.svg';
 
-import { Piece, PieceColor } from '../types/piece';
+import { Piece, PieceColor, PieceType } from '../types/piece';
 
 export const getPieceSvg = (piece: Piece): string => {
   const { piece_type, piece_color } = piece;
@@ -32,6 +32,14 @@ export const getPieceSvg = (piece: Piece): string => {
   }
 };
 
-export const invertColor = (color: PieceColor) => {
+export const invertColor = (color: PieceColor): PieceColor => {
   return color === 'White' ? 'Black' : 'White';
 };
+
+export const isPieceType = (piece: Piece | null, type: PieceType): boolean => {
+  return piece?.piece_type === type;
+};
+
+export const isPawn = (piece: Piece | null): boolean => isPieceType(piece, 'Pawn');
+export const isKing = (piece: Piece | null): boolean => isPieceType(piece, 'King');
+export const isRook = (piece: Piece | null): boolean => isPieceType(piece, 'Rook');
