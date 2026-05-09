@@ -4,6 +4,8 @@ import { MatchResult } from './match';
 import { Move } from './move';
 import { PieceColor } from './piece';
 
+export type PlayerStatus = 'win' | 'lose' | 'draw';
+
 export type GameData = {
   currentBoard: Board;
   serverBoard: Board;
