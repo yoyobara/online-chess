@@ -23,6 +23,17 @@ export const determineMoveType = (
   srcIndex: number,
   destIndex: number
 ): MoveType => {
+  const piece = board.state[srcIndex];
+
+  if (piece?.piece_type === 'Pawn') {
+    const srcFile = srcIndex % 8;
+    const destFile = destIndex % 8;
+
+    if (srcFile !== destFile && board.state[destIndex] === null) {
+      return 'EnPassant';
+    }
+  }
+
   if (srcIndex === 4 && destIndex === 6) {
     return 'KingsideCastling';
   } else if (srcIndex === 4 && destIndex === 2) {
@@ -79,15 +90,19 @@ export const applyMove = (
     newBoard.state[destIndex]!.piece_type = promotion;
   }
 
-  if (
-    moveType === 'KingsideCastling' ||
-    moveType === 'QueensideCastling'
-  ) {
+  if (moveType === 'KingsideCastling' || moveType === 'QueensideCastling') {
     const castlingMove = getCastlingMove(myColor, moveType);
 
     newBoard.state[castlingMove.rookDest] =
       newBoard.state[castlingMove.rookSrc];
     newBoard.state[castlingMove.rookSrc] = null;
+  }
+
+  if (moveType === 'EnPassant') {
+    const destFile = destIndex % 8;
+    const srcRank = Math.floor(srcIndex / 8);
+    const capturedPawnIndex = srcRank * 8 + destFile;
+    newBoard.state[capturedPawnIndex] = null;
   }
 
   return newBoard;

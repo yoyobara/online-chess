@@ -8,4 +8,5 @@ export type CastlingRights = {
 export interface Board {
   state: Array<Piece | null>;
   castling_rights: [CastlingRights, CastlingRights];
+  en_passant_square: number | null;
 }
