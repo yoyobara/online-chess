@@ -70,8 +70,8 @@ export const PlayPage: FC<PlayPageProps> = ({
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
         />
       </div>
-      <Paper className={styles.chat}></Paper>
-      <Paper className={styles.history}></Paper>
+      {/* <Paper className={styles.chat}></Paper>
+      <Paper className={styles.history}></Paper> */}
       <PlayerPaper
         playerName={me.username}
         playerRating={me.rank}
@@ -94,10 +94,10 @@ export const PlayPage: FC<PlayPageProps> = ({
         }
         className={styles.opponent}
       />
-      <div className={styles.buttons}>
+      {/* <div className={styles.buttons}>
         <Button variant="red">Resign</Button>
         <Button variant="white">Offer Draw</Button>
-      </div>
+      </div> */}
       {gameState.type === 'WaitForPromotionChoice' && (
         <PromotionModal
           color={game.myColor}
