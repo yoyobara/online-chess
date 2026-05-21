@@ -3,7 +3,7 @@ import { Paper } from '../../../components/Paper/Paper';
 import styles from './PlayerPaper.module.scss';
 
 import profile_default from '../../../assets/profile_default.svg';
-import { PlayerStatus } from '../../../types/game_state';
+import { PlayerStatus } from '../../../utils/match';
 
 interface PlayPaperProps {
   className?: string;

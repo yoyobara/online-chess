@@ -1,6 +1,5 @@
-import { ServerMessage } from '../utils/realtime/message';
 import { Board } from './board';
-import { MatchResult } from './match';
+import { MatchResult, MatchState } from './match';
 import { Move } from './move';
 import { PieceColor } from './piece';
 
@@ -32,7 +31,14 @@ export type GameState =
     };
 
 export type GameStateAction =
-  | ServerMessage
+  | {
+      type: 'GameInit';
+      initialState: MatchState;
+      color: PieceColor;
+      opponentId: number;
+    }
+  | { type: 'ServerMoveResult'; success: boolean }
+  | { type: 'BoardUpdate'; state: MatchState }
   | { type: 'WaitingForMoveResponse'; move: Move }
   | { type: 'WaitingForPromotionChoice'; move: Move }
   | { type: 'PromotionModalClose' };

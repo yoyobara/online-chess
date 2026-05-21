@@ -75,13 +75,11 @@ export const getCastlingMove = (color: PieceColor, type: CastlingType) => {
   return CASTLING_MOVES[`${color}-${type}`];
 };
 
-export const applyMove = (
-  board: Board,
-  move: Move,
-  myColor: PieceColor
-): Board => {
+export const applyMove = (board: Board, move: Move): Board => {
   const newBoard = _.cloneDeep(board);
   const { srcIndex, destIndex, promotion, moveType } = move;
+
+  const piece = board.state[srcIndex]!;
 
   newBoard.state[destIndex] = newBoard.state[srcIndex];
   newBoard.state[srcIndex] = null;
@@ -91,7 +89,7 @@ export const applyMove = (
   }
 
   if (moveType === 'KingsideCastling' || moveType === 'QueensideCastling') {
-    const castlingMove = getCastlingMove(myColor, moveType);
+    const castlingMove = getCastlingMove(piece.piece_color, moveType);
 
     newBoard.state[castlingMove.rookDest] =
       newBoard.state[castlingMove.rookSrc];

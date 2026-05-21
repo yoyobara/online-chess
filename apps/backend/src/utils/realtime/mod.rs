@@ -48,6 +48,7 @@ impl RealtimeSession {
             .ephemeral_match_repo
             .get_players(&match_id)
             .await?;
+
         let (player_color, opponent_color, opponent_id) = if player_id == players.white_player_id {
             (Color::White, Color::Black, players.black_player_id)
         } else {

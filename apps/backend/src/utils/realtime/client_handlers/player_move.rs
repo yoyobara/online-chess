@@ -47,14 +47,11 @@ fn get_match_result(session: &RealtimeSession, match_state: &MatchState) -> Opti
 }
 
 async fn finalize_match(session: &mut RealtimeSession, match_state: &MatchState) -> Result<()> {
-    // derive from ids attributes and colors attributes
     let (white_player_id, black_player_id) = match (session.player_color, session.opponent_color) {
         (Color::White, Color::Black) => (session.player_id, session.opponent_id),
         (Color::Black, Color::White) => (session.opponent_id, session.player_id),
         _ => unreachable!(),
     };
-
-    let result = get_match_result(session, match_state).unwrap();
 
     session
         .app_state
@@ -71,7 +68,11 @@ async fn finalize_match(session: &mut RealtimeSession, match_state: &MatchState)
     session
         .app_state
         .user_repo
-        .update_users_ranks_elo(white_player_id, black_player_id, result)
+        .update_users_ranks_elo(
+            white_player_id,
+            black_player_id,
+            match_state.match_result.unwrap(),
+        )
         .await?;
 
     Ok(())

@@ -8,38 +8,38 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
   action: GameStateAction
 ) => {
   switch (action.type) {
-    case 'JoinResponse': {
+    case 'GameInit': {
       if (state) {
-        console.error('got JoinResponse message while already playing');
+        console.error('got GameInit action while already playing');
         return state;
       }
 
-      const { initial_state, color, opponent_id } = action.data;
+      const { initialState, color, opponentId } = action;
 
       return {
         type: 'Playing',
         game: {
-          currentBoard: initial_state.board,
-          serverBoard: initial_state.board,
-          moveCount: initial_state.move_count,
+          currentBoard: initialState.board,
+          serverBoard: initialState.board,
+          moveCount: initialState.move_count,
           myColor: color,
           opponentColor: invertColor(color),
-          opponentId: opponent_id,
+          opponentId: opponentId,
         },
       };
     }
 
-    case 'NewState': {
+    case 'BoardUpdate': {
       if (
         state?.type !== 'Playing' &&
         state?.type !== 'WaitForMoveResponse' &&
         state?.type !== 'WaitForPromotionChoice'
       ) {
-        console.error('got NewState message while not playing');
+        console.error('got BoardUpdate action while not playing');
         return state;
       }
 
-      const { board, move_count, match_result } = action.data;
+      const { board, move_count, match_result } = action.state;
 
       if (!match_result) {
         return {
@@ -65,13 +65,15 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
       }
     }
 
-    case 'MoveResult':
+    case 'ServerMoveResult':
       if (state?.type !== 'WaitForMoveResponse') {
-        console.error('got bad move message not when waiting for response');
+        console.error(
+          'got ServerMoveResult action not when waiting for response'
+        );
         return state;
       }
 
-      if (!action.data) {
+      if (!action.success) {
         return {
           type: 'Playing',
           game: {
@@ -84,7 +86,10 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
       }
 
     case 'WaitingForMoveResponse':
-      if (state?.type !== 'Playing' && state?.type !== 'WaitForPromotionChoice') {
+      if (
+        state?.type !== 'Playing' &&
+        state?.type !== 'WaitForPromotionChoice'
+      ) {
         console.error('not currently playing..');
         return state;
       }
@@ -93,11 +98,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
         type: 'WaitForMoveResponse',
         game: {
           ...state.game,
-          currentBoard: applyMove(
-            state.game.serverBoard,
-            action.move,
-            state.game.myColor
-          ),
+          currentBoard: applyMove(state.game.serverBoard, action.move),
         },
         optimisticMove: action.move,
       };
@@ -112,11 +113,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
         type: 'WaitForPromotionChoice',
         game: {
           ...state.game,
-          currentBoard: applyMove(
-            state.game.serverBoard,
-            action.move,
-            state.game.myColor
-          ),
+          currentBoard: applyMove(state.game.serverBoard, action.move),
         },
         optimisticMove: action.move,
       };

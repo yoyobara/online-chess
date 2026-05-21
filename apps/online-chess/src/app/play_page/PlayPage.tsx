@@ -1,7 +1,5 @@
 import { FC, useEffect } from 'react';
 import styles from './PlayPage.module.scss';
-import { Button } from '../../components/Button/Button';
-import { Paper } from '../../components/Paper/Paper';
 import { PlayerPaper } from './player_paper/PlayerPaper';
 import { Chessboard } from './chessboard/Chessboard';
 import { useRequiredAuth } from '../../contexts/auth';

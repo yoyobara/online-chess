@@ -12,12 +12,30 @@ export const PlayPageContainer: FC = () => {
   const [gameState, dispatch] = useReducer(gameStateReducer, null);
 
   useEffect(() => {
-    console.log('current state', gameState);
-  }, [gameState]);
+    if (!lastMessage) return;
 
-  useEffect(() => {
-    console.log('recieved', lastMessage);
-    if (lastMessage) dispatch(lastMessage);
+    switch (lastMessage.type) {
+      case 'JoinResponse':
+        dispatch({
+          type: 'GameInit',
+          initialState: lastMessage.data.initial_state,
+          color: lastMessage.data.color,
+          opponentId: lastMessage.data.opponent_id,
+        });
+        break;
+      case 'MoveResult':
+        dispatch({
+          type: 'ServerMoveResult',
+          success: lastMessage.data,
+        });
+        break;
+      case 'NewState':
+        dispatch({
+          type: 'BoardUpdate',
+          state: lastMessage.data,
+        });
+        break;
+    }
   }, [lastMessage]);
 
   const setWaitingForMoveResponse = useCallback((optimisticMove: Move) => {
