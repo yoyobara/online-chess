@@ -49,7 +49,7 @@ async fn finalize_match(session: &mut RealtimeSession) -> Result<()> {
         .persistent_match_repo
         .create_match(
             players.white_player_id,
-            players.white_player_id,
+            players.black_player_id,
             &state,
             moves,
         )
