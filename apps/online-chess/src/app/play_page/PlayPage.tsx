@@ -40,7 +40,10 @@ export const PlayPage: FC<PlayPageProps> = ({
   useEffect(() => {
     if (gameState.type === 'Ended') {
       queryClient.invalidateQueries({
-        queryKey: ['auth_data', 'user', game.opponentId],
+        queryKey: ['auth_data'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['user', game.opponentId],
       });
 
       const backToLobbyTimeout = setTimeout(() => {
