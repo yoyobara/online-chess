@@ -21,7 +21,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
         game: {
           currentBoard: initialState.board,
           serverBoard: initialState.board,
-          moveCount: initialState.move_count,
+          currentTurn: initialState.current_turn,
           myColor: color,
           opponentColor: invertColor(color),
           opponentId: opponentId,
@@ -39,7 +39,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
         return state;
       }
 
-      const { board, move_count, match_result } = action.state;
+      const { board, match_result, current_turn } = action.state;
 
       if (!match_result) {
         return {
@@ -48,7 +48,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
             ...state.game,
             currentBoard: board,
             serverBoard: board,
-            moveCount: move_count,
+            currentTurn: current_turn,
           },
         };
       } else {
@@ -58,7 +58,6 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
             ...state.game,
             currentBoard: board,
             serverBoard: board,
-            moveCount: move_count,
           },
           result: match_result,
         };

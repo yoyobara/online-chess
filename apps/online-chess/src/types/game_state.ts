@@ -6,7 +6,7 @@ import { PieceColor } from './piece';
 export type GameData = {
   currentBoard: Board;
   serverBoard: Board;
-  moveCount: number;
+  currentTurn: PieceColor;
   myColor: PieceColor;
   opponentColor: PieceColor;
   opponentId: number;

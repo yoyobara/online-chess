@@ -35,7 +35,7 @@ export const PlayPage: FC<PlayPageProps> = ({
   const me = useRequiredAuth();
   const opponent = useUserData(game.opponentId);
 
-  const isMyTurn = game.moveCount % 2 === (game.myColor === 'White' ? 0 : 1);
+  const isMyTurn = game.currentTurn === game.myColor;
 
   useEffect(() => {
     if (gameState.type === 'Ended') {

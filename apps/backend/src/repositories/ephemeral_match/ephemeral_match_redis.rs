@@ -122,6 +122,10 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
                         "match_result",
                         serde_json::to_string::<Option<MatchResult>>(&new_state.match_result)?,
                     ),
+                    (
+                        "current_turn",
+                        serde_json::to_string(&new_state.current_turn)?,
+                    ),
                 ],
             )
             .await?;
