@@ -11,6 +11,6 @@ pub enum MatchResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MatchState {
     pub board: Board,
-    pub move_count: i32,
+    pub current_turn: Color,
     pub match_result: Option<MatchResult>,
 }

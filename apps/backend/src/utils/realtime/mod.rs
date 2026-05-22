@@ -28,6 +28,7 @@ pub struct RealtimeSession {
 
     match_id: String,
 
+    #[allow(dead_code)]
     player_id: i32,
     player_color: Color,
 

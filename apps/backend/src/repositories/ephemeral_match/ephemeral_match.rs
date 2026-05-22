@@ -34,12 +34,14 @@ pub trait EphemeralMatchRepository: Send + Sync + Debug {
         new_state: &MatchState,
     ) -> EphemeralMatchRepositoryResult<()>;
 
+    async fn push_move(&self, match_id: &str, mv: Move) -> EphemeralMatchRepositoryResult<()>;
+
+    async fn get_match_moves(&self, match_id: &str) -> EphemeralMatchRepositoryResult<Vec<Move>>;
+
     async fn get_players(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchPlayers>;
 
     async fn finalize_match(
         &self,
         match_id: &str,
     ) -> EphemeralMatchRepositoryResult<(MatchPlayers, MatchState, Vec<Move>)>;
-
-    async fn push_move(&self, match_id: &str, mv: Move) -> EphemeralMatchRepositoryResult<()>;
 }
