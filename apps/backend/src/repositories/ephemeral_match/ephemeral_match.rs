@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use async_trait::async_trait;
-use rust_chess::board::Board;
+use rust_chess::{board::Board, core::chess_move::Move};
 
 use crate::{
     models::r#match::{MatchPlayers, MatchState},
@@ -39,7 +39,7 @@ pub trait EphemeralMatchRepository: Send + Sync + Debug {
     async fn finalize_match(
         &self,
         match_id: &str,
-        white_player_id: i32,
-        black_player_id: i32,
-    ) -> EphemeralMatchRepositoryResult<()>;
+    ) -> EphemeralMatchRepositoryResult<(MatchPlayers, MatchState, Vec<Move>)>;
+
+    async fn push_move(&self, match_id: &str, mv: Move) -> EphemeralMatchRepositoryResult<()>;
 }

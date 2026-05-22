@@ -46,32 +46,26 @@ fn get_match_result(session: &RealtimeSession, match_state: &MatchState) -> Opti
     })
 }
 
-async fn finalize_match(session: &mut RealtimeSession, match_state: &MatchState) -> Result<()> {
-    let (white_player_id, black_player_id) = match (session.player_color, session.opponent_color) {
-        (Color::White, Color::Black) => (session.player_id, session.opponent_id),
-        (Color::Black, Color::White) => (session.opponent_id, session.player_id),
-        _ => unreachable!(),
-    };
-
-    session
+async fn finalize_match(session: &mut RealtimeSession) -> Result<()> {
+    let (players, state, moves) = session
         .app_state
-        .persistent_match_repo
-        .create_match(session.player_id, session.opponent_id, &match_state)
+        .ephemeral_match_repo
+        .finalize_match(&session.match_id)
         .await?;
 
     session
         .app_state
-        .ephemeral_match_repo
-        .finalize_match(&session.match_id, white_player_id, black_player_id)
+        .persistent_match_repo
+        .create_match(players.white_player_id, players.white_player_id, &state)
         .await?;
 
     session
         .app_state
         .user_repo
         .update_users_ranks_elo(
-            white_player_id,
-            black_player_id,
-            match_state.match_result.unwrap(),
+            players.white_player_id,
+            players.black_player_id,
+            state.match_result.unwrap(),
         )
         .await?;
 
@@ -82,12 +76,7 @@ pub async fn handle_client_player_move(
     session: &mut RealtimeSession,
     move_data: PlayerMoveData,
 ) -> Result<()> {
-    let mv = Move::new(
-        move_data.src_square,
-        move_data.dest_square,
-        move_data.promotion,
-        move_data.move_type,
-    );
+    let mv = Move::from(move_data);
 
     let mut match_state = session
         .app_state
@@ -107,7 +96,7 @@ pub async fn handle_client_player_move(
         match_state.match_result = get_match_result(session, &match_state);
 
         if match_state.match_result.is_some() {
-            finalize_match(session, &match_state).await?;
+            finalize_match(session).await?;
         } else {
             session
                 .app_state
