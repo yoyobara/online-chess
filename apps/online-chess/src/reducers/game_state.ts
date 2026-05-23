@@ -25,7 +25,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
           myColor: color,
           opponentColor: invertColor(color),
           opponentId: opponentId,
-          moveList: [], // FIX
+          moveList: action.initialMoves,
         },
       };
     }

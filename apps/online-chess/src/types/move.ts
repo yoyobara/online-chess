@@ -10,3 +10,10 @@ export type Move = {
   promotion: PieceType | null;
   moveType: MoveType;
 };
+
+export type MoveDTO = {
+  src_square: string;
+  dest_square: string;
+  promotion: PieceType | null;
+  move_type: MoveType;
+};

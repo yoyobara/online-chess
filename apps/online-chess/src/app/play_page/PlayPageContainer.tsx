@@ -3,8 +3,8 @@ import { useRealtime } from '../../contexts/realtime';
 import { PlayPage } from './PlayPage';
 import { PieceType } from '../../types/piece';
 import { Move } from '../../types/move';
-import { getSquareIndex, getSquareName } from '../../utils/square';
 import { gameStateReducer } from '../../reducers/game_state';
+import { MoveFromDTO, MoveToDTO } from '../../utils/move';
 
 export const PlayPageContainer: FC = () => {
   const { lastMessage, sendMessage } = useRealtime();
@@ -21,6 +21,7 @@ export const PlayPageContainer: FC = () => {
           initialState: lastMessage.data.initial_state,
           color: lastMessage.data.color,
           opponentId: lastMessage.data.opponent_id,
+          initialMoves: lastMessage.data.initial_moves.map(MoveFromDTO),
         });
         break;
       case 'MoveResult':
@@ -30,16 +31,11 @@ export const PlayPageContainer: FC = () => {
         });
         break;
       case 'PlayerMove': {
-        const [move, newState] = lastMessage.data;
+        const [moveDto, newState] = lastMessage.data;
 
         dispatch({
           type: 'BoardUpdate',
-          move: {
-            srcIndex: getSquareIndex(move.src_square),
-            destIndex: getSquareIndex(move.dest_square),
-            moveType: move.move_type,
-            promotion: move.promotion,
-          },
+          move: MoveFromDTO(moveDto),
           newState,
         });
         break;
@@ -76,10 +72,8 @@ export const PlayPageContainer: FC = () => {
       sendMessage({
         type: 'PlayerMove',
         data: {
-          src_square: getSquareName(gameState.optimisticMove.srcIndex),
-          dest_square: getSquareName(gameState.optimisticMove.destIndex),
+          ...MoveToDTO(gameState.optimisticMove),
           promotion: pieceType,
-          move_type: gameState.optimisticMove.moveType,
         },
       });
 

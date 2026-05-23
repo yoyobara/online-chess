@@ -37,6 +37,7 @@ export type GameStateAction =
       initialState: MatchState;
       color: PieceColor;
       opponentId: number;
+      initialMoves: Move[];
     }
   | { type: 'ServerMoveResult'; success: boolean }
   | { type: 'BoardUpdate'; move: Move; newState: MatchState }

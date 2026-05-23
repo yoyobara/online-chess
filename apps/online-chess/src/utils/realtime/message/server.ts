@@ -1,11 +1,12 @@
 import { MatchState } from '../../../types/match';
-import { Move, MoveType } from '../../../types/move';
-import { PieceColor, PieceType } from '../../../types/piece';
+import { MoveDTO } from '../../../types/move';
+import { PieceColor } from '../../../types/piece';
 
 type JoinResponse = {
   initial_state: MatchState;
   color: PieceColor;
   opponent_id: number;
+  initial_moves: MoveDTO[];
 };
 
 export type ServerMessage =
@@ -19,13 +20,5 @@ export type ServerMessage =
     }
   | {
       type: 'PlayerMove';
-      data: [
-        {
-          src_square: string;
-          dest_square: string;
-          promotion: PieceType | null;
-          move_type: MoveType;
-        },
-        MatchState
-      ];
+      data: [MoveDTO, MatchState];
     };
