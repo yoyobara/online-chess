@@ -9,14 +9,18 @@ interface MoveHistoryProps {
   className?: string;
 }
 
+const moveToText = (mv: Move): string => {
+  const src = getSquareName(mv.srcIndex);
+  const dest = getSquareName(mv.destIndex);
+
+  return `${src} ➔ ${dest}`;
+};
+
 export const MoveHistory: FC<MoveHistoryProps> = ({ moves, className }) => {
-  console.log(moves);
   return (
     <Paper className={`${styles.move_history} ${className}`}>
       {moves.map((mv) => (
-        <h1>{`${mv.moveType}: ${getSquareName(mv.srcIndex)} -> ${getSquareName(
-          mv.destIndex
-        )}${mv.promotion ? ' (' + mv.promotion + ')' : ''}`}</h1>
+        <div className={styles.move}>{moveToText(mv)}</div>
       ))}
     </Paper>
   );
