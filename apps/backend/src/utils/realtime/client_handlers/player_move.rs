@@ -110,7 +110,7 @@ pub async fn handle_client_player_move(
             .pubsub
             .publish(
                 &format!("match:{}", session.match_id),
-                &PubSubMessage::PlayerMove(match_state),
+                &PubSubMessage::PlayerMove(mv, match_state),
             )
             .await?;
     } else {

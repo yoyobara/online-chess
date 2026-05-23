@@ -70,9 +70,9 @@ impl RealtimeSession {
 
     async fn handle_pubsub_msg(&mut self, msg: PubSubMessage) -> anyhow::Result<()> {
         match msg {
-            PubSubMessage::PlayerMove(new_state) => {
+            PubSubMessage::PlayerMove(mv, new_state) => {
                 self.communicator
-                    .send(ServerMessage::NewState(new_state))
+                    .send(ServerMessage::PlayerMove(mv.into(), new_state))
                     .await
             }
             _ => Err(anyhow!("bad pubsub message")),

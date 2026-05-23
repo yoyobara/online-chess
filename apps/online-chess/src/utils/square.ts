@@ -14,3 +14,13 @@ export const getSquareColor = (index: number): SquareColor => {
 
   return (row + column) % 2 === 0 ? 'Dark' : 'Light';
 };
+
+export const getSquareIndex = (square: string): number => {
+  const file = square[0].toUpperCase();
+  const rank = Number(square[1]);
+
+  const column = 'ABCDEFGH'.indexOf(file);
+  const row = rank - 1;
+
+  return row * 8 + column;
+};

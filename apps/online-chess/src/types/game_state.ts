@@ -10,6 +10,7 @@ export type GameData = {
   myColor: PieceColor;
   opponentColor: PieceColor;
   opponentId: number;
+  moveList: Move[];
 };
 
 export type GameState =
@@ -38,7 +39,7 @@ export type GameStateAction =
       opponentId: number;
     }
   | { type: 'ServerMoveResult'; success: boolean }
-  | { type: 'BoardUpdate'; state: MatchState }
+  | { type: 'BoardUpdate'; move: Move; newState: MatchState }
   | { type: 'WaitingForMoveResponse'; move: Move }
   | { type: 'WaitingForPromotionChoice'; move: Move }
   | { type: 'PromotionModalClose' };

@@ -3,7 +3,7 @@ import { useRealtime } from '../../contexts/realtime';
 import { PlayPage } from './PlayPage';
 import { PieceType } from '../../types/piece';
 import { Move } from '../../types/move';
-import { getSquareName } from '../../utils/square';
+import { getSquareIndex, getSquareName } from '../../utils/square';
 import { gameStateReducer } from '../../reducers/game_state';
 
 export const PlayPageContainer: FC = () => {
@@ -29,12 +29,21 @@ export const PlayPageContainer: FC = () => {
           success: lastMessage.data,
         });
         break;
-      case 'NewState':
+      case 'PlayerMove': {
+        const [move, newState] = lastMessage.data;
+
         dispatch({
           type: 'BoardUpdate',
-          state: lastMessage.data,
+          move: {
+            srcIndex: getSquareIndex(move.src_square),
+            destIndex: getSquareIndex(move.dest_square),
+            moveType: move.move_type,
+            promotion: move.promotion,
+          },
+          newState,
         });
         break;
+      }
     }
   }, [lastMessage]);
 

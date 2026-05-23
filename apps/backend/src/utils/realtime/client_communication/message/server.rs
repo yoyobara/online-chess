@@ -1,11 +1,14 @@
 use serde::Serialize;
 
-use crate::models::r#match::{JoinResponse, MatchState};
+use crate::{
+    models::r#match::{JoinResponse, MatchState},
+    utils::realtime::client_communication::message::PlayerMoveData,
+};
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", content = "data")]
 pub enum ServerMessage {
     JoinResponse(JoinResponse),
     MoveResult(bool),
-    NewState(MatchState),
+    PlayerMove(PlayerMoveData, MatchState),
 }

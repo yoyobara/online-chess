@@ -3,9 +3,9 @@ use rust_chess::core::{
     piece::PieceType,
     square::Square,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct PlayerMoveData {
     pub src_square: Square,
     pub dest_square: Square,
@@ -18,6 +18,17 @@ impl From<PlayerMoveData> for Move {
         Self {
             from: value.src_square,
             to: value.dest_square,
+            move_type: value.move_type,
+            promotion: value.promotion,
+        }
+    }
+}
+
+impl From<Move> for PlayerMoveData {
+    fn from(value: Move) -> Self {
+        Self {
+            src_square: value.from,
+            dest_square: value.to,
             move_type: value.move_type,
             promotion: value.promotion,
         }

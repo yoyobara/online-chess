@@ -1,5 +1,6 @@
 import { MatchState } from '../../../types/match';
-import { PieceColor } from '../../../types/piece';
+import { Move, MoveType } from '../../../types/move';
+import { PieceColor, PieceType } from '../../../types/piece';
 
 type JoinResponse = {
   initial_state: MatchState;
@@ -17,6 +18,14 @@ export type ServerMessage =
       data: boolean;
     }
   | {
-      type: 'NewState';
-      data: MatchState;
+      type: 'PlayerMove';
+      data: [
+        {
+          src_square: string;
+          dest_square: string;
+          promotion: PieceType | null;
+          move_type: MoveType;
+        },
+        MatchState
+      ];
     };

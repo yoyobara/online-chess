@@ -1,3 +1,4 @@
+use rust_chess::core::chess_move::Move;
 use serde::{Deserialize, Serialize};
 
 use crate::models::r#match::MatchState;
@@ -5,5 +6,5 @@ use crate::models::r#match::MatchState;
 #[derive(Debug, Serialize, Deserialize)]
 pub enum PubSubMessage {
     MatchmakingMatchId(String),
-    PlayerMove(MatchState),
+    PlayerMove(Move, MatchState),
 }

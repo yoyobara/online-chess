@@ -25,6 +25,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
           myColor: color,
           opponentColor: invertColor(color),
           opponentId: opponentId,
+          moveList: [], // FIX
         },
       };
     }
@@ -39,7 +40,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
         return state;
       }
 
-      const { board, match_result, current_turn } = action.state;
+      const { board, match_result, current_turn } = action.newState;
 
       if (!match_result) {
         return {
@@ -49,6 +50,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
             currentBoard: board,
             serverBoard: board,
             currentTurn: current_turn,
+            moveList: [...state.game.moveList, action.move],
           },
         };
       } else {
@@ -58,6 +60,7 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
             ...state.game,
             currentBoard: board,
             serverBoard: board,
+            moveList: [...state.game.moveList, action.move],
           },
           result: match_result,
         };

@@ -11,6 +11,7 @@ import { PieceType } from '../../types/piece';
 import { determinePlayerStatus } from '../../utils/match';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { MoveHistory } from './move_history/MoveHistory';
 
 export interface PlayPageProps {
   gameState: GameState;
@@ -71,8 +72,8 @@ export const PlayPage: FC<PlayPageProps> = ({
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
         />
       </div>
-      {/* <Paper className={styles.chat}></Paper>
-      <Paper className={styles.history}></Paper> */}
+      {/* <Paper className={styles.chat}></Paper> */}
+      <MoveHistory moves={game.moveList} className={styles.history} />
       <PlayerPaper
         playerName={me.username}
         playerRating={me.rank}
