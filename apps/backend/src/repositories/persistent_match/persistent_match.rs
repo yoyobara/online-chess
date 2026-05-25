@@ -3,6 +3,7 @@ use crate::{
     repositories::persistent_match::error::PersistentMatchRepositoryResult,
 };
 use async_trait::async_trait;
+use rust_chess::core::chess_move::Move;
 use std::fmt::Debug;
 
 #[async_trait]
@@ -12,5 +13,6 @@ pub trait PersistentMatchRepository: Send + Sync + Debug {
         white_player_id: i32,
         black_player_id: i32,
         ending_state: &MatchState,
+        moves: Vec<Move>,
     ) -> PersistentMatchRepositoryResult<i32>;
 }

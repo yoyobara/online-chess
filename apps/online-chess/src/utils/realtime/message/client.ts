@@ -1,5 +1,4 @@
-import { MoveType } from '../../../types/move';
-import { PieceType } from '../../../types/piece';
+import { MoveDTO } from '../../../types/move';
 
 export type ClientMessage =
   | {
@@ -7,10 +6,5 @@ export type ClientMessage =
     }
   | {
       type: 'PlayerMove';
-      data: {
-        src_square: string;
-        dest_square: string;
-        promotion: PieceType | null;
-        move_type: MoveType;
-      };
+      data: MoveDTO;
     };

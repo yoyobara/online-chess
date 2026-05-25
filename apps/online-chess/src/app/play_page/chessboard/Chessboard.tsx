@@ -8,10 +8,7 @@ import { PieceColor } from '../../../types/piece';
 import { getSquareName } from '../../../utils/square';
 import { useRealtime } from '../../../contexts/realtime';
 import { Move } from '../../../types/move';
-import {
-  determineMoveType,
-  isOnPromotionRow,
-} from '../../../utils/board';
+import { determineMoveType, isOnPromotionRow } from '../../../utils/board';
 
 interface ChessBoardProps {
   board: Board;

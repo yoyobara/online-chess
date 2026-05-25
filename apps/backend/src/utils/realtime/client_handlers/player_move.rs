@@ -1,8 +1,5 @@
 use anyhow::Result;
-use rust_chess::{
-    board::EndgameState,
-    core::{chess_move::Move, color::Color},
-};
+use rust_chess::{board::EndgameState, core::chess_move::Move};
 
 use crate::{
     models::r#match::{MatchResult, MatchState},
@@ -16,13 +13,7 @@ use crate::{
 };
 
 fn allowed_to_move(session: &RealtimeSession, match_state: &MatchState, mv: Move) -> bool {
-    let your_turn = match_state.move_count % 2
-        == (if session.player_color == Color::White {
-            0
-        } else {
-            1
-        });
-
+    let your_turn = match_state.current_turn == session.player_color;
     let your_piece =
         match_state.board.get(mv.from).map(|p| p.piece_color) == Some(session.player_color);
 
@@ -46,32 +37,31 @@ fn get_match_result(session: &RealtimeSession, match_state: &MatchState) -> Opti
     })
 }
 
-async fn finalize_match(session: &mut RealtimeSession, match_state: &MatchState) -> Result<()> {
-    let (white_player_id, black_player_id) = match (session.player_color, session.opponent_color) {
-        (Color::White, Color::Black) => (session.player_id, session.opponent_id),
-        (Color::Black, Color::White) => (session.opponent_id, session.player_id),
-        _ => unreachable!(),
-    };
-
-    session
+async fn finalize_match(session: &mut RealtimeSession) -> Result<()> {
+    let (players, state, moves) = session
         .app_state
-        .persistent_match_repo
-        .create_match(session.player_id, session.opponent_id, &match_state)
+        .ephemeral_match_repo
+        .finalize_match(&session.match_id)
         .await?;
 
     session
         .app_state
-        .ephemeral_match_repo
-        .finalize_match(&session.match_id, white_player_id, black_player_id)
+        .persistent_match_repo
+        .create_match(
+            players.white_player_id,
+            players.black_player_id,
+            &state,
+            moves,
+        )
         .await?;
 
     session
         .app_state
         .user_repo
         .update_users_ranks_elo(
-            white_player_id,
-            black_player_id,
-            match_state.match_result.unwrap(),
+            players.white_player_id,
+            players.black_player_id,
+            state.match_result.unwrap(),
         )
         .await?;
 
@@ -82,12 +72,7 @@ pub async fn handle_client_player_move(
     session: &mut RealtimeSession,
     move_data: PlayerMoveData,
 ) -> Result<()> {
-    let mv = Move::new(
-        move_data.src_square,
-        move_data.dest_square,
-        move_data.promotion,
-        move_data.move_type,
-    );
+    let mv = Move::from(move_data);
 
     let mut match_state = session
         .app_state
@@ -97,30 +82,35 @@ pub async fn handle_client_player_move(
 
     if allowed_to_move(session, &match_state, mv) {
         match_state.board.apply_move(mv);
-        match_state.move_count += 1;
+        match_state.current_turn = !match_state.current_turn;
+        match_state.match_result = get_match_result(session, &match_state);
 
         session
             .communicator
             .send(ServerMessage::MoveResult(true))
             .await?;
 
-        match_state.match_result = get_match_result(session, &match_state);
+        session
+            .app_state
+            .ephemeral_match_repo
+            .update_match_state(&session.match_id, &match_state)
+            .await?;
+
+        session
+            .app_state
+            .ephemeral_match_repo
+            .push_move(&session.match_id, mv)
+            .await?;
 
         if match_state.match_result.is_some() {
-            finalize_match(session, &match_state).await?;
-        } else {
-            session
-                .app_state
-                .ephemeral_match_repo
-                .update_match_state(&session.match_id, &match_state)
-                .await?;
+            finalize_match(session).await?;
         }
 
         session
             .pubsub
             .publish(
                 &format!("match:{}", session.match_id),
-                &PubSubMessage::PlayerMove(match_state),
+                &PubSubMessage::PlayerMove(mv, match_state),
             )
             .await?;
     } else {

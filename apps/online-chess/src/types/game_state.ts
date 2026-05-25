@@ -6,10 +6,11 @@ import { PieceColor } from './piece';
 export type GameData = {
   currentBoard: Board;
   serverBoard: Board;
-  moveCount: number;
+  currentTurn: PieceColor;
   myColor: PieceColor;
   opponentColor: PieceColor;
   opponentId: number;
+  moveList: Move[];
 };
 
 export type GameState =
@@ -36,9 +37,10 @@ export type GameStateAction =
       initialState: MatchState;
       color: PieceColor;
       opponentId: number;
+      initialMoves: Move[];
     }
   | { type: 'ServerMoveResult'; success: boolean }
-  | { type: 'BoardUpdate'; state: MatchState }
+  | { type: 'BoardUpdate'; move: Move; newState: MatchState }
   | { type: 'WaitingForMoveResponse'; move: Move }
   | { type: 'WaitingForPromotionChoice'; move: Move }
   | { type: 'PromotionModalClose' };

@@ -2,7 +2,10 @@ use std::num::ParseIntError;
 
 use async_trait::async_trait;
 use redis::{aio::MultiplexedConnection, AsyncTypedCommands};
-use rust_chess::board::Board;
+use rust_chess::{
+    board::Board,
+    core::{chess_move::Move, color::Color},
+};
 
 use crate::{
     models::r#match::{MatchPlayers, MatchResult, MatchState},
@@ -52,15 +55,15 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
     ) -> EphemeralMatchRepositoryResult<String> {
         let match_id = new_uuid_v4();
 
-        let _: () = redis::pipe()
+        redis::pipe()
             .atomic()
             .hset_multiple(
                 format!("matches:{}", &match_id),
                 &[
                     ("white_player_id", white_player_id.to_string()),
                     ("black_player_id", black_player_id.to_string()),
+                    ("current_turn", serde_json::to_string(&Color::White)?),
                     ("game_board", serde_json::to_string(&starting_board)?),
-                    ("move_count", 0.to_string()),
                     (
                         "match_result",
                         serde_json::to_string::<Option<MatchResult>>(&None)?,
@@ -69,7 +72,7 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
             )
             .sadd(format!("player:{}:matches", white_player_id), &match_id)
             .sadd(format!("player:{}:matches", black_player_id), &match_id)
-            .query_async(&mut self.connection.clone())
+            .query_async::<()>(&mut self.connection.clone())
             .await?;
 
         Ok(match_id)
@@ -93,13 +96,13 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
             .clone()
             .hmget(
                 format!("matches:{}", match_id),
-                &["game_board", "move_count", "match_result"],
+                &["game_board", "current_turn", "match_result"],
             )
             .await?;
 
         Ok(MatchState {
             board: serde_json::from_str(&match_fields[0])?,
-            move_count: match_fields[1].parse()?,
+            current_turn: serde_json::from_str(&match_fields[1])?,
             match_result: serde_json::from_str(&match_fields[2])?,
         })
     }
@@ -115,16 +118,46 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
                 format!("matches:{}", match_id),
                 &[
                     ("game_board", serde_json::to_string(&new_state.board)?),
-                    ("move_count", new_state.move_count.to_string()),
                     (
                         "match_result",
                         serde_json::to_string::<Option<MatchResult>>(&new_state.match_result)?,
+                    ),
+                    (
+                        "current_turn",
+                        serde_json::to_string(&new_state.current_turn)?,
                     ),
                 ],
             )
             .await?;
 
         Ok(())
+    }
+
+    async fn push_move(&self, match_id: &str, mv: Move) -> EphemeralMatchRepositoryResult<()> {
+        self.connection
+            .clone()
+            .rpush(
+                format!("matches:{}:moves", match_id),
+                serde_json::to_string(&mv)?,
+            )
+            .await?;
+
+        Ok(())
+    }
+
+    async fn get_match_moves(&self, match_id: &str) -> EphemeralMatchRepositoryResult<Vec<Move>> {
+        let moves: Vec<String> = self
+            .connection
+            .clone()
+            .lrange(format!("matches:{}:moves", match_id), 0, -1)
+            .await?;
+
+        let deserialized = moves
+            .into_iter()
+            .map(|mv| serde_json::from_str::<Move>(&mv))
+            .collect::<Result<Vec<Move>, _>>()?;
+
+        Ok(deserialized)
     }
 
     async fn get_players(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchPlayers> {
@@ -146,16 +179,27 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
     async fn finalize_match(
         &self,
         match_id: &str,
-        white_player_id: i32,
-        black_player_id: i32,
-    ) -> EphemeralMatchRepositoryResult<()> {
+    ) -> EphemeralMatchRepositoryResult<(MatchPlayers, MatchState, Vec<Move>)> {
+        let players = self.get_players(match_id).await?;
+        let state = self.get_match_state(match_id).await?;
+        let moves = self.get_match_moves(match_id).await?;
+
         redis::pipe()
             .atomic()
             .del(format!("matches:{}", match_id))
-            .srem(format!("player:{}:matches", white_player_id), match_id)
-            .srem(format!("player:{}:matches", black_player_id), match_id);
+            .del(format!("matches:{}:moves", match_id))
+            .srem(
+                format!("player:{}:matches", players.white_player_id),
+                match_id,
+            )
+            .srem(
+                format!("player:{}:matches", players.black_player_id),
+                match_id,
+            )
+            .query_async::<()>(&mut self.connection.clone())
+            .await?;
 
-        Ok(())
+        Ok((players, state, moves))
     }
 }
 

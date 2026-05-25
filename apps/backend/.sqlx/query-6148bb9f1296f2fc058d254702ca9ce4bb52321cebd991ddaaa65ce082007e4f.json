@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO moves (match_id, move_order, from_square, to_square, move_type, promotion) VALUES ($1, $2, $3, $4, $5, $6);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        {
+          "Custom": {
+            "name": "move_type_enum",
+            "kind": {
+              "Enum": [
+                "quiet",
+                "capture",
+                "en_passant",
+                "queenside_castling",
+                "kingside_castling"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "piece_type_enum",
+            "kind": {
+              "Enum": [
+                "pawn",
+                "rook",
+                "knight",
+                "bishop",
+                "king",
+                "queen"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6148bb9f1296f2fc058d254702ca9ce4bb52321cebd991ddaaa65ce082007e4f"
+}

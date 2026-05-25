@@ -11,6 +11,7 @@ import { PieceType } from '../../types/piece';
 import { determinePlayerStatus } from '../../utils/match';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { MoveHistory } from './move_history/MoveHistory';
 
 export interface PlayPageProps {
   gameState: GameState;
@@ -35,12 +36,15 @@ export const PlayPage: FC<PlayPageProps> = ({
   const me = useRequiredAuth();
   const opponent = useUserData(game.opponentId);
 
-  const isMyTurn = game.moveCount % 2 === (game.myColor === 'White' ? 0 : 1);
+  const isMyTurn = game.currentTurn === game.myColor;
 
   useEffect(() => {
     if (gameState.type === 'Ended') {
       queryClient.invalidateQueries({
-        queryKey: ['auth_data', 'user', game.opponentId],
+        queryKey: ['auth_data'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['user', game.opponentId],
       });
 
       const backToLobbyTimeout = setTimeout(() => {
@@ -68,8 +72,8 @@ export const PlayPage: FC<PlayPageProps> = ({
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
         />
       </div>
-      {/* <Paper className={styles.chat}></Paper>
-      <Paper className={styles.history}></Paper> */}
+      {/* <Paper className={styles.chat}></Paper> */}
+      <MoveHistory moves={game.moveList} className={styles.history} />
       <PlayerPaper
         playerName={me.username}
         playerRating={me.rank}

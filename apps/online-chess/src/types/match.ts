@@ -5,6 +5,6 @@ export type MatchResult = { type: 'Draw' } | { type: 'Win'; data: PieceColor };
 
 export type MatchState = {
   board: Board;
-  move_count: number;
+  current_turn: PieceColor;
   match_result: MatchResult | null;
 };

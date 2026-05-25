@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH current AS (\n                SELECT id, rank\n                FROM users\n                WHERE id IN ($1, $2)\n                FOR UPDATE\n            )\n            UPDATE users u\n            SET rank = u.rank + 32 * (\n                CASE \n                    WHEN u.id = $1 AND $3 = 'white_win' THEN 1\n                    WHEN u.id = $2 AND $3 = 'black_win' THEN 1\n                    WHEN $3 = 'draw' THEN 0.5\n                    ELSE 0\n                END\n                -\n                (\n                    1.0 / (\n                        1 + POWER(10,\n                            (\n                                (SELECT c.rank FROM current c\n                                WHERE c.id = CASE \n                                    WHEN u.id = $1 THEN $2\n                                    ELSE $1\n                                END)\n                                - u.rank\n                            ) / 400.0\n                        )\n                    )\n                )\n            )\n            WHERE u.id IN ($1, $2);\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3116576879cd903cd4d5c38a3f6d0d9dc91d598cd62059f794e2272ebd23aa8f"
+}
