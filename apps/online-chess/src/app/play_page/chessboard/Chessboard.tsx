@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
 import styles from './Chessboard.module.scss';
-import { Square } from './square/Square';
+import { SquareComponent } from './square/SquareComponent';
 import { PieceComponent } from './piece_component/PieceComponent';
 import { Board } from '../../../types/board';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { PieceColor } from '../../../types/piece';
-import { getSquareName } from '../../../utils/square';
+import { Square } from '../../../types/square';
+import { getSquareIndex, getSquareName } from '../../../utils/square';
 import { useRealtime } from '../../../contexts/realtime';
 import { Move } from '../../../types/move';
 import { determineMoveType, isOnPromotionRow } from '../../../utils/board';
@@ -37,37 +38,35 @@ export const Chessboard: FC<ChessBoardProps> = ({
 
     if (movedPiece === 'Pawn' && isOnPromotionRow(destIndex, myColor)) {
       setWaitingForPromotionChoice({
-        srcIndex,
-        destIndex,
-        moveType,
+        from: getSquareName(srcIndex),
+        to: getSquareName(destIndex),
+        move_type: moveType,
         promotion: null,
       });
     } else {
+      const move: Move = {
+        from: getSquareName(srcIndex),
+        to: getSquareName(destIndex),
+        promotion: null,
+        move_type: moveType,
+      };
       sendMessage({
         type: 'PlayerMove',
-        data: {
-          src_square: getSquareName(srcIndex),
-          dest_square: getSquareName(destIndex),
-          promotion: null,
-          move_type: moveType,
-        },
+        data: move,
       });
-      setWaitingForMoveResponse({
-        srcIndex,
-        destIndex,
-        moveType,
-        promotion: null,
-      });
+      setWaitingForMoveResponse(move);
     }
   };
 
   const onDragEnd = (ev: DragEndEvent) => {
     if (!ev.over) return;
 
-    const destSquareNumber: number = ev.over.data.current?.squareNumber;
-    const srcSquareNumber: number = ev.active.data.current?.squareNumber;
+    const destSquareName: Square = ev.over.data.current?.name;
+    const srcSquareName: Square = ev.active.data.current?.squareName;
 
-    handleMove(srcSquareNumber, destSquareNumber);
+    if (destSquareName && srcSquareName) {
+      handleMove(getSquareIndex(srcSquareName), getSquareIndex(destSquareName));
+    }
   };
 
   return (
@@ -75,10 +74,13 @@ export const Chessboard: FC<ChessBoardProps> = ({
       <div className={styles.chessboard}>
         {board.state.map((piece, i) => (
           <React.Fragment key={i}>
-            <Square squareNumber={i} index={myColor === 'White' ? i : 63 - i} />
+            <SquareComponent
+              squareName={getSquareName(i)}
+              index={myColor === 'White' ? i : 63 - i}
+            />
             {piece ? (
               <PieceComponent
-                squareNumber={i}
+                squareName={getSquareName(i)}
                 index={myColor === 'White' ? i : 63 - i}
                 piece={piece}
                 disabled={disableDrag}

@@ -1,26 +1,25 @@
 import { FC } from 'react';
 import styles from './Square.module.scss';
 import { useDroppable } from '@dnd-kit/core';
-import { getSquareColor, getSquareName } from '../../../../utils/square';
+import { Square as SquareType } from '../../../../types/square';
+import { getSquareColor, getSquareIndex } from '../../../../utils/square';
 
-export interface SquareProps {
-  squareNumber: number;
+export interface SquareComponentProps {
+  squareName: SquareType;
   index: number;
 }
 
-export const Square: FC<SquareProps> = ({
-  squareNumber,
+export const SquareComponent: FC<SquareComponentProps> = ({
+  squareName,
   index,
-}: SquareProps) => {
-  const name = getSquareName(squareNumber);
-  const color = getSquareColor(squareNumber);
+}: SquareComponentProps) => {
+  const color = getSquareColor(getSquareIndex(squareName));
   const [row, column] = [Math.floor(index / 8), index % 8];
 
   const { setNodeRef } = useDroppable({
-    id: `square ${name}`,
+    id: `square ${squareName}`,
     data: {
-      name,
-      squareNumber,
+      name: squareName,
       color,
     },
   });

@@ -4,7 +4,6 @@ import { PlayPage } from './PlayPage';
 import { PieceType } from '../../types/piece';
 import { Move } from '../../types/move';
 import { gameStateReducer } from '../../reducers/game_state';
-import { MoveFromDTO, MoveToDTO } from '../../utils/move';
 
 export const PlayPageContainer: FC = () => {
   const { lastMessage, sendMessage } = useRealtime();
@@ -21,7 +20,7 @@ export const PlayPageContainer: FC = () => {
           initialState: lastMessage.data.initial_state,
           color: lastMessage.data.color,
           opponentId: lastMessage.data.opponent_id,
-          initialMoves: lastMessage.data.initial_moves.map(MoveFromDTO),
+          initialMoves: lastMessage.data.initial_moves,
         });
         break;
       case 'MoveResult':
@@ -31,11 +30,11 @@ export const PlayPageContainer: FC = () => {
         });
         break;
       case 'PlayerMove': {
-        const [moveDto, newState] = lastMessage.data;
+        const [move, newState] = lastMessage.data;
 
         dispatch({
           type: 'BoardUpdate',
-          move: MoveFromDTO(moveDto),
+          move,
           newState,
         });
         break;
@@ -72,7 +71,7 @@ export const PlayPageContainer: FC = () => {
       sendMessage({
         type: 'PlayerMove',
         data: {
-          ...MoveToDTO(gameState.optimisticMove),
+          ...gameState.optimisticMove,
           promotion: pieceType,
         },
       });
