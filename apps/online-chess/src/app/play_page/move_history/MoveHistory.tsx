@@ -14,10 +14,14 @@ const moveToText = (mv: Move): string => {
 
 export const MoveHistory: FC<MoveHistoryProps> = ({ moves, className }) => {
   return (
-    <Paper className={`${styles.move_history} ${className}`}>
-      {moves.map((mv) => (
-        <div className={styles.move}>{moveToText(mv)}</div>
-      ))}
+    <Paper className={`${styles.container} ${className}`}>
+      <div className={styles.title}>Moves</div>
+      <hr style={{ width: '100%' }} />
+      <div className={styles.scroller}>
+        {moves.map((mv) => (
+          <div className={styles.move}>{moveToText(mv)}</div>
+        ))}
+      </div>
     </Paper>
   );
 };

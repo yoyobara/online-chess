@@ -1,6 +1,18 @@
-.move_history {
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 3rem;
+    padding: 2% 5%;
+    text-align: center;
+}
+
+.scroller {
+    width: 100%;
     display: grid;
-    overflow-y: scroll;
+    overflow-x: hidden;
     grid-template-columns: repeat(2, 50%);
     align-content: start;
     gap: 2px;
