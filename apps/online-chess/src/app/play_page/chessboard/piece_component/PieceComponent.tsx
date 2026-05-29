@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Piece, PieceColor } from '../../../../types/piece';
+import { Square as SquareType } from '../../../../types/square';
 
 import styles from './PieceComponent.module.scss';
 import { getPieceSvg } from '../../../../utils/piece';
@@ -7,23 +8,23 @@ import { useDraggable } from '@dnd-kit/core';
 
 export interface PieceComponentProps {
   piece: Piece;
-  squareNumber: number;
+  squareName: SquareType;
   index: number;
   disabled: true | PieceColor;
 }
 
 export const PieceComponent: FC<PieceComponentProps> = ({
   piece,
-  squareNumber,
+  squareName,
   index,
   disabled,
 }: PieceComponentProps) => {
   const [row, column] = [Math.floor(index / 8), index % 8];
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: `piece ${squareNumber}`,
+    id: `piece ${squareName}`,
     data: {
-      squareNumber,
+      squareName,
     },
     disabled: disabled === true || disabled === piece.piece_color,
   });
