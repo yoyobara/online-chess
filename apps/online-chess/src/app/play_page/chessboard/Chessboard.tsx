@@ -38,15 +38,15 @@ export const Chessboard: FC<ChessBoardProps> = ({
 
     if (movedPiece === 'Pawn' && isOnPromotionRow(destIndex, myColor)) {
       setWaitingForPromotionChoice({
-        src_square: getSquareName(srcIndex),
-        dest_square: getSquareName(destIndex),
+        from: getSquareName(srcIndex),
+        to: getSquareName(destIndex),
         move_type: moveType,
         promotion: null,
       });
     } else {
       const move: Move = {
-        src_square: getSquareName(srcIndex),
-        dest_square: getSquareName(destIndex),
+        from: getSquareName(srcIndex),
+        to: getSquareName(destIndex),
         promotion: null,
         move_type: moveType,
       };

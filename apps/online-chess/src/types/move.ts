@@ -6,8 +6,8 @@ export type CastlingType = 'QueensideCastling' | 'KingsideCastling';
 export type MoveType = 'Quiet' | 'Capture' | 'EnPassant' | CastlingType;
 
 export type Move = {
-  src_square: Square;
-  dest_square: Square;
+  from: Square;
+  to: Square;
   promotion: PieceType | null;
   move_type: MoveType;
 };

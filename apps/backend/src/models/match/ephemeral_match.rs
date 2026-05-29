@@ -1,16 +1,14 @@
-use rust_chess::core::color::Color;
+use rust_chess::core::{chess_move::Move, color::Color};
 use serde::Serialize;
 
-use crate::{
-    models::r#match::MatchState, utils::realtime::client_communication::message::PlayerMoveData,
-};
+use crate::models::r#match::MatchState;
 
 #[derive(Serialize, Debug)]
 pub struct JoinResponse {
     pub initial_state: MatchState,
     pub color: Color,
     pub opponent_id: i32,
-    pub initial_moves: Vec<PlayerMoveData>,
+    pub initial_moves: Vec<Move>,
 }
 
 #[derive(Serialize, Debug)]

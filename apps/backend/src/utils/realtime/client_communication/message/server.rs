@@ -1,14 +1,12 @@
+use rust_chess::core::chess_move::Move;
 use serde::Serialize;
 
-use crate::{
-    models::r#match::{JoinResponse, MatchState},
-    utils::realtime::client_communication::message::PlayerMoveData,
-};
+use crate::models::r#match::{JoinResponse, MatchState};
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "type", content = "data")]
 pub enum ServerMessage {
     JoinResponse(JoinResponse),
     MoveResult(bool),
-    PlayerMove(PlayerMoveData, MatchState),
+    PlayerMove(Move, MatchState),
 }

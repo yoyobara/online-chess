@@ -9,7 +9,7 @@ interface MoveHistoryProps {
 }
 
 const moveToText = (mv: Move): string => {
-  return `${mv.src_square} ➔ ${mv.dest_square}`;
+  return `${mv.from} ➔ ${mv.to}`;
 };
 
 export const MoveHistory: FC<MoveHistoryProps> = ({ moves, className }) => {

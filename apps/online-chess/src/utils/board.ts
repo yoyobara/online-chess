@@ -77,10 +77,11 @@ export const getCastlingMove = (color: PieceColor, type: CastlingType) => {
 };
 
 export const applyMove = (board: Board, move: Move): Board => {
+  const { from, to, promotion, move_type } = move;
+
   const newBoard = _.cloneDeep(board);
-  const { src_square, dest_square, promotion, move_type } = move;
-  const srcIndex = getSquareIndex(src_square);
-  const destIndex = getSquareIndex(dest_square);
+  const srcIndex = getSquareIndex(from);
+  const destIndex = getSquareIndex(to);
 
   const piece = board.state[srcIndex]!;
 

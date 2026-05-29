@@ -5,10 +5,7 @@ use crate::{
     models::r#match::{MatchResult, MatchState},
     utils::{
         pubsub::message::PubSubMessage,
-        realtime::{
-            client_communication::message::{PlayerMoveData, ServerMessage},
-            RealtimeSession,
-        },
+        realtime::{client_communication::message::ServerMessage, RealtimeSession},
     },
 };
 
@@ -68,12 +65,7 @@ async fn finalize_match(session: &mut RealtimeSession) -> Result<()> {
     Ok(())
 }
 
-pub async fn handle_client_player_move(
-    session: &mut RealtimeSession,
-    move_data: PlayerMoveData,
-) -> Result<()> {
-    let mv = Move::from(move_data);
-
+pub async fn handle_client_player_move(session: &mut RealtimeSession, mv: Move) -> Result<()> {
     let mut match_state = session
         .app_state
         .ephemeral_match_repo
