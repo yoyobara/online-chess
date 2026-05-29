@@ -1,4 +1,4 @@
-import { MoveDTO } from '../../../types/move';
+import { Move } from '../../../types/move';
 
 export type ClientMessage =
   | {
@@ -6,5 +6,5 @@ export type ClientMessage =
     }
   | {
       type: 'PlayerMove';
-      data: MoveDTO;
+      data: Move;
     };

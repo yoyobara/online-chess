@@ -1,19 +1,13 @@
 import { PieceType } from './piece';
+import { Square } from './square';
 
 export type CastlingType = 'QueensideCastling' | 'KingsideCastling';
 
 export type MoveType = 'Quiet' | 'Capture' | 'EnPassant' | CastlingType;
 
 export type Move = {
-  srcIndex: number;
-  destIndex: number;
-  promotion: PieceType | null;
-  moveType: MoveType;
-};
-
-export type MoveDTO = {
-  src_square: string;
-  dest_square: string;
+  src_square: Square;
+  dest_square: Square;
   promotion: PieceType | null;
   move_type: MoveType;
 };
