@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { Board } from '../types/board';
 import { Move, CastlingType, MoveType } from '../types/move';
 import { Piece, PieceColor } from '../types/piece';
+import { getSquareIndex } from './square';
 
 export const getPieceByIndex = (
   board: Board,
@@ -77,7 +78,9 @@ export const getCastlingMove = (color: PieceColor, type: CastlingType) => {
 
 export const applyMove = (board: Board, move: Move): Board => {
   const newBoard = _.cloneDeep(board);
-  const { srcIndex, destIndex, promotion, moveType } = move;
+  const { src_square, dest_square, promotion, move_type } = move;
+  const srcIndex = getSquareIndex(src_square);
+  const destIndex = getSquareIndex(dest_square);
 
   const piece = board.state[srcIndex]!;
 
@@ -88,15 +91,15 @@ export const applyMove = (board: Board, move: Move): Board => {
     newBoard.state[destIndex]!.piece_type = promotion;
   }
 
-  if (moveType === 'KingsideCastling' || moveType === 'QueensideCastling') {
-    const castlingMove = getCastlingMove(piece.piece_color, moveType);
+  if (move_type === 'KingsideCastling' || move_type === 'QueensideCastling') {
+    const castlingMove = getCastlingMove(piece.piece_color, move_type);
 
     newBoard.state[castlingMove.rookDest] =
       newBoard.state[castlingMove.rookSrc];
     newBoard.state[castlingMove.rookSrc] = null;
   }
 
-  if (moveType === 'EnPassant') {
+  if (move_type === 'EnPassant') {
     const destFile = destIndex % 8;
     const srcRank = Math.floor(srcIndex / 8);
     const capturedPawnIndex = srcRank * 8 + destFile;
