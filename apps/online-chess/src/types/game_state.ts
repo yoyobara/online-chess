@@ -1,13 +1,8 @@
+import { ChatMessage } from './chat';
 import { Board } from './board';
 import { MatchResult, MatchState } from './match';
 import { Move } from './move';
 import { PieceColor } from './piece';
-
-export type ChatMessage = {
-  id: string;
-  authorId: number;
-  content: string;
-};
 
 export type GameData = {
   currentBoard: Board;

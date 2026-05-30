@@ -4,7 +4,7 @@ import { Input } from '../../../components/Input/Input';
 import { Button } from '../../../components/Button/Button';
 import styles from './Chat.module.scss';
 import { MessageBubble } from './message_bubble/MessageBubble';
-import { ChatMessage } from '../../../types/game_state';
+import { ChatMessage } from '../../../types/chat';
 
 export interface ChatProps {
   className?: string;

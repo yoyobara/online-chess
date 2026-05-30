@@ -16,7 +16,7 @@ use crate::{
                 message::{ClientMessage, ServerMessage},
                 ClientCommunicator,
             },
-            client_handlers::{handle_client_join, handle_client_player_move},
+            client_handlers::{handle_client_chat, handle_client_join, handle_client_player_move},
         },
     },
 };
@@ -75,6 +75,11 @@ impl RealtimeSession {
                     .send(ServerMessage::PlayerMove(mv.into(), new_state))
                     .await
             }
+            PubSubMessage::ChatMessage(chat_msg) => {
+                self.communicator
+                    .send(ServerMessage::ChatMessage(chat_msg))
+                    .await
+            }
             _ => Err(anyhow!("bad pubsub message")),
         }
     }
@@ -83,6 +88,7 @@ impl RealtimeSession {
         match msg {
             ClientMessage::JoinGame => handle_client_join(self).await,
             ClientMessage::PlayerMove(mv) => handle_client_player_move(self, mv).await,
+            ClientMessage::ChatMessage(content) => handle_client_chat(self, content).await,
         }
     }
 
