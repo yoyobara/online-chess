@@ -1,6 +1,7 @@
 import { MatchState } from '../../../types/match';
 import { Move } from '../../../types/move';
 import { PieceColor } from '../../../types/piece';
+import { ChatMessage } from '../../../types/game_state';
 
 type JoinResponse = {
   initial_state: MatchState;
@@ -21,4 +22,8 @@ export type ServerMessage =
   | {
       type: 'PlayerMove';
       data: [Move, MatchState];
+    }
+  | {
+      type: 'ChatMessage';
+      data: ChatMessage;
     };

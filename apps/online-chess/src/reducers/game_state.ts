@@ -26,8 +26,20 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
           opponentColor: invertColor(color),
           opponentId: opponentId,
           moveList: action.initialMoves,
+          messages: [],
         },
       };
+    }
+
+    case 'ChatMessage': {
+      if (!state) return state;
+      return {
+        ...state,
+        game: {
+          ...state.game,
+          messages: [...state.game.messages, action.message],
+        },
+      } as GameState;
     }
 
     case 'BoardUpdate': {

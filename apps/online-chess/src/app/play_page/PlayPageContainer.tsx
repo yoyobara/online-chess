@@ -39,8 +39,25 @@ export const PlayPageContainer: FC = () => {
         });
         break;
       }
+      case 'ChatMessage': {
+        dispatch({
+          type: 'ChatMessage',
+          message: lastMessage.data,
+        });
+        break;
+      }
     }
   }, [lastMessage]);
+
+  const onSendMessage = useCallback(
+    (content: string) => {
+      sendMessage({
+        type: 'ChatMessage',
+        data: content,
+      });
+    },
+    [sendMessage]
+  );
 
   const setWaitingForMoveResponse = useCallback((optimisticMove: Move) => {
     dispatch({
@@ -95,6 +112,7 @@ export const PlayPageContainer: FC = () => {
       setWaitingForPromotionChoice={setWaitingForPromotionChoice}
       onPromotionModalClose={onPromotionModalClose}
       onPromotionModalSelect={onPromotionModalSelect}
+      onSendMessage={onSendMessage}
     />
   );
 };

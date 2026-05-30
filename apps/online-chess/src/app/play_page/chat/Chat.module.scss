@@ -1,7 +1,51 @@
 .container {
-
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .scroller {
-    overflow-y: scroll;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 8px;
+
+  /* Custom Scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
+}
+
+.input_area {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.input {
+  flex: 1;
+  padding: 8px 12px !important; // Override default Input padding
+  font-size: 14px !important;
+}
+
+.send_button {
+  padding: 0 16px !important; // Override default Button padding
+  font-size: 14px !important;
+  height: auto;
 }

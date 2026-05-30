@@ -20,6 +20,7 @@ export interface PlayPageProps {
   setWaitingForPromotionChoice: (move: Move) => void;
   onPromotionModalClose: () => void;
   onPromotionModalSelect: (pieceType: PieceType) => void;
+  onSendMessage: (content: string) => void;
 }
 
 export const PlayPage: FC<PlayPageProps> = ({
@@ -28,6 +29,7 @@ export const PlayPage: FC<PlayPageProps> = ({
   setWaitingForPromotionChoice,
   onPromotionModalClose,
   onPromotionModalSelect,
+  onSendMessage,
 }) => {
   const { game } = gameState;
 
@@ -73,7 +75,12 @@ export const PlayPage: FC<PlayPageProps> = ({
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
         />
       </div>
-      <Chat className={styles.chat} />
+      <Chat
+        className={styles.chat}
+        messages={game.messages}
+        userId={me.id}
+        onSend={onSendMessage}
+      />
       <MoveHistory moves={game.moveList} className={styles.history} />
       <PlayerPaper
         playerName={me.username}

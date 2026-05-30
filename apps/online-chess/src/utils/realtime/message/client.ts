@@ -7,4 +7,8 @@ export type ClientMessage =
   | {
       type: 'PlayerMove';
       data: Move;
+    }
+  | {
+      type: 'ChatMessage';
+      data: string;
     };

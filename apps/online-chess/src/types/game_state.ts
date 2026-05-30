@@ -3,6 +3,12 @@ import { MatchResult, MatchState } from './match';
 import { Move } from './move';
 import { PieceColor } from './piece';
 
+export type ChatMessage = {
+  id: string;
+  authorId: number;
+  content: string;
+};
+
 export type GameData = {
   currentBoard: Board;
   serverBoard: Board;
@@ -11,6 +17,7 @@ export type GameData = {
   opponentColor: PieceColor;
   opponentId: number;
   moveList: Move[];
+  messages: ChatMessage[];
 };
 
 export type GameState =
@@ -43,4 +50,5 @@ export type GameStateAction =
   | { type: 'BoardUpdate'; move: Move; newState: MatchState }
   | { type: 'WaitingForMoveResponse'; move: Move }
   | { type: 'WaitingForPromotionChoice'; move: Move }
-  | { type: 'PromotionModalClose' };
+  | { type: 'PromotionModalClose' }
+  | { type: 'ChatMessage'; message: ChatMessage };
