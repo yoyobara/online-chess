@@ -8,6 +8,7 @@ type JoinResponse = {
   color: PieceColor;
   opponent_id: number;
   initial_moves: Move[];
+  initial_chat_messages: ChatMessage[];
 };
 
 export type ServerMessage =

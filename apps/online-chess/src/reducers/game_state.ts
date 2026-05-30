@@ -14,7 +14,13 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
         return state;
       }
 
-      const { initialState, color, opponentId } = action;
+      const {
+        initialState,
+        color,
+        opponentId,
+        initialMoves,
+        initialChatMessages,
+      } = action;
 
       return {
         type: 'Playing',
@@ -25,8 +31,8 @@ export const gameStateReducer: Reducer<GameState | null, GameStateAction> = (
           myColor: color,
           opponentColor: invertColor(color),
           opponentId: opponentId,
-          moveList: action.initialMoves,
-          messages: [],
+          moveList: initialMoves,
+          messages: initialChatMessages,
         },
       };
     }

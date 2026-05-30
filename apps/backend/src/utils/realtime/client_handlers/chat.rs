@@ -14,6 +14,12 @@ pub async fn handle_client_chat(
     };
 
     session
+        .app_state
+        .ephemeral_match_repo
+        .push_chat_message(&session.match_id, chat_msg.clone())
+        .await?;
+
+    session
         .pubsub
         .publish(
             &format!("match:{}", session.match_id),

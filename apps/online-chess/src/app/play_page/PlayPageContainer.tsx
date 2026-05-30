@@ -21,6 +21,7 @@ export const PlayPageContainer: FC = () => {
           color: lastMessage.data.color,
           opponentId: lastMessage.data.opponent_id,
           initialMoves: lastMessage.data.initial_moves,
+          initialChatMessages: lastMessage.data.initial_chat_messages,
         });
         break;
       case 'MoveResult':

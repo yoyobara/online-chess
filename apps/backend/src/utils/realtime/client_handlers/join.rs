@@ -16,13 +16,20 @@ pub async fn handle_client_join(session: &mut RealtimeSession) -> anyhow::Result
         .get_match_moves(&session.match_id)
         .await?;
 
+    let initial_chat_messages = session
+        .app_state
+        .ephemeral_match_repo
+        .get_match_chat_messages(&session.match_id)
+        .await?;
+
     session
         .communicator
         .send(ServerMessage::JoinResponse(JoinResponse {
             initial_state: match_state,
             color: session.player_color,
             opponent_id: session.opponent_id,
-            initial_moves: initial_moves.into_iter().map(Into::into).collect(),
+            initial_moves,
+            initial_chat_messages,
         }))
         .await
 }

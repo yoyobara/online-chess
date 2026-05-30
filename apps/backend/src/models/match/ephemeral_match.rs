@@ -1,7 +1,7 @@
 use rust_chess::core::{chess_move::Move, color::Color};
 use serde::Serialize;
 
-use crate::models::r#match::MatchState;
+use crate::models::{chat::ChatMessage, r#match::MatchState};
 
 #[derive(Serialize, Debug)]
 pub struct JoinResponse {
@@ -9,6 +9,7 @@ pub struct JoinResponse {
     pub color: Color,
     pub opponent_id: i32,
     pub initial_moves: Vec<Move>,
+    pub initial_chat_messages: Vec<ChatMessage>,
 }
 
 #[derive(Serialize, Debug)]

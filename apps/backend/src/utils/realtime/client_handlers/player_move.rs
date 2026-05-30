@@ -35,7 +35,7 @@ fn get_match_result(session: &RealtimeSession, match_state: &MatchState) -> Opti
 }
 
 async fn finalize_match(session: &mut RealtimeSession) -> Result<()> {
-    let (players, state, moves) = session
+    let (players, state, moves, chat) = session
         .app_state
         .ephemeral_match_repo
         .finalize_match(&session.match_id)
@@ -49,6 +49,7 @@ async fn finalize_match(session: &mut RealtimeSession) -> Result<()> {
             players.black_player_id,
             &state,
             moves,
+            chat,
         )
         .await?;
 
