@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 16px;
+  padding: 1rem;
   box-sizing: border-box;
 }
 
@@ -11,19 +11,20 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-right: 8px;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
 
   /* Custom Scrollbar */
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 0.375rem;
   }
   &::-webkit-scrollbar-track {
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
     background: #e5e7eb;
-    border-radius: 3px;
+    border-radius: 0.1875rem;
   }
   &::-webkit-scrollbar-thumb:hover {
     background: #d1d5db;
@@ -32,20 +33,20 @@
 
 .input_area {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
   border-top: 1px solid #f3f4f6;
 }
 
 .input {
   flex: 1;
-  padding: 8px 12px !important; // Override default Input padding
-  font-size: 14px !important;
+  padding: 0.5rem 0.75rem !important; // Override default Input padding
+  font-size: 1.125rem !important;
 }
 
 .send_button {
-  padding: 0 16px !important; // Override default Button padding
-  font-size: 14px !important;
+  padding: 0 1rem !important; // Override default Button padding
+  font-size: 1.125rem !important;
   height: auto;
 }

@@ -19,14 +19,16 @@ pub struct User {
 
 #[derive(Serialize, Debug)]
 pub struct UserData {
-    username: String,
-    email: String,
-    rank: i32,
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub rank: i32,
 }
 
 impl From<User> for UserData {
     fn from(value: User) -> Self {
         Self {
+            id: value.id,
             username: value.username,
             rank: value.rank,
             email: value.email,
