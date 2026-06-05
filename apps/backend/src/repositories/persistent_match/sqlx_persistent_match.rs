@@ -8,7 +8,10 @@ use rust_chess::core::{
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    models::r#match::{MatchResult, MatchState},
+    models::{
+        chat::ChatMessage,
+        r#match::{MatchResult, MatchState},
+    },
     repositories::persistent_match::{
         error::{PersistentMatchRepositoryError, PersistentMatchRepositoryResult},
         persistent_match::PersistentMatchRepository,
@@ -63,6 +66,7 @@ impl PersistentMatchRepository for SqlxPersistentMatchRepository {
         black_player_id: i32,
         ending_state: &MatchState,
         moves: Vec<Move>,
+        chat_messages: Vec<ChatMessage>,
     ) -> PersistentMatchRepositoryResult<i32> {
         let board_json = serde_json::to_string(&ending_state.board)?;
         let result: PersistentMatchResult = ending_state
@@ -94,6 +98,19 @@ impl PersistentMatchRepository for SqlxPersistentMatchRepository {
                 move_type as PersistentMoveType,
                 promotion as Option<PersistentPieceType>
             ).execute(&mut *tx).await?;
+        }
+
+        for msg in chat_messages {
+            let msg_uuid = uuid::Uuid::parse_str(&msg.id).map_err(|e| anyhow!(e))?;
+            sqlx::query!(
+                "INSERT INTO chat_messages (id, match_id, author_id, content) VALUES ($1, $2, $3, $4);",
+                msg_uuid,
+                match_id,
+                msg.author_id,
+                msg.content
+            )
+            .execute(&mut *tx)
+            .await?;
         }
 
         tx.commit().await?;

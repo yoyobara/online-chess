@@ -8,7 +8,7 @@ use rust_chess::{
 };
 
 use crate::{
-    models::r#match::{MatchPlayers, MatchResult, MatchState},
+    models::{chat::ChatMessage, r#match::{MatchPlayers, MatchResult, MatchState}},
     repositories::ephemeral_match::{
         EphemeralMatchRepository, EphemeralMatchRepositoryError, EphemeralMatchRepositoryResult,
     },
@@ -160,6 +160,40 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
         Ok(deserialized)
     }
 
+    async fn push_chat_message(
+        &self,
+        match_id: &str,
+        message: ChatMessage,
+    ) -> EphemeralMatchRepositoryResult<()> {
+        self.connection
+            .clone()
+            .rpush(
+                format!("matches:{}:chat", match_id),
+                serde_json::to_string(&message)?,
+            )
+            .await?;
+
+        Ok(())
+    }
+
+    async fn get_match_chat_messages(
+        &self,
+        match_id: &str,
+    ) -> EphemeralMatchRepositoryResult<Vec<ChatMessage>> {
+        let messages: Vec<String> = self
+            .connection
+            .clone()
+            .lrange(format!("matches:{}:chat", match_id), 0, -1)
+            .await?;
+
+        let deserialized = messages
+            .into_iter()
+            .map(|msg| serde_json::from_str::<ChatMessage>(&msg))
+            .collect::<Result<Vec<ChatMessage>, _>>()?;
+
+        Ok(deserialized)
+    }
+
     async fn get_players(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchPlayers> {
         let players = self
             .connection
@@ -179,15 +213,17 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
     async fn finalize_match(
         &self,
         match_id: &str,
-    ) -> EphemeralMatchRepositoryResult<(MatchPlayers, MatchState, Vec<Move>)> {
+    ) -> EphemeralMatchRepositoryResult<(MatchPlayers, MatchState, Vec<Move>, Vec<ChatMessage>)> {
         let players = self.get_players(match_id).await?;
         let state = self.get_match_state(match_id).await?;
         let moves = self.get_match_moves(match_id).await?;
+        let chat = self.get_match_chat_messages(match_id).await?;
 
         redis::pipe()
             .atomic()
             .del(format!("matches:{}", match_id))
             .del(format!("matches:{}:moves", match_id))
+            .del(format!("matches:{}:chat", match_id))
             .srem(
                 format!("player:{}:matches", players.white_player_id),
                 match_id,
@@ -199,7 +235,7 @@ impl EphemeralMatchRepository for RedisEphemeralMatchRepository {
             .query_async::<()>(&mut self.connection.clone())
             .await?;
 
-        Ok((players, state, moves))
+        Ok((players, state, moves, chat))
     }
 }
 

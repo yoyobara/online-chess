@@ -21,6 +21,7 @@ export const PlayPageContainer: FC = () => {
           color: lastMessage.data.color,
           opponentId: lastMessage.data.opponent_id,
           initialMoves: lastMessage.data.initial_moves,
+          initialChatMessages: lastMessage.data.initial_chat_messages,
         });
         break;
       case 'MoveResult':
@@ -39,8 +40,25 @@ export const PlayPageContainer: FC = () => {
         });
         break;
       }
+      case 'ChatMessage': {
+        dispatch({
+          type: 'ChatMessage',
+          message: lastMessage.data,
+        });
+        break;
+      }
     }
   }, [lastMessage]);
+
+  const onSendMessage = useCallback(
+    (content: string) => {
+      sendMessage({
+        type: 'ChatMessage',
+        data: content,
+      });
+    },
+    [sendMessage]
+  );
 
   const setWaitingForMoveResponse = useCallback((optimisticMove: Move) => {
     dispatch({
@@ -95,6 +113,7 @@ export const PlayPageContainer: FC = () => {
       setWaitingForPromotionChoice={setWaitingForPromotionChoice}
       onPromotionModalClose={onPromotionModalClose}
       onPromotionModalSelect={onPromotionModalSelect}
+      onSendMessage={onSendMessage}
     />
   );
 };

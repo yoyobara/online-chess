@@ -1,0 +1,23 @@
+.message_bubble {
+  max-width: 80%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  word-break: break-word;
+  position: relative;
+
+  &.own {
+    align-self: flex-end;
+    background-color: #3b82f6;
+    color: white;
+    border-bottom-right-radius: 0.125rem;
+  }
+
+  &.opponent {
+    align-self: flex-start;
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border-bottom-left-radius: 0.125rem;
+  }
+}

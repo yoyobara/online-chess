@@ -12,6 +12,7 @@ import { determinePlayerStatus } from '../../utils/match';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { MoveHistory } from './move_history/MoveHistory';
+import { Chat } from './chat/Chat';
 
 export interface PlayPageProps {
   gameState: GameState;
@@ -19,6 +20,7 @@ export interface PlayPageProps {
   setWaitingForPromotionChoice: (move: Move) => void;
   onPromotionModalClose: () => void;
   onPromotionModalSelect: (pieceType: PieceType) => void;
+  onSendMessage: (content: string) => void;
 }
 
 export const PlayPage: FC<PlayPageProps> = ({
@@ -27,6 +29,7 @@ export const PlayPage: FC<PlayPageProps> = ({
   setWaitingForPromotionChoice,
   onPromotionModalClose,
   onPromotionModalSelect,
+  onSendMessage,
 }) => {
   const { game } = gameState;
 
@@ -72,7 +75,12 @@ export const PlayPage: FC<PlayPageProps> = ({
           setWaitingForPromotionChoice={setWaitingForPromotionChoice}
         />
       </div>
-      {/* <Paper className={styles.chat}></Paper> */}
+      <Chat
+        className={styles.chat}
+        messages={game.messages}
+        userId={me.id}
+        onSend={onSendMessage}
+      />
       <MoveHistory moves={game.moveList} className={styles.history} />
       <PlayerPaper
         playerName={me.username}

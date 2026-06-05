@@ -1,3 +1,4 @@
+import { ChatMessage } from './chat';
 import { Board } from './board';
 import { MatchResult, MatchState } from './match';
 import { Move } from './move';
@@ -11,6 +12,7 @@ export type GameData = {
   opponentColor: PieceColor;
   opponentId: number;
   moveList: Move[];
+  messages: ChatMessage[];
 };
 
 export type GameState =
@@ -38,9 +40,11 @@ export type GameStateAction =
       color: PieceColor;
       opponentId: number;
       initialMoves: Move[];
+      initialChatMessages: ChatMessage[];
     }
   | { type: 'ServerMoveResult'; success: boolean }
   | { type: 'BoardUpdate'; move: Move; newState: MatchState }
   | { type: 'WaitingForMoveResponse'; move: Move }
   | { type: 'WaitingForPromotionChoice'; move: Move }
-  | { type: 'PromotionModalClose' };
+  | { type: 'PromotionModalClose' }
+  | { type: 'ChatMessage'; message: ChatMessage };

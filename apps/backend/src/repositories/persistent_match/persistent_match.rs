@@ -1,5 +1,5 @@
 use crate::{
-    models::r#match::MatchState,
+    models::{chat::ChatMessage, r#match::MatchState},
     repositories::persistent_match::error::PersistentMatchRepositoryResult,
 };
 use async_trait::async_trait;
@@ -14,5 +14,6 @@ pub trait PersistentMatchRepository: Send + Sync + Debug {
         black_player_id: i32,
         ending_state: &MatchState,
         moves: Vec<Move>,
+        chat_messages: Vec<ChatMessage>,
     ) -> PersistentMatchRepositoryResult<i32>;
 }

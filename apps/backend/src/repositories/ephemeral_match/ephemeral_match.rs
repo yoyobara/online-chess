@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use rust_chess::{board::Board, core::chess_move::Move};
 
 use crate::{
-    models::r#match::{MatchPlayers, MatchState},
+    models::{chat::ChatMessage, r#match::{MatchPlayers, MatchState}},
     repositories::ephemeral_match::error::EphemeralMatchRepositoryResult,
 };
 
@@ -38,10 +38,21 @@ pub trait EphemeralMatchRepository: Send + Sync + Debug {
 
     async fn get_match_moves(&self, match_id: &str) -> EphemeralMatchRepositoryResult<Vec<Move>>;
 
+    async fn push_chat_message(
+        &self,
+        match_id: &str,
+        message: ChatMessage,
+    ) -> EphemeralMatchRepositoryResult<()>;
+
+    async fn get_match_chat_messages(
+        &self,
+        match_id: &str,
+    ) -> EphemeralMatchRepositoryResult<Vec<ChatMessage>>;
+
     async fn get_players(&self, match_id: &str) -> EphemeralMatchRepositoryResult<MatchPlayers>;
 
     async fn finalize_match(
         &self,
         match_id: &str,
-    ) -> EphemeralMatchRepositoryResult<(MatchPlayers, MatchState, Vec<Move>)>;
+    ) -> EphemeralMatchRepositoryResult<(MatchPlayers, MatchState, Vec<Move>, Vec<ChatMessage>)>;
 }

@@ -6,4 +6,5 @@ use serde::Deserialize;
 pub enum ClientMessage {
     JoinGame,
     PlayerMove(Move),
+    ChatMessage(String),
 }
