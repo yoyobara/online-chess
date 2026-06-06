@@ -6,6 +6,7 @@ mod pubsub_handlers;
 use anyhow::anyhow;
 use rust_chess::core::color::Color;
 use tokio::select;
+use tracing::{error, info};
 
 use crate::{
     state::AppState,
@@ -22,18 +23,15 @@ use crate::{
 };
 
 pub struct RealtimeSession {
-    app_state: AppState,
-    communicator: Box<dyn ClientCommunicator>,
-    pubsub: Box<dyn PubSub>,
+    pub app_state: AppState,
+    pub communicator: Box<dyn ClientCommunicator>,
+    pub pubsub: Box<dyn PubSub>,
 
-    match_id: String,
+    pub match_id: String,
+    pub player_id: i32,
+    pub player_color: Color,
 
-    #[allow(dead_code)]
-    player_id: i32,
-    player_color: Color,
-
-    opponent_id: i32,
-    opponent_color: Color,
+    pub opponent_id: i32,
 }
 
 impl RealtimeSession {
@@ -50,10 +48,10 @@ impl RealtimeSession {
             .get_players(&match_id)
             .await?;
 
-        let (player_color, opponent_color, opponent_id) = if player_id == players.white_player_id {
-            (Color::White, Color::Black, players.black_player_id)
+        let (player_color, opponent_id) = if player_id == players.white_player_id {
+            (Color::White, players.black_player_id)
         } else {
-            (Color::Black, Color::White, players.white_player_id)
+            (Color::Black, players.white_player_id)
         };
 
         Ok(Self {
@@ -64,7 +62,6 @@ impl RealtimeSession {
             player_id,
             player_color,
             opponent_id,
-            opponent_color,
         })
     }
 
@@ -80,7 +77,10 @@ impl RealtimeSession {
                     .send(ServerMessage::ChatMessage(chat_msg))
                     .await
             }
-            _ => Err(anyhow!("bad pubsub message")),
+            _ => {
+                error!("Received unexpected pubsub message: {:?}", msg);
+                Err(anyhow!("bad pubsub message"))
+            }
         }
     }
 
@@ -98,16 +98,40 @@ impl RealtimeSession {
             .subscribe(&format!("match:{}", self.match_id))
             .await?;
 
+        info!(
+            "Starting realtime mainloop for player {} in match {}",
+            self.player_id, self.match_id
+        );
+
         loop {
             select! {
-                Some(pubsub_msg) = pubsub_reciever.recv() => self.handle_pubsub_msg(pubsub_msg?).await?,
-                Some(client_msg) = self.communicator.recv() => self.handle_client_msg(client_msg?).await?,
-                else => {
-                    break;
+                maybe_pubsub = pubsub_reciever.recv() => {
+                    match maybe_pubsub {
+                        Some(Ok(msg)) => self.handle_pubsub_msg(msg).await?,
+                        Some(Err(e)) => {
+                            error!("Pubsub receiver error: {}", e);
+                            break;
+                        }
+                        None => break,
+                    }
+                }
+                maybe_client = self.communicator.recv() => {
+                    match maybe_client {
+                        Some(Ok(msg)) => self.handle_client_msg(msg).await?,
+                        Some(Err(e)) => {
+                            error!("Client communicator error: {}", e);
+                            break;
+                        }
+                        None => break,
+                    }
                 }
             }
         }
 
+        info!(
+            "Realtime mainloop ended for player {} in match {}",
+            self.player_id, self.match_id
+        );
         Ok(())
     }
 }

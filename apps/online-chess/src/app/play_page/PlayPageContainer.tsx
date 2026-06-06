@@ -1,54 +1,47 @@
-import { FC, useCallback, useEffect, useReducer } from 'react';
-import { useRealtime } from '../../contexts/realtime';
+import { FC, useCallback, useReducer } from 'react';
+import { useRealtime, useRealtimeMessage } from '../../contexts/realtime';
 import { PlayPage } from './PlayPage';
 import { PieceType } from '../../types/piece';
 import { Move } from '../../types/move';
 import { gameStateReducer } from '../../reducers/game_state';
 
 export const PlayPageContainer: FC = () => {
-  const { lastMessage, sendMessage } = useRealtime();
-
+  const { sendMessage } = useRealtime();
   const [gameState, dispatch] = useReducer(gameStateReducer, null);
 
-  useEffect(() => {
-    if (!lastMessage) return;
+  useRealtimeMessage('JoinResponse', (data) => {
+    dispatch({
+      type: 'GameInit',
+      initialState: data.initial_state,
+      color: data.color,
+      opponentId: data.opponent_id,
+      initialMoves: data.initial_moves,
+      initialChatMessages: data.initial_chat_messages,
+    });
+  });
 
-    switch (lastMessage.type) {
-      case 'JoinResponse':
-        dispatch({
-          type: 'GameInit',
-          initialState: lastMessage.data.initial_state,
-          color: lastMessage.data.color,
-          opponentId: lastMessage.data.opponent_id,
-          initialMoves: lastMessage.data.initial_moves,
-          initialChatMessages: lastMessage.data.initial_chat_messages,
-        });
-        break;
-      case 'MoveResult':
-        dispatch({
-          type: 'ServerMoveResult',
-          success: lastMessage.data,
-        });
-        break;
-      case 'PlayerMove': {
-        const [move, newState] = lastMessage.data;
+  useRealtimeMessage('MoveResult', (data) => {
+    dispatch({
+      type: 'ServerMoveResult',
+      success: data,
+    });
+  });
 
-        dispatch({
-          type: 'BoardUpdate',
-          move,
-          newState,
-        });
-        break;
-      }
-      case 'ChatMessage': {
-        dispatch({
-          type: 'ChatMessage',
-          message: lastMessage.data,
-        });
-        break;
-      }
-    }
-  }, [lastMessage]);
+  useRealtimeMessage('PlayerMove', (data) => {
+    const [move, newState] = data;
+    dispatch({
+      type: 'BoardUpdate',
+      move,
+      newState,
+    });
+  });
+
+  useRealtimeMessage('ChatMessage', (data) => {
+    dispatch({
+      type: 'ChatMessage',
+      message: data,
+    });
+  });
 
   const onSendMessage = useCallback(
     (content: string) => {

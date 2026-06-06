@@ -9,6 +9,7 @@ use axum::{
     extract::{ws::WebSocket, Path, State, WebSocketUpgrade},
     response::Response,
 };
+use tracing::error;
 
 #[allow(unused_variables)]
 async fn handle_socket(
@@ -34,11 +35,13 @@ pub async fn realtime_handler(
         .is_player_in_match(player_id, &match_id)
         .await?;
 
-    in_match
-        .then_some(ws.on_upgrade(async move |socket| {
-            if let Err(e) = handle_socket(socket, player_id, match_id, app_state).await {
-                eprintln!("error in {}: {}", e.backtrace(), e);
-            }
-        }))
-        .ok_or(ApiError::UserNotInMatch)
+    if !in_match {
+        return Err(ApiError::UserNotInMatch);
+    }
+
+    Ok(ws.on_upgrade(async move |socket| {
+        if let Err(e) = handle_socket(socket, player_id, match_id, app_state).await {
+            error!(error = %e, "Error in websocket session");
+        }
+    }))
 }
